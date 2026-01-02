@@ -3,228 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus Helper</title>
+    <title>Nexus | Your Creative Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Quicksand:wght@500;700&display=swap');
-        
         :root { 
-            --accent: #4a90e2; 
-            --bg: #f8f9fa; 
-            --panel: #ffffff;
-            --text: #2d3436;
-            --border: #e1e4e8; 
+            --accent: #6c5ce7; /* Soft Premium Purple */
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         }
 
         body { 
-            margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; 
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+            margin: 0; padding: 0; min-height: 100vh;
+            background: var(--bg-gradient);
+            font-family: 'Inter', sans-serif;
+            display: flex; flex-direction: column; overflow: hidden;
+            color: #2d3436;
         }
 
-        /* ☁️ GENTLE FEEDBACK */
-        @keyframes gentle-pulse {
-            0% { box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1); }
-            50% { box-shadow: 0 8px 24px rgba(74, 144, 226, 0.3); }
-            100% { box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1); }
-        }
-        .thinking-active #imageFrame { animation: gentle-pulse 2s infinite ease-in-out; border-color: var(--accent); }
-
-        /* MODEST LAYOUT */
-        .top-nav { 
-            height: 60px; background: #fff; border-bottom: 1px solid var(--border); 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 20px; z-index: 100;
+        /* 🌫️ PREMIUM FROSTED TEXTURE */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+            border-radius: 24px;
         }
 
-        .studio-core { display: grid; grid-template-columns: 340px 1fr; flex: 1; overflow: hidden; }
+        /* 🔘 TACTILE 3D BUTTONS */
+        .btn-3d {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px #4834d4, 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-3d:hover { transform: translateY(-1px); box-shadow: 0 5px #4834d4, 0 10px 20px rgba(0,0,0,0.1); }
+        .btn-3d:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px #4834d4, 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* 📂 TABS */
+        .tab-bar {
+            display: flex; gap: 10px; margin-bottom: 20px;
+            background: rgba(0,0,0,0.03); padding: 5px; border-radius: 15px;
+        }
+
+        .tab-trigger {
+            flex: 1; padding: 10px; border-radius: 10px; border: none;
+            font-family: 'Quicksand'; font-size: 13px; cursor: pointer;
+            background: transparent; color: #636e72; transition: 0.3s;
+        }
+
+        .tab-trigger.active { background: #fff; color: var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* 🏠 LAYOUT */
+        header { padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-family: 'Quicksand'; font-size: 26px; font-weight: 700; color: var(--accent); }
+
+        .main-container {
+            display: grid; grid-template-columns: 380px 1fr;
+            gap: 30px; padding: 0 40px 40px 40px; flex: 1; overflow: hidden;
+        }
+
+        .workspace { padding: 30px; display: flex; flex-direction: column; overflow-y: auto; }
         
-        .sidebar { background: #fff; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .preview-pane {
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; background: rgba(255,255,255,0.3);
+            border-radius: 30px; position: relative;
+        }
+
+        #canvas {
+            width: 90%; max-width: 512px; aspect-ratio: 1/1;
+            background: #fff; border-radius: 20px; box-shadow: var(--shadow);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative; border: 8px solid #fff;
+        }
+
+        #outputImg { width: 100%; height: 100%; object-fit: contain; display: none; }
+
+        /* INPUT STYLES */
+        input, textarea, select {
+            width: 100%; padding: 15px; border-radius: 14px; border: 1px solid #ddd;
+            background: rgba(255,255,255,0.5); font-family: inherit; margin-top: 10px;
+            box-sizing: border-box;
+        }
+
+        .hidden { display: none; }
         
-        .tab-btn { 
-            flex: 1; background: transparent; border: none; color: #95a5a6; 
-            font-family: 'Quicksand', sans-serif; font-size: 14px; padding: 15px 0; 
-            cursor: pointer; transition: 0.3s; border-bottom: 2px solid transparent;
+        /* 🔒 MODERN LOGIN */
+        #gatekeeper {
+            position: fixed; inset: 0; background: var(--bg-gradient);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
         }
-        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
-
-        .tab-content { padding: 25px; display: none; overflow-y: auto; flex: 1; }
-        .tab-content.active { display: block; }
-
-        .preview-area { background: #f0f2f5; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
-        
-        #imageFrame { 
-            width: 100%; max-width: 512px; aspect-ratio: 1/1; 
-            border: 2px solid #fff; background: #fff; 
-            display: flex; align-items: center; justify-content: center; 
-            border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;
-            transition: 0.5s;
-        }
-        #mainImg { max-width: 100%; height: auto; border-radius: 8px; display: none; }
-
-        /* 🏠 FRIENDLY LOGIN */
-        #gatekeeper { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-card { text-align: center; width: 90%; max-width: 360px; }
-        .brand-main { font-family: 'Quicksand'; font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 5px; }
-        .brand-sub { font-size: 14px; color: #7f8c8d; margin-bottom: 30px; }
-        
-        .info-box { text-align: left; background: #f8f9fa; border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 25px; font-size: 13px; color: #636e72; line-height: 1.6; }
-
-        input, textarea, select { 
-            width: 100%; background: #fdfdfd; border: 1px solid var(--border); color: var(--text); 
-            padding: 12px; border-radius: 10px; font-size: 14px; margin-top: 8px; box-sizing: border-box;
-        }
-
-        .btn-gen { 
-            background: var(--accent); color: #fff; border: none; 
-            font-family: 'Quicksand'; font-weight: 700; padding: 14px; 
-            border-radius: 10px; cursor: pointer; transition: 0.2s; width: 100%;
-        }
-        .btn-gen:hover { opacity: 0.9; transform: scale(1.02); }
-
-        /* STATUS DOT */
-        .status-pill { font-size: 10px; background: #eee; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
-        .dot { width: 6px; height: 6px; border-radius: 50%; background: #2ecc71; }
     </style>
 </head>
 <body>
 
-    <audio id="bgAudio" loop src="ambient.wav"></audio>
-
     <div id="gatekeeper">
-        <div class="login-card">
-            <div class="brand-main">Nexus</div>
-            <div class="brand-sub">Your Creative Suite</div>
-            
-            <div class="info-box">
-                Hello! I'm here to help you turn your ideas into images. This suite is designed to be a simple, private space for your projects. 
-                <br><br>
-                ✨ <b>Create</b> with words<br>
-                ✨ <b>Refine</b> your style<br>
-                ✨ <b>Save</b> for later
-            </div>
-
-            <input type="password" id="passInput" placeholder="Enter your passkey..." style="text-align:center;">
-            <button class="btn-gen" style="margin-top:20px;" onclick="unlock()">Let's Start</button>
+        <div class="glass-panel" style="padding: 50px; text-align: center; width: 350px;">
+            <div class="brand" style="margin-bottom: 10px;">Nexus</div>
+            <p style="font-size: 14px; color: #636e72; margin-bottom: 30px;">Your friendly creative companion.</p>
+            <input type="password" id="passKey" placeholder="Passkey" style="text-align: center;">
+            <button class="btn-3d" style="width: 100%; margin-top: 20px;" onclick="unlock()">Enter Workspace</button>
         </div>
     </div>
 
-    <header class="top-nav">
-        <div style="font-family:Quicksand; font-weight:700; color:var(--accent); font-size:20px;">Nexus</div>
-        <div style="display:flex; gap:15px; align-items:center;">
-            <div class="status-pill"><div class="dot"></div> Ready</div>
-            <button onclick="toggleSettings()" style="background:none; border:none; cursor:pointer; font-size:18px; opacity:0.4;">⚙️</button>
+    <header>
+        <div class="brand">Nexus</div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <span style="font-size: 12px; color: #636e72;">● Systems Nominal</span>
+            <button onclick="config()" style="background:none; border:none; cursor:pointer; font-size:18px;">⚙️</button>
         </div>
     </header>
 
-    <main class="studio-core">
-        <div class="sidebar">
-            <div style="display:flex; border-bottom:1px solid var(--border);">
-                <button class="tab-btn active" id="btn-create" onclick="switchTab('create')">Create</button>
-                <button class="tab-btn" id="btn-collection" onclick="switchTab('collection')">Collection</button>
-                <button class="tab-btn" id="btn-about" onclick="switchTab('about')">About</button>
+    <main class="main-container">
+        <div class="glass-panel workspace">
+            <div class="tab-bar">
+                <button class="tab-trigger active" onclick="setTab('txt2img', this)">Text</button>
+                <button class="tab-trigger" onclick="setTab('img2img', this)">Vision</button>
+                <button class="tab-trigger" onclick="setTab('extras', this)">Upscale</button>
+                <button class="tab-trigger" onclick="setTab('interrogate', this)">Identify</button>
             </div>
+
+            <div id="txt2img" class="tab-content">
+                <label style="font-size: 13px; font-weight: 600; color: #636e72;">Describe your idea</label>
+                <textarea id="prompt" rows="5" placeholder="A beautiful sunset over a calm lake..."></textarea>
+            </div>
+
+            <div id="img2img" class="tab-content hidden">
+                <label style="font-size: 13px; font-weight: 600; color: #636e72;">Reference Image</label>
+                <input type="file" id="imgInput" accept="image/*">
+                <p style="font-size: 11px; color: #b2bec3;">I'll use this to guide the new creation.</p>
+            </div>
+
+            <div id="extras" class="tab-content hidden">
+                <label style="font-size: 13px; font-weight: 600; color: #636e72;">Enhance Quality</label>
+                <select id="upscaleFactor">
+                    <option value="2">2x Size (High Detail)</option>
+                    <option value="4">4x Size (Ultra HD)</option>
+                </select>
+                <p style="font-size: 11px; color: #b2bec3; margin-top: 10px;">Select an image from your collection to upscale.</p>
+            </div>
+
+            <button id="genBtn" class="btn-3d" style="margin-top: 30px;" onclick="handleAction()">Create Now</button>
             
-            <div id="tab-create" class="tab-content active">
-                <label style="font-weight:600; font-size:13px; color:#636e72;">What are we making today?</label>
-                <textarea id="promptIn" rows="4" placeholder="e.g., A cozy cabin in the woods..."></textarea>
-                <button class="btn-gen" style="margin-top:20px;" onclick="generate()">Create Image</button>
-            </div>
-
-            <div id="tab-collection" class="tab-content">
-                <div id="historyGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"></div>
-                <button onclick="selfDestruct()" style="width:100%; margin-top:20px; background:none; border:none; color:#d63031; font-size:11px; cursor:pointer;">[ Tidy up and logout ]</button>
-            </div>
-
-            <div id="tab-about" class="tab-content">
-                <div style="font-family:Quicksand; font-weight:700; margin-bottom:10px;">Hi, I'm Nexus.</div>
-                <p style="font-size:14px; color:#636e72; line-height:1.6;">
-                    I'm a personal AI assistant built to make image generation easy and accessible. Whether you're a designer or just exploring, I'm happy to help!
-                </p>
-                <p style="font-size:12px; color:#b2bec3;">Version 5.0 • Personal Edition</p>
-            </div>
+            <div id="status" style="margin-top: 20px; font-size: 12px; color: var(--accent); font-weight: 600;"></div>
         </div>
 
-        <div class="preview-area">
-            <div id="imageFrame">
-                <div id="waitText" style="color:#b2bec3; font-weight:500;">Ready when you are.</div>
-                <img id="mainImg">
+        <div class="preview-pane">
+            <div id="canvas">
+                <div id="placeholder" style="text-align: center; color: #b2bec3;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">✨</div>
+                    <div style="font-family: 'Quicksand';">Ready for your ideas.</div>
+                </div>
+                <img id="outputImg">
             </div>
-            <button id="dlBtn" class="btn-gen" style="display:none; margin-top:20px; width:180px; background:#fff; color:var(--accent); border:1px solid var(--accent);" onclick="download()">Save Image</button>
+            
+            <div style="margin-top: 20px; display: flex; gap: 15px;">
+                <button class="btn-3d" style="background: white; color: var(--accent); box-shadow: 0 4px #eee;" onclick="download()">Save Artwork</button>
+            </div>
         </div>
     </main>
 
     <script>
-        const MASTER_KEY = "NEXUS77";
-        let FORGE_URL = sessionStorage.getItem('nexus_url') || "";
-        let sessionHistory = [];
+        let currentTab = 'txt2img';
+        let api_url = sessionStorage.getItem('nexus_api') || "";
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-'+tab).classList.add('active');
-            document.getElementById('btn-'+tab).classList.add('active');
+        function setTab(tabId, el) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
         }
 
         function unlock() {
-            if(document.getElementById('passInput').value.toUpperCase() === MASTER_KEY) {
+            if(document.getElementById('passKey').value.toUpperCase() === "NEXUS77") {
                 document.getElementById('gatekeeper').style.display = 'none';
-                document.getElementById('bgAudio').volume = 0.05;
-                document.getElementById('bgAudio').play().catch(() => {});
             }
         }
 
-        async function generate() {
-            if(!FORGE_URL) return alert("Please set your link in settings ⚙️");
-            document.body.classList.add('thinking-active');
-            document.getElementById('waitText').innerText = "Working on it...";
+        function config() {
+            let u = prompt("Uplink URL (Gradio):", api_url);
+            if(u) { api_url = u; sessionStorage.setItem('nexus_api', u); }
+        }
+
+        async function handleAction() {
+            if(!api_url) return alert("Please set your link in settings ⚙️");
+            const status = document.getElementById('status');
+            status.innerText = "Thinking...";
             
+            let endpoint = "/sdapi/v1/txt2img";
+            let payload = { "prompt": document.getElementById('prompt').value, "steps": 20 };
+
+            if(currentTab === 'interrogate') endpoint = "/sdapi/v1/interrogate";
+            // Add other logic here as needed
+
             try {
-                const res = await fetch(`${FORGE_URL}/sdapi/v1/txt2img`, {
+                const res = await fetch(api_url + endpoint, {
                     method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({
-                        "prompt": document.getElementById('promptIn').value,
-                        "steps": 20
-                    })
+                    body: JSON.stringify(payload)
                 });
                 const data = await res.json();
                 const b64 = "data:image/png;base64," + data.images[0];
-                const img = document.getElementById('mainImg');
-                img.src = b64;
-                img.style.display = "block";
-                document.getElementById('waitText').style.display = "none";
-                document.getElementById('dlBtn').style.display = "block";
                 
-                sessionHistory.unshift(b64);
-                renderHistory();
-            } catch(e) { alert("Something went wrong with the connection."); }
-            document.body.classList.remove('thinking-active');
-        }
-
-        function renderHistory() {
-            const grid = document.getElementById('historyGrid');
-            grid.innerHTML = "";
-            sessionHistory.slice(0, 6).forEach(src => {
-                const div = document.createElement('div');
-                div.style = "border:1px solid #eee; aspect-ratio:1; border-radius:8px; background:url("+src+"); background-size:cover; cursor:pointer;";
-                div.onclick = () => { document.getElementById('mainImg').src = src; };
-                grid.appendChild(div);
-            });
-        }
-
-        function toggleSettings() {
-            let url = prompt("Link to Forge:", FORGE_URL);
-            if(url) { FORGE_URL = url; sessionStorage.setItem('nexus_url', url); }
+                document.getElementById('outputImg').src = b64;
+                document.getElementById('outputImg').style.display = 'block';
+                document.getElementById('placeholder').style.display = 'none';
+                status.innerText = "Complete.";
+            } catch(e) {
+                status.innerText = "Connection lost.";
+            }
         }
 
         function download() {
-            const a = document.createElement('a'); a.href = document.getElementById('mainImg').src;
-            a.download = "nexus-creation.png"; a.click();
-        }
-
-        function selfDestruct() {
-            if(confirm("Clear your current images and logout?")) {
-                sessionStorage.clear();
-                location.reload();
-            }
+            const a = document.createElement('a');
+            a.href = document.getElementById('outputImg').src;
+            a.download = "nexus_creation.png";
+            a.click();
         }
     </script>
 </body>
