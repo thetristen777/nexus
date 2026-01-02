@@ -8,221 +8,457 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
-    <title>NEXUS | T.K. Industries</title>
+    <title>NEXUS | T.K. INDUSTRIES v4.0</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600&display=swap');
-        :root { --accent: #00d2ff; --bg: #020204; --border: rgba(0, 210, 255, 0.2); }
         
+        :root { 
+            --accent: #00d2ff; 
+            --accent-dim: rgba(0, 210, 255, 0.1);
+            --bg: #020204; 
+            --panel: #08090d;
+            --border: rgba(0, 210, 255, 0.2); 
+            --text-muted: #666;
+        }
+        
+        /* CORE LAYOUT & CRT FX */
         body { 
             margin: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; 
             height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
-        
-        .top-nav { height: 60px; background: #000; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; }
-        
-        .studio-core { display: grid; grid-template-columns: 350px 1fr; flex: 1; overflow: hidden; }
-        
-        .sidebar { 
-            background: #08090d; border-right: 1px solid var(--border); padding: 20px; 
-            overflow-y: auto; display: flex; flex-direction: column;
-            padding-bottom: 100px; /* ⬅️ BREATHING ROOM FOR MOBILE */
-        }
-        
-        .preview-area { 
-            background: #000; position: relative; display: flex; align-items: center; 
-            justify-content: center; flex-direction: column; overflow-y: auto; padding: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .studio-core { grid-template-columns: 1fr; display: block; overflow-y: auto; }
-            .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+
+        /* CRT SCANLINE OVERLAY */
+        .crt-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 2px, 3px 100%;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
         }
 
-        .btn-gen { background: var(--accent); color: #000; border: none; font-family: 'Orbitron'; font-weight: 900; padding: 15px; cursor: pointer; width: 100%; margin: 10px 0; border-radius: 4px; }
-        .btn-opt { background: #111; border: 1px solid var(--border); color: #fff; padding: 10px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; border-radius: 2px; }
-        .btn-opt.active { border-color: var(--accent); color: var(--accent); background: rgba(0,210,255,0.1); }
+        .top-nav { 
+            height: 60px; background: #000; border-bottom: 1px solid var(--border); 
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; 
+        }
         
-        select, textarea, input { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; margin: 5px 0; box-sizing: border-box; border-radius: 4px; }
-        label { font-family: 'Orbitron'; font-size: 9px; color: var(--accent); margin-top: 15px; display: block; letter-spacing: 1px; }
+        .studio-core { 
+            display: grid; grid-template-columns: 380px 1fr; flex: 1; overflow: hidden; 
+        }
         
-        .security-log { position: absolute; bottom: 10px; left: 10px; width: 220px; font-family: 'Orbitron'; font-size: 7px; color: var(--accent); opacity: 0.7; pointer-events: none; }
+        /* SIDEBAR / CONTROLS */
+        .sidebar { 
+            background: var(--panel); border-right: 1px solid var(--border); 
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex; border-bottom: 1px solid var(--border); background: #000;
+        }
+
+        .tab-btn {
+            flex: 1; background: transparent; border: none; color: #555; 
+            font-family: 'Orbitron'; font-size: 10px; padding: 15px 0; cursor: pointer;
+            transition: 0.3s; border-bottom: 2px solid transparent;
+        }
+        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: var(--accent-dim); text-shadow: 0 0 5px var(--accent); }
+
+        .tab-content {
+            padding: 20px; overflow-y: auto; flex: 1;
+            /* BREATHING ROOM */
+            padding-bottom: 150px; 
+            display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s ease;
+        }
+        .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
+
+        /* PREVIEW AREA */
+        .preview-area { 
+            background: #000; position: relative; display: flex; align-items: center; 
+            justify-content: flex-start; flex-direction: column; overflow-y: auto; 
+            padding: 40px 20px 150px 20px; /* EXTRA BREATHING ROOM */
+        }
         
-        #mainImg { max-width: 100%; height: auto; border: 1px solid var(--border); display: none; margin-bottom: 20px; }
+        @media (max-width: 850px) {
+            .studio-core { grid-template-columns: 1fr; display: block; overflow-y: auto; }
+            .sidebar { border-right: none; height: auto; border-bottom: 1px solid var(--border); }
+            /* On mobile, sidebar scrolls within the page flow, so we restrict height or let it flow? 
+               Let's let it flow but keep tabs sticky */
+            .sidebar { max-height: 60vh; } 
+            .preview-area { min-height: 50vh; border-top: 1px solid var(--border); }
+        }
+
+        /* UI ELEMENTS */
+        .btn-gen { background: var(--accent); color: #000; border: none; font-family: 'Orbitron'; font-weight: 900; padding: 15px; cursor: pointer; width: 100%; margin: 15px 0; border-radius: 4px; box-shadow: 0 0 15px rgba(0,210,255,0.3); transition: 0.2s; }
+        .btn-gen:hover { box-shadow: 0 0 25px rgba(0,210,255,0.6); transform: scale(1.01); }
+        
+        .btn-opt { background: #111; border: 1px solid #333; color: #aaa; padding: 10px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; border-radius: 2px; transition:0.2s; }
+        .btn-opt:hover { border-color: var(--accent); color: #fff; }
+        .btn-opt.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+        
+        .magic-btn { background: linear-gradient(45deg, #111, #222); border: 1px dashed var(--accent); color: var(--accent); width: 100%; margin-top:5px; }
+
+        select, textarea, input[type="text"], input[type="password"] { 
+            width: 100%; background: #000; border: 1px solid #333; color: #fff; 
+            padding: 12px; margin: 5px 0; box-sizing: border-box; border-radius: 4px; font-family: 'Inter'; font-size: 12px;
+        }
+        select:focus, textarea:focus, input:focus { outline: none; border-color: var(--accent); }
+
+        label { font-family: 'Orbitron'; font-size: 9px; color: var(--accent); margin-top: 20px; display: block; letter-spacing: 1px; }
+        
+        /* IMAGE UPLOADER */
+        .drop-zone {
+            border: 2px dashed #333; padding: 30px; text-align: center; margin-bottom: 10px;
+            color: #555; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; transition: 0.3s;
+        }
+        .drop-zone.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+        #imgPreview { max-width: 100%; height: auto; display: none; border: 1px solid var(--accent); margin-top:10px; }
+
+        /* GALLERY GRID */
+        .history-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .history-item { border: 1px solid #333; aspect-ratio: 1; overflow: hidden; cursor: pointer; position:relative; }
+        .history-item img { width: 100%; height: 100%; object-fit: cover; transition:0.3s; }
+        .history-item:hover img { transform: scale(1.1); }
+        .history-item:hover { border-color: var(--accent); }
+
+        /* MAIN IMAGE */
+        #mainImg { max-width: 100%; height: auto; border: 1px solid var(--border); display: none; margin-bottom: 20px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+        #placeholder { font-family: 'Orbitron'; opacity: 0.2; letter-spacing: 5px; animation: pulse 2s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 0.1; } 50% { opacity: 0.3; } 100% { opacity: 0.1; } }
+
+        /* GATEKEEPER */
         #gatekeeper { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
         
-        footer { height: 40px; background: #000; border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; font-family: 'Orbitron'; font-size: 7px; color: var(--accent); flex-shrink: 0; }
+        footer { height: 40px; background: #000; border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; font-family: 'Orbitron'; font-size: 7px; color: var(--accent); flex-shrink: 0; position:relative; z-index: 50; }
     </style>
 </head>
 <body>
 
     <audio id="bgAudio" loop src="ambient.wav"></audio>
+    <div class="crt-overlay"></div>
 
     <div id="gatekeeper">
-        <div style="text-align: center; border: 1px solid var(--accent); padding: 40px; background: #050508; width: 80%; max-width: 300px;">
-            <div style="font-family:Orbitron; color:var(--accent); font-weight:900; margin-bottom:10px;">NEXUS SYSTEM</div>
-            <input type="password" id="passInput" style="text-align:center; font-family:Orbitron; font-size:20px; margin:20px 0;" placeholder="PASSKEY">
-            <button class="btn-gen" onclick="unlock()">AUTHORIZE ACCESS</button>
+        <div style="text-align: center; border: 1px solid var(--accent); padding: 40px; background: #050508; width: 80%; max-width: 300px; box-shadow: 0 0 50px rgba(0,210,255,0.1);">
+            <div style="font-family:Orbitron; color:var(--accent); font-weight:900; margin-bottom:10px; font-size: 18px;">NEXUS <span style="font-weight:100">OMEGA</span></div>
+            <div style="font-size: 9px; color: #555; margin-bottom: 20px;">V4.0 // SECURE TERMINAL</div>
+            <input type="password" id="passInput" style="text-align:center; font-family:Orbitron; font-size:16px; margin:20px 0;" placeholder="PASSKEY">
+            <button class="btn-gen" onclick="unlock()">INITIALIZE</button>
         </div>
     </div>
 
     <header class="top-nav">
-        <div style="font-family:Orbitron; color:var(--accent); font-weight:900; font-size:14px;">NEXUS <span style="font-size:8px; opacity:0.5;">V3.8</span></div>
-        <div style="display:flex; align-items:center; gap:10px;">
-            <div style="font-family:Orbitron; font-size:10px; color:var(--accent);">VOL: <span id="volLevel">2</span></div>
-            <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.10" oninput="updateVolume(this.value)" style="width:60px; accent-color:var(--accent);">
-            <button onclick="toggleSettings()" style="background:none; border:none; cursor:pointer;">⚙️</button>
+        <div style="font-family:Orbitron; color:var(--accent); font-weight:900; font-size:14px;">NEXUS <span style="font-size:8px; opacity:0.5;">V4.0</span></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div style="font-family:Orbitron; font-size:10px; color:var(--accent); display:none;" id="volControls">
+                VOL <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.10" oninput="updateVolume(this.value)" style="width:40px; accent-color:var(--accent); vertical-align:middle;">
+            </div>
+            <button onclick="toggleSettings()" style="background:none; border:none; cursor:pointer; font-size: 16px;">⚙️</button>
         </div>
     </header>
 
-    <div id="settingsBox" style="display:none; position:fixed; top:70px; right:20px; background:#0a0b10; border:1px solid var(--accent); padding:20px; z-index:5000; width:280px;">
-        <label>NEURAL UPLINK</label>
+    <div id="settingsBox" style="display:none; position:fixed; top:70px; right:20px; background:#0a0b10; border:1px solid var(--accent); padding:20px; z-index:5000; width:280px; box-shadow: 0 10px 40px #000;">
+        <label>NEURAL UPLINK (API)</label>
         <input type="text" id="urlInput">
-        <button class="btn-gen" onclick="saveURL()">SAVE CONFIG</button>
+        <button class="btn-gen" style="padding:10px; font-size:10px;" onclick="saveURL()">SAVE CONFIG</button>
     </div>
 
     <main class="studio-core">
+        
         <div class="sidebar">
-            <label>STEERING MODE</label>
-            <select id="stylePreset">
-                <option value="">RAW SYNTHESIS</option>
-                <option value=", highly detailed, 8k, photorealistic, cinematic lighting">PHOTOREAL</option>
-                <option value=", cyberpunk style, neon lights, intricate mechanical detail, synthwave">CYBERPUNK</option>
-                <option value=", ethereal, dreamlike, soft focus, masterwork, digital art">ETHEREAL</option>
-            </select>
-
-            <label>VISION PROMPT</label>
-            <textarea id="promptIn" rows="3" placeholder="Enter vision..."></textarea>
-            <button class="btn-opt" style="margin-top:5px; background:#1a1a1a; width:100%; border:1px dashed var(--accent);" onclick="randomPrompt()">🎲 SURPRISE ME</button>
-
-            <label>ASPECT RATIO</label>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <button class="btn-opt active" style="flex:1" onclick="setRatio(this, 512, 512)">1:1</button>
-                <button class="btn-opt" style="flex:1" onclick="setRatio(this, 512, 768)">2:3</button>
-                <button class="btn-opt" style="flex:1" onclick="setRatio(this, 768, 512)">3:2</button>
+            <div class="tab-header">
+                <button class="tab-btn active" onclick="switchTab('neural')">NEURAL (TXT)</button>
+                <button class="tab-btn" onclick="switchTab('visual')">VISUAL (IMG)</button>
+                <button class="tab-btn" onclick="switchTab('archive')">ARCHIVE</button>
             </div>
 
-            <label>NEURAL INTENSITY (CFG)</label>
-            <input type="range" id="cfgScale" min="1" max="20" value="7" style="accent-color:var(--accent);">
+            <div id="tab-neural" class="tab-content active">
+                <label>STEERING MODE</label>
+                <select id="stylePreset">
+                    <option value="">RAW SYNTHESIS</option>
+                    <option value=", highly detailed, 8k, photorealistic, cinematic lighting, masterpiece">PHOTOREAL</option>
+                    <option value=", cyberpunk style, neon lights, intricate mechanical detail, synthwave, dark atmosphere">CYBERPUNK</option>
+                    <option value=", ethereal, dreamlike, soft focus, masterwork, oil painting style">ETHEREAL</option>
+                    <option value=", anime style, studio ghibli, cel shaded, vibrant">ANIME</option>
+                </select>
 
-            <div style="display:flex; align-items:center; gap:10px; margin: 15px 0;">
-                <input type="checkbox" id="upscale" style="width:20px;">
-                <label style="margin:0;">HI-RES ENHANCE (2X)</label>
+                <label>VISION PROMPT</label>
+                <textarea id="promptIn" rows="3" placeholder="Input neural data..."></textarea>
+                <button class="btn-opt magic-btn" onclick="enhancePrompt()">✨ MAGIC ENHANCE</button>
+                <button class="btn-opt" style="margin-top:5px; width:100%; border-style:dashed;" onclick="randomPrompt()">🎲 RANDOMIZE</button>
+
+                <label>ASPECT RATIO</label>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn-opt active" style="flex:1" onclick="setRatio(this, 512, 512)">1:1</button>
+                    <button class="btn-opt" style="flex:1" onclick="setRatio(this, 512, 768)">2:3</button>
+                    <button class="btn-opt" style="flex:1" onclick="setRatio(this, 768, 512)">3:2</button>
+                </div>
+
+                <label>CFG SCALE (CREATIVITY vs ADHERENCE)</label>
+                <input type="range" id="cfgScale" min="1" max="20" value="7" style="accent-color:var(--accent);">
+
+                <div style="display:flex; align-items:center; gap:10px; margin: 15px 0;">
+                    <input type="checkbox" id="upscale" style="width:20px; accent-color:var(--accent);">
+                    <label style="margin:0; font-size:10px;">HI-RES FIX (2x UPSCALE)</label>
+                </div>
+
+                <button class="btn-gen" onclick="generate('txt2img')">INITIATE SYNTHESIS</button>
             </div>
 
-            <button class="btn-gen" onclick="generate()">EXECUTE SYNTHESIS</button>
-            
-            <div id="sidebarLog" style="font-size:7px; color:#444; font-family:Orbitron; line-height:1.5; margin-top:20px;"></div>
+            <div id="tab-visual" class="tab-content">
+                <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                    [CLICK TO UPLOAD SOURCE]<br>or Drag & Drop
+                </div>
+                <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
+                <img id="imgPreview">
+
+                <label>VISUAL PROMPT (GUIDANCE)</label>
+                <textarea id="promptInImg" rows="2" placeholder="Describe changes..."></textarea>
+
+                <label>TRANSFORMATION STRENGTH (DENOISING)</label>
+                <div style="display:flex; justify-content:space-between; font-size:9px; color:#555; font-family:'Orbitron'">
+                    <span>SUBTLE</span><span>RADICAL</span>
+                </div>
+                <input type="range" id="denoising" min="0.1" max="1.0" step="0.05" value="0.75" style="accent-color:var(--accent);">
+                
+                <button class="btn-gen" onclick="generate('img2img')">INITIATE REFINEMENT</button>
+            </div>
+
+            <div id="tab-archive" class="tab-content">
+                <div style="font-family:'Orbitron'; font-size:10px; color:#555; margin-bottom:10px;">SESSION CACHE (RAM ONLY)</div>
+                <div class="history-grid" id="historyGrid">
+                    </div>
+                <button class="btn-opt" style="width:100%; margin-top:20px;" onclick="clearHistory()">PURGE CACHE</button>
+            </div>
         </div>
 
         <div class="preview-area">
-            <div id="placeholder" style="font-family:Orbitron; opacity:0.1; letter-spacing:5px;">SYSTEM STANDBY</div>
+            <div id="placeholder">SYSTEM STANDBY</div>
             <img id="mainImg" src="">
-            <button id="dlBtn" class="btn-opt" style="display:none; margin: 20px 0 60px 0; width:220px; border: 1px solid var(--accent); background: rgba(0,210,255,0.05);" onclick="downloadImg()">💾 SAVE ARTIFACT</button>
-            <div id="secLog" class="security-log"></div>
+            
+            <div id="actionButtons" style="display:none; width:100%; max-width:512px; gap:10px; margin-top:20px;">
+                <button class="btn-opt" style="flex:1; border-color:var(--accent); color:var(--accent);" onclick="downloadImg()">💾 SAVE ARTIFACT</button>
+            </div>
+
+            <div id="consoleLog" style="width:100%; max-width:512px; margin-top:20px; font-family:'Orbitron'; font-size:8px; color:#444;"></div>
         </div>
     </main>
 
     <footer>
         <div>UPLINK: <span id="statusTag">OFFLINE</span></div>
-        <div style="opacity:0.5;">POWERED BY GEMINI | T.K. INDUSTRIES</div>
+        <div style="opacity:0.5;">POWERED BY GEMINI</div>
     </footer>
 
     <script>
+        // CONFIG
         const DEFAULT_UPLINK = "https://ca52b0ad1763dbfd61.gradio.live"; 
         const MASTER_KEY = "NEXUS77";
-
         let FORGE_URL = localStorage.getItem('nexus_url') || DEFAULT_UPLINK;
+        
+        // STATE
         let currentW = 512, currentH = 512;
+        let uploadedBase64 = null;
+        let sessionHistory = [];
 
-        const randomIdeas = [
-            "A futuristic city built inside a giant glass dome on Mars",
-            "A robotic knight kneeling in a garden of glowing flowers",
-            "A portrait of a person with liquid gold skin and neon eyes",
-            "A massive space station shaped like a DNA strand",
-            "A cyberpunk street market in the rain at night",
-            "A floating island with waterfalls falling into the clouds"
-        ];
-
-        function randomPrompt() {
-            const idea = randomIdeas[Math.floor(Math.random() * randomIdeas.length)];
-            document.getElementById('promptIn').value = idea;
-        }
-
-        function addLog(msg) {
-            const entry = document.createElement('div');
-            entry.innerText = `> ${new Date().toLocaleTimeString()}: ${msg}`;
-            document.getElementById('secLog').prepend(entry);
-        }
+        // --- CORE FUNCTIONS ---
 
         function unlock() {
             if(document.getElementById('passInput').value.toUpperCase() === MASTER_KEY) {
                 document.getElementById('gatekeeper').style.display = 'none';
+                document.getElementById('volControls').style.display = 'block';
                 const audio = document.getElementById('bgAudio');
                 audio.volume = 0.10; 
-                audio.play().catch(e => console.log("User must interact"));
-                addLog("ACCESS GRANTED - UPLINK STABLE");
+                audio.play().catch(e => console.log("Audio requires interaction"));
+                log("SYSTEM ONLINE. WELCOME, OPERATOR.");
                 document.getElementById('statusTag').innerText = "STABLE";
                 document.getElementById('statusTag').style.color = "#00ff88";
             }
         }
 
-        function updateVolume(v) { 
-            const audio = document.getElementById('bgAudio');
-            audio.volume = v; 
-            document.getElementById('volLevel').innerText = Math.round(v*20); 
+        function switchTab(tabName) {
+            // UI Update
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Find specific button (rough match)
+            const btns = document.querySelectorAll('.tab-btn');
+            if(tabName === 'neural') btns[0].classList.add('active');
+            if(tabName === 'visual') btns[1].classList.add('active');
+            if(tabName === 'archive') btns[2].classList.add('active');
+
+            // Show Content
+            document.getElementById(`tab-${tabName}`).classList.add('active');
         }
 
+        function log(msg) {
+            const entry = document.createElement('div');
+            entry.innerText = `> ${new Date().toLocaleTimeString().split(' ')[0]}: ${msg}`;
+            const logBox = document.getElementById('consoleLog');
+            logBox.prepend(entry);
+            if(logBox.children.length > 5) logBox.lastChild.remove();
+        }
+
+        // --- TXT2IMG LOGIC ---
+
+        function enhancePrompt() {
+            const input = document.getElementById('promptIn');
+            const enhancers = ["masterpiece", "best quality", "ultra detailed", "8k", "dynamic lighting", "trending on artstation"];
+            let current = input.value.trim();
+            if(!current) current = "Abstract cybernetic structure";
+            input.value = current + ", " + enhancers.join(", ");
+            log("PROMPT ENHANCED");
+        }
+
+        function randomPrompt() {
+            const ideas = [
+                "A futuristic city inside a glass dome on Mars", 
+                "Robotic samurai in a neon rain", 
+                "Crystalline entity floating in space", 
+                "Cyberpunk street food vendor at night"
+            ];
+            document.getElementById('promptIn').value = ideas[Math.floor(Math.random()*ideas.length)];
+        }
+
+        function setRatio(btn, w, h) {
+            document.querySelectorAll('#tab-neural .btn-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentW = w; currentH = h;
+        }
+
+        // --- IMG2IMG LOGIC ---
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    uploadedBase64 = e.target.result.split(',')[1]; // Remove header
+                    const img = document.getElementById('imgPreview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('dropZone').classList.add('active');
+                    document.getElementById('dropZone').innerText = "IMAGE LOADED";
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- GENERATION ENGINE ---
+
+        async function generate(mode) {
+            log(`INITIALIZING ${mode.toUpperCase()}...`);
+            document.getElementById('placeholder').innerText = "PROCESSING // PLEASE WAIT";
+            document.getElementById('placeholder').style.display = "block";
+            document.getElementById('mainImg').style.display = "none";
+            
+            let payload = {};
+            let endpoint = "";
+
+            if (mode === 'txt2img') {
+                endpoint = "/sdapi/v1/txt2img";
+                payload = {
+                    "prompt": document.getElementById('promptIn').value + document.getElementById('stylePreset').value,
+                    "steps": 20, "width": currentW, "height": currentH,
+                    "cfg_scale": document.getElementById('cfgScale').value,
+                    "enable_hr": document.getElementById('upscale').checked,
+                    "hr_scale": 2, "hr_upscaler": "R-ESRGAN 4x+"
+                };
+            } else if (mode === 'img2img') {
+                if(!uploadedBase64) { alert("UPLOAD SOURCE IMAGE FIRST"); return; }
+                endpoint = "/sdapi/v1/img2img";
+                payload = {
+                    "init_images": [uploadedBase64],
+                    "prompt": document.getElementById('promptInImg').value + document.getElementById('stylePreset').value,
+                    "steps": 20, 
+                    "denoising_strength": document.getElementById('denoising').value
+                };
+            }
+
+            try {
+                const res = await fetch(`${FORGE_URL}${endpoint}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                
+                // DISPLAY RESULT
+                const finalImgB64 = "data:image/png;base64," + data.images[0];
+                const img = document.getElementById('mainImg');
+                img.src = finalImgB64;
+                img.style.display = "block";
+                document.getElementById('placeholder').style.display = "none";
+                document.getElementById('actionButtons').style.display = "flex";
+                
+                // SAVE TO HISTORY
+                addToHistory(finalImgB64);
+                
+                // SCROLL TO RESULT
+                img.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                log("SYNTHESIS COMPLETE");
+
+            } catch(e) { 
+                log("ERROR: CHECK CONNECTION"); 
+                console.error(e);
+            }
+        }
+
+        // --- HISTORY & UTILS ---
+
+        function addToHistory(b64) {
+            sessionHistory.unshift(b64);
+            if(sessionHistory.length > 6) sessionHistory.pop();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const grid = document.getElementById('historyGrid');
+            grid.innerHTML = "";
+            sessionHistory.forEach((src) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `<img src="${src}">`;
+                div.onclick = () => {
+                    document.getElementById('mainImg').src = src;
+                    document.getElementById('mainImg').style.display = 'block';
+                    document.getElementById('placeholder').style.display = 'none';
+                    document.getElementById('actionButtons').style.display = 'flex';
+                    document.getElementById('mainImg').scrollIntoView({ behavior: 'smooth' });
+                };
+                grid.appendChild(div);
+            });
+        }
+
+        function clearHistory() {
+            sessionHistory = [];
+            renderHistory();
+        }
+
+        function downloadImg() {
+            const a = document.createElement('a'); 
+            a.href = document.getElementById('mainImg').src;
+            a.download = `nexus_omega_${Date.now()}.png`; 
+            a.click();
+        }
+
+        function updateVolume(v) { document.getElementById('bgAudio').volume = v; }
+        
         function toggleSettings() { 
             const s = document.getElementById('settingsBox'); 
             s.style.display = s.style.display === 'none' ? 'block' : 'none'; 
             document.getElementById('urlInput').value = FORGE_URL;
         }
-
+        
         function saveURL() { 
             FORGE_URL = document.getElementById('urlInput').value; 
             localStorage.setItem('nexus_url', FORGE_URL); 
             toggleSettings(); 
         }
 
-        function setRatio(btn, w, h) {
-            document.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active'); currentW = w; currentH = h;
-        }
+        // DRAG & DROP
+        const dz = document.getElementById('dropZone');
+        dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('active'); });
+        dz.addEventListener('dragleave', () => dz.classList.remove('active'));
+        dz.addEventListener('drop', (e) => {
+            e.preventDefault(); dz.classList.remove('active');
+            handleFileSelect({ files: e.dataTransfer.files });
+        });
 
-        async function generate() {
-            addLog("SYNTHESIZING...");
-            document.getElementById('placeholder').innerText = "PROCESSING...";
-            
-            const payload = {
-                "prompt": document.getElementById('promptIn').value + document.getElementById('stylePreset').value,
-                "steps": 20, "width": currentW, "height": currentH,
-                "cfg_scale": document.getElementById('cfgScale').value,
-                "enable_hr": document.getElementById('upscale').checked,
-                "hr_scale": 2, "hr_upscaler": "R-ESRGAN 4x+"
-            };
-
-            try {
-                const res = await fetch(`${FORGE_URL}/sdapi/v1/txt2img`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                const img = document.getElementById('mainImg');
-                img.src = "data:image/png;base64," + data.images[0];
-                img.style.display = "block";
-                document.getElementById('placeholder').style.display = "none";
-                document.getElementById('dlBtn').style.display = "block";
-                addLog("SUCCESS");
-                
-                // Scroll the button into view automatically
-                document.getElementById('dlBtn').scrollIntoView({ behavior: 'smooth' });
-            } catch(e) { addLog("TIMEOUT - CHECK GRADIO LINK"); }
-        }
-
-        function downloadImg() {
-            const a = document.createElement('a'); a.href = document.getElementById('mainImg').src;
-            a.download = `nexus_${Date.now()}.png`; a.click();
-        }
     </script>
 </body>
 </html>
