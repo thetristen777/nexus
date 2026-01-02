@@ -3,11 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus | Creative Suite</title>
+    <title>Nexus | Apex Terminal v5.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
-        :root { --accent: #5d5fef; --text-main: #2d3436; --text-sub: #636e72; --white: #ffffff; }
+        :root { 
+            --accent: #5d5fef; 
+            --accent-glow: rgba(93, 95, 239, 0.4);
+            --text-main: #2d3436; 
+            --text-sub: #636e72; 
+            --white: #ffffff; 
+            --panel-bg: rgba(255, 255, 255, 0.7);
+        }
 
         body { 
             margin: 0; padding: 0; height: 100vh;
@@ -16,204 +23,300 @@
             font-family: 'Inter', sans-serif; display: flex; overflow: hidden; color: var(--text-main);
         }
 
+        /* SIDEBAR ARCHITECTURE */
         .sidebar {
-            width: 380px; background: linear-gradient(145deg, #e6e9ef 0%, #d1d5db 100%);
+            width: 400px; background: linear-gradient(145deg, #e6e9ef 0%, #d1d5db 100%);
             border-right: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column;
             position: relative; box-shadow: inset -5px 0 15px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
         }
 
-        .btn-premium {
-            font-family: 'Quicksand'; font-weight: 700; padding: 12px; border: none; border-radius: 12px;
-            cursor: pointer; transition: 0.1s; background: var(--accent); color: white;
-            box-shadow: 0 4px 0px #3f41b5; font-size: 11px; letter-spacing: 1px;
-        }
-        .btn-premium:active { transform: translateY(3px); box-shadow: 0 1px 0px #3f41b5; }
-
-        .music-player {
-            margin: 20px; padding: 18px; border-radius: 20px;
-            background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.5);
-            backdrop-filter: blur(5px);
-        }
-        .audio-controls { display: flex; align-items: center; gap: 15px; }
-        .vol-slider { width: 100%; accent-color: var(--accent); height: 4px; cursor: pointer; margin-top: 10px; }
-
-        .tab-nav { display: flex; padding: 10px 20px; gap: 8px; }
+        /* TAB SYSTEM */
+        .tab-nav { display: flex; padding: 10px; gap: 4px; background: rgba(0,0,0,0.03); }
         .tab-trigger {
-            flex: 1; padding: 10px; border-radius: 10px; border: none; font-family: 'Quicksand';
-            font-weight: 700; font-size: 10px; background: rgba(0,0,0,0.05); cursor: pointer; color: var(--text-sub);
+            flex: 1; padding: 12px 5px; border-radius: 8px; border: none; font-family: 'Quicksand';
+            font-weight: 700; font-size: 9px; background: transparent; cursor: pointer; color: var(--text-sub);
+            transition: 0.2s; letter-spacing: 0.5px;
         }
         .tab-trigger.active { background: white; color: var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        .image-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        .canvas-frame {
-            width: 85%; max-width: 500px; aspect-ratio: 1/1; background: white; border-radius: 30px;
-            padding: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 1px solid #fff;
+        .tab-content { 
+            display: none; padding: 20px 25px; overflow-y: auto; flex: 1; 
+            padding-bottom: 120px; /* EXTRA BREATHING ROOM */
         }
-        #outputImg { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-        textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; background: rgba(255,255,255,0.6); margin-top: 10px; font-family: inherit; resize: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* BUTTONS */
+        .btn-premium {
+            font-family: 'Quicksand'; font-weight: 700; padding: 14px; border: none; border-radius: 12px;
+            cursor: pointer; transition: 0.1s; background: var(--accent); color: white;
+            box-shadow: 0 4px 0px #3f41b5; font-size: 11px; letter-spacing: 1px; width: 100%; margin-top: 10px;
+        }
+        .btn-premium:active { transform: translateY(3px); box-shadow: 0 1px 0px #3f41b5; }
+        .btn-secondary { background: #fff; color: var(--accent); border: 1px solid var(--accent); box-shadow: 0 4px 0px #ddd; }
         
-        #gatekeeper { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        /* INPUTS */
+        label { font-size: 10px; font-weight: 800; color: var(--text-sub); display: block; margin-top: 15px; letter-spacing: 1px; text-transform: uppercase; }
+        textarea, select, input[type="text"], input[type="number"] { 
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; 
+            background: rgba(255,255,255,0.8); margin-top: 5px; font-family: inherit; box-sizing: border-box;
+        }
+
+        /* GRID FOR MULTI-GEN */
+        .main-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; padding: 50px 20px 150px 20px; }
+        .output-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px; width: 100%; max-width: 1100px;
+        }
+        .canvas-frame {
+            background: white; border-radius: 25px; padding: 12px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid #fff;
+        }
+        .canvas-frame img { width: 100%; height: auto; border-radius: 15px; display: block; }
+        
+        /* MUSIC WIDGET */
+        .music-mini { background: var(--panel-bg); border-radius: 15px; padding: 15px; margin: 0 20px 20px 20px; border: 1px solid rgba(255,255,255,0.5); }
+
+        /* IDENTITY CARD */
+        .bio-card { background: white; padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
+        .social-link { 
+            display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; 
+            text-decoration: none; color: var(--text-main); font-weight: 700; font-size: 12px;
+            margin-bottom: 8px; transition: 0.2s; background: #fff; border: 1px solid #eee;
+        }
+        .social-link:hover { transform: translateX(5px); border-color: var(--accent); }
+
+        /* MOBILE FIX */
+        @media (max-width: 850px) {
+            body { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #ddd; }
+            .main-view { min-height: 100vh; padding-bottom: 200px; }
+        }
+
+        #gatekeeper { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div id="gatekeeper">
         <div style="text-align:center; width: 300px;">
-            <h1 style="font-family:'Quicksand'; color:var(--accent);">Nexus</h1>
-            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 30px;">Authorized Access Only</p>
-            <input type="password" id="passKey" placeholder="••••••••" style="text-align:center; padding: 12px; border-radius: 10px; border: 1px solid #eee; width: 100%;">
-            <button class="btn-premium" style="width:100%; margin-top:20px;" onclick="unlock()">Start Session</button>
+            <h1 style="font-family:'Quicksand'; color:var(--accent); font-size: 32px; margin-bottom:5px;">NEXUS</h1>
+            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 30px; letter-spacing: 2px;">V5.5 APEX TERMINAL</p>
+            <input type="password" id="passKey" placeholder="ENTER PASSKEY" style="text-align:center; padding: 15px; border-radius: 12px; border: 1px solid #eee; width: 100%;">
+            <button class="btn-premium" onclick="unlock()">INITIALIZE SYSTEM</button>
         </div>
     </div>
 
     <aside class="sidebar">
-        <div style="padding: 30px 25px 10px 25px;">
-            <div style="font-family:'Quicksand'; font-size:22px; font-weight:700;">Nexus</div>
-        </div>
-
-        <div class="music-player">
-            <div style="font-family:'Quicksand'; font-weight:700; font-size:11px; margin-bottom:10px; color:var(--text-sub);">SYSTEM AUDIO</div>
-            <div class="audio-controls">
-                <button class="btn-premium" style="padding:10px 20px; flex: 1;" id="playBtn" onclick="togglePlay()">PLAY AUDIO</button>
-            </div>
-            <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.2" oninput="setVolume(this.value)">
+        <div style="padding: 25px;">
+            <div style="font-family:'Quicksand'; font-size:24px; font-weight:700; color:var(--accent);">Nexus <span style="font-weight:300; color:var(--text-sub)">Apex</span></div>
         </div>
 
         <nav class="tab-nav">
-            <button class="tab-trigger active" onclick="setTab('txt', this)">CREATE</button>
-            <button class="tab-trigger" onclick="setTab('id', this)">IDENTIFY</button>
+            <button class="tab-trigger active" onclick="setTab('neural', this)">NEURAL</button>
+            <button class="tab-trigger" onclick="setTab('refinery', this)">REFINERY</button>
+            <button class="tab-trigger" onclick="setTab('archive', this)">ARCHIVE</button>
+            <button class="tab-trigger" onclick="setTab('identity', this)">IDENTITY</button>
         </nav>
 
-        <div style="padding: 0 25px; flex: 1;">
-            <div id="tab-txt">
-                <label style="font-size:11px; font-weight:700; color:var(--text-sub);">PROMPT</label>
-                <textarea id="prompt" rows="5" placeholder="Imagine..."></textarea>
-                <button class="btn-premium" style="width:100%; margin-top:15px;" onclick="generate()">Create Image</button>
+        <div id="tab-neural" class="tab-content active">
+            <label>Style Palette</label>
+            <select id="stylePreset">
+                <option value="">Raw Output</option>
+                <option value=", cyberpunk style, neon lights, highly detailed, futuristic">Cyberpunk</option>
+                <option value=", photorealistic, 8k, cinematic lighting, masterpiece">Photorealistic</option>
+                <option value=", studio ghibli style, anime, lush colors, whimsical">Studio Ghibli</option>
+                <option value=", oil painting, renaissance style, brush strokes, classical">Renaissance</option>
+            </select>
+
+            <label>Neural Prompt</label>
+            <textarea id="prompt" rows="3" placeholder="Describe your vision..."></textarea>
+            
+            <label>Negative Data</label>
+            <textarea id="negPrompt" rows="1" placeholder="blurry, distorted..."></textarea>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label>Batch Count</label>
+                    <input type="number" id="batchSize" value="1" min="1" max="4">
+                </div>
+                <div>
+                    <label>Steps</label>
+                    <input type="number" id="steps" value="20" min="1">
+                </div>
             </div>
 
-            <div id="tab-id" style="display:none;">
-                <label style="font-size:11px; font-weight:700; color:var(--text-sub);">SOURCE IMAGE</label>
-                <input type="file" id="fileIn" accept="image/*" onchange="previewImage(this)">
-                <button class="btn-premium" style="width:100%; margin-top:15px;" onclick="identify()">Analyze Vision</button>
-                <div id="idStatus" style="font-size:11px; margin-top:15px; color:var(--accent); font-weight: 600;"></div>
-            </div>
+            <button class="btn-premium" onclick="generate('txt2img')">SYNTHESIZE BATCH</button>
         </div>
-        
-        <div style="padding: 20px; border-top: 1px solid rgba(0,0,0,0.05); font-size: 10px; color: var(--text-sub);">
-            STATUS: <span style="color:#2ecc71">ONLINE</span>
-            <button onclick="config()" style="float:right; background:none; border:none; cursor:pointer; opacity: 0.3;">⚙️</button>
+
+        <div id="tab-refinery" class="tab-content">
+            <label>Source Vision</label>
+            <div style="padding: 15px; border: 2px dashed #ccc; border-radius: 15px; text-align: center; background: rgba(255,255,255,0.5);">
+                <input type="file" id="fileIn" accept="image/*" onchange="previewSource(this)">
+            </div>
+            
+            <button class="btn-premium btn-secondary" onclick="analyzeImage()">ANALYZE SOURCE (CLIP)</button>
+            
+            <label>Denoising (Variation Strength)</label>
+            <input type="range" id="denoising" min="0" max="1" step="0.05" value="0.7" style="width:100%; accent-color:var(--accent);">
+            
+            <button class="btn-premium" onclick="generate('img2img')">RE-SYNTHESIZE</button>
+        </div>
+
+        <div id="tab-archive" class="tab-content">
+            <label>Session Artifacts</label>
+            <div id="historyGrid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;"></div>
+        </div>
+
+        <div id="tab-identity" class="tab-content">
+            <div class="bio-card">
+                <strong>Hi, I'm Tristen.</strong><br>
+                Me and Gemini built this interface together. What started as an idea quickly became a high-performance creative project. Thank you for supporting the journey.
+            </div>
+
+            <label>Connect & Support</label>
+            <a href="https://www.youtube.com/@Southeast_Dreamscapes334" target="_blank" class="social-link">
+                <span style="font-size:18px;">📺</span> YouTube Channel
+            </a>
+            <a href="https://open.spotify.com/artist/2mQLY5gZx2VrUG6tCbdAdl?si=I1iF0xuTT9mANWi_vQMrmg" target="_blank" class="social-link">
+                <span style="font-size:18px;">🎧</span> Spotify Artist Page
+            </a>
+        </div>
+
+        <div class="music-mini">
+            <div style="font-size:9px; font-weight:800; color:var(--text-sub); margin-bottom:8px;">AMBIENT UPLINK</div>
+            <button class="btn-premium" style="padding:8px; margin:0;" id="playBtn" onclick="togglePlay()">PLAY AUDIO</button>
+            <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.2" oninput="audio.volume = this.value" style="width:100%; margin-top:10px;">
         </div>
     </aside>
 
-    <main class="image-container">
-        <div class="canvas-frame">
-            <div id="placeholder" style="text-align:center; color:#ccc; font-family: 'Quicksand';">Ready for input</div>
-            <img id="outputImg">
-        </div>
-        <button id="saveBtn" onclick="save()" style="display:none; position:absolute; bottom:30px; right:30px;" class="btn-premium">💾 SAVE IMAGE</button>
+    <main class="main-view">
+        <div id="statusIndicator" style="font-family:'Quicksand'; font-weight:700; color:#ccc; margin-bottom:20px;">SYSTEM STANDBY</div>
+        <div id="outputGrid" class="output-grid">
+            </div>
     </main>
 
     <script>
-        // Use try-catch to prevent "White Screen of Death" if a single line fails
-        try {
-            let api_url = sessionStorage.getItem('nexus_api') || "";
-            let currentB64 = "";
+        // UPDATED DEFAULTS
+        let api_url = "https://3f115e20cf09132213.gradio.live";
+        let currentB64 = ""; 
+        let history = [];
+        const audio = new Audio('ambient.wav');
+        audio.loop = true;
+
+        function unlock() {
+            if(document.getElementById('passKey').value.toUpperCase() === "NEXUS77") {
+                document.getElementById('gatekeeper').style.display = 'none';
+                audio.play().catch(e => console.log("Audio waiting for user."));
+            }
+        }
+
+        function setTab(tab, el) {
+            document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        function togglePlay() {
+            if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = "PAUSE AUDIO"; }
+            else { audio.pause(); document.getElementById('playBtn').innerText = "PLAY AUDIO"; }
+        }
+
+        function previewSource(input) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                currentB64 = e.target.result;
+                document.getElementById('statusIndicator').innerText = "SOURCE LOADED";
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        async function analyzeImage() {
+            if(!currentB64) return alert("Upload a picture first");
+            document.getElementById('statusIndicator').innerText = "ANALYZING VISION...";
+            try {
+                const res = await fetch(api_url + "/sdapi/v1/interrogate", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ image: currentB64.split(',')[1], model: "clip" })
+                });
+                const data = await res.json();
+                document.getElementById('prompt').value = data.caption || "Identification successful.";
+                document.getElementById('statusIndicator').innerText = "VISION SYNCHRONIZED";
+            } catch(e) { alert("Analysis failed. Link may be expired."); }
+        }
+
+        async function generate(mode) {
+            const grid = document.getElementById('outputGrid');
+            const status = document.getElementById('statusIndicator');
             
-            // Audio setup
-            const audio = new Audio('ambient.wav'); 
-            audio.loop = true;
-            audio.volume = 0.2;
+            grid.innerHTML = "";
+            status.innerText = "SYNTHESIZING NEURAL DATA...";
 
-            function togglePlay() {
-                if (audio.paused) { 
-                    audio.play().catch(e => console.log("Audio not found yet")); 
-                    document.getElementById('playBtn').innerText = "PAUSE AUDIO"; 
-                } else { 
-                    audio.pause(); 
-                    document.getElementById('playBtn').innerText = "PLAY AUDIO"; 
-                }
-            }
-
-            function setVolume(v) { audio.volume = v; }
-
-            function unlock() { 
-                const pass = document.getElementById('passKey').value.toUpperCase();
-                if(pass === "NEXUS77") {
-                    document.getElementById('gatekeeper').style.display = 'none';
-                    audio.play().catch(e => console.log("Music file ambient.wav missing from repo"));
-                }
-            }
+            let endpoint = mode === 'txt2img' ? "/sdapi/v1/txt2img" : "/sdapi/v1/img2img";
+            let batchSize = parseInt(document.getElementById('batchSize').value);
             
-            function config() { 
-                let u = prompt("API URL:", api_url); 
-                if(u){ api_url = u; sessionStorage.setItem('nexus_api', u); } 
+            let payload = {
+                prompt: document.getElementById('prompt').value + document.getElementById('stylePreset').value,
+                negative_prompt: document.getElementById('negPrompt').value,
+                steps: parseInt(document.getElementById('steps').value),
+                batch_size: batchSize,
+                width: 512, height: 512
+            };
+
+            if(mode === 'img2img') {
+                if(!currentB64) return alert("No source image.");
+                payload.init_images = [currentB64.split(',')[1]];
+                payload.denoising_strength = parseFloat(document.getElementById('denoising').value);
             }
 
-            function setTab(t, el) {
-                document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active')); 
-                el.classList.add('active');
-                document.getElementById('tab-txt').style.display = (t === 'txt') ? 'block' : 'none';
-                document.getElementById('tab-id').style.display = (t === 'id') ? 'block' : 'none';
-            }
-
-            function previewImage(input) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    currentB64 = e.target.result;
-                    document.getElementById('outputImg').src = currentB64;
-                    document.getElementById('outputImg').style.display = 'block';
-                    document.getElementById('placeholder').style.display = 'none';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-
-            async function identify() {
-                if(!api_url || !currentB64) return alert("Uplink or Image missing.");
-                const status = document.getElementById('idStatus');
-                status.innerText = "Analyzing vision...";
-                try {
-                    const res = await fetch(api_url + "/sdapi/v1/interrogate", {
-                        method: 'POST', 
-                        headers: {'Content-Type':'application/json'},
-                        body: JSON.stringify({ image: currentB64.split(',')[1], model: "clip" })
-                    });
-                    const data = await res.json();
-                    const result = data.caption || data.prompt || "Identification failed.";
-                    document.getElementById('prompt').value = result;
-                    status.innerText = "Vision synchronized.";
-                } catch(e) { status.innerText = "Connection error."; }
-            }
-
-            async function generate() {
-                if(!api_url) return alert("Configure Uplink ⚙️");
-                document.getElementById('placeholder').innerText = "Creating...";
-                document.getElementById('outputImg').style.display = "none";
-                document.getElementById('placeholder').style.display = "block";
+            try {
+                const res = await fetch(api_url + endpoint, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
                 
-                try {
-                    const res = await fetch(api_url + "/sdapi/v1/txt2img", {
-                        method: 'POST', 
-                        headers: {'Content-Type':'application/json'},
-                        body: JSON.stringify({ "prompt": document.getElementById('prompt').value, "steps": 20 })
-                    });
-                    const data = await res.json();
-                    currentB64 = "data:image/png;base64," + data.images[0];
-                    document.getElementById('outputImg').src = currentB64;
-                    document.getElementById('outputImg').style.display = 'block';
-                    document.getElementById('placeholder').style.display = "none";
-                    document.getElementById('saveBtn').style.display = 'block';
-                } catch(e) { alert("Generation failed."); }
-            }
+                status.innerText = "BATCH COMPLETE";
 
-            function save() { 
-                const a = document.createElement('a'); 
-                a.href = currentB64; 
-                a.download = `nexus_${Date.now()}.png`; 
-                a.click(); 
+                data.images.forEach((imgData, index) => {
+                    const fullB64 = "data:image/png;base64," + imgData;
+                    const container = document.createElement('div');
+                    container.className = "canvas-frame";
+                    container.innerHTML = `
+                        <img src="${fullB64}">
+                        <button class="btn-premium" style="padding:8px; font-size:9px;" onclick="downloadSolo('${fullB64}')">SAVE ARTIFACT</button>
+                    `;
+                    grid.appendChild(container);
+                    addToArchive(fullB64);
+                });
+
+            } catch(e) { 
+                status.innerText = "UPLINK OFFLINE";
+                alert("Generation failed. Check Gradio link.");
             }
-        } catch (fatalError) {
-            console.error("Nexus system error:", fatalError);
+        }
+
+        function addToArchive(b64) {
+            history.unshift(b64);
+            const arch = document.getElementById('historyGrid');
+            arch.innerHTML = history.slice(0, 8).map(src => `<img src="${src}" style="width:100%; border-radius:8px; cursor:pointer;" onclick="restore(this.src)">`).join('');
+        }
+
+        function restore(src) {
+            const grid = document.getElementById('outputGrid');
+            grid.innerHTML = `<div class="canvas-frame"><img src="${src}"></div>`;
+        }
+
+        function downloadSolo(src) {
+            const a = document.createElement('a');
+            a.href = src;
+            a.download = `nexus_${Date.now()}.png`;
+            a.click();
         }
     </script>
 </body>
