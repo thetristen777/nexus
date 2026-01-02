@@ -7,126 +7,189 @@
     <script src="https://www.paypal.com/sdk/js?client-id=BAAmHnd5CiEDa90TY6DIL5eA9Xp5A8uUMNaYK4_uw3AwsFuLkJzoBNoeaTCsPWDZ2yn0u1or0aXuq64C6g&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
 
     <style>
-        :root { --bg: #07070a; --panel: #111116; --accent: #6366f1; --accent-vid: #ec4899; --text: #f4f4f5; --dim: #a1a1aa; --border: #27272a; }
-        * { box-sizing: border-box; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        :root {
+            --bg: #030305;
+            --glass: rgba(18, 18, 26, 0.7);
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --pink: #ec4899;
+            --text: #ffffff;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
 
-        /* TAB NAVIGATION */
-        .tab-bar { width: 70px; background: #000; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 20px; }
-        .tab-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--dim); transition: 0.2s; border: 1px solid transparent; }
-        .tab-icon:hover { color: var(--accent); background: #1a1a20; }
-        .tab-icon.active { color: var(--accent); background: #1a1a20; border-color: var(--accent); }
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* SIDEBAR PANELS */
-        .sidebar { width: 350px; background: var(--panel); border-right: 1px solid var(--border); padding: 25px; overflow-y: auto; display: none; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* LIVING BACKGROUND */
+        .mesh-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(at 0% 0%, #1e1b4b 0px, transparent 50%),
+                        radial-gradient(at 100% 100%, #312e81 0px, transparent 50%),
+                        radial-gradient(at 50% 50%, #020617 0px, transparent 100%);
+            animation: meshMove 20s infinite alternate;
+        }
+        @keyframes meshMove { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+        /* TACTILE TAB BAR */
+        .tab-bar {
+            width: 80px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 30px 0; gap: 25px;
+        }
+
+        .tab-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 20px;
+            background: transparent; color: var(--text-dim);
+            border: 1px solid transparent;
+        }
+
+        .tab-icon:hover { 
+            background: var(--glass); color: var(--text); 
+            transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .tab-icon.active {
+            background: var(--accent); color: white;
+            box-shadow: 0 0 20px var(--accent-glow);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* FROSTED SIDEBARS */
+        .sidebar {
+            width: 360px;
+            background: var(--glass);
+            backdrop-filter: blur(30px) saturate(150%);
+            border-right: 1px solid var(--border);
+            padding: 30px;
+            overflow-y: auto;
+            display: none;
+            animation: slideRight 0.4s ease-out;
+        }
         .sidebar.active { display: flex; flex-direction: column; }
+        @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* UI ELEMENTS */
-        .brand { font-weight: 900; font-size: 1.2rem; margin-bottom: 30px; display: flex; align-items: center; gap: 8px; }
-        .brand span { color: var(--accent); }
-        label { font-size: 10px; color: var(--dim); text-transform: uppercase; font-weight: 800; margin: 15px 0 8px 0; display: block; }
-        textarea, select, input { width: 100%; background: #09090b; border: 1px solid var(--border); border-radius: 8px; color: white; padding: 12px; font-family: inherit; }
-        .btn-gen { background: var(--accent); border: none; padding: 15px; border-radius: 10px; color: white; font-weight: 800; cursor: pointer; margin-top: 20px; }
-        .btn-gen:hover { filter: brightness(1.2); }
+        .brand { font-size: 1.1rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 40px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
 
-        /* MAIN CONTENT AREA */
-        .main { flex: 1; padding: 40px; overflow-y: auto; background-image: radial-gradient(#1a1a1a 1px, transparent 0); background-size: 40px 40px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
-        .art-card { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
-        .art-card img { width: 100%; display: block; }
+        /* INPUT STYLING */
+        label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-top: 20px; display: block; letter-spacing: 1px; }
+        textarea, select, input {
+            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            border-radius: 12px; color: white; padding: 14px; margin-top: 8px;
+            font-size: 13px; outline: none;
+        }
+        textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
 
-        /* ABOUT SECTION */
-        .about-text { line-height: 1.6; color: var(--dim); font-size: 14px; }
-        .about-text h2 { color: var(--text); }
+        /* PSYCHOLOGICAL BUTTONS */
+        .btn-gen {
+            background: linear-gradient(135deg, var(--accent), #4f46e5);
+            border: none; padding: 18px; border-radius: 15px;
+            color: white; font-weight: 800; cursor: pointer; margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            position: relative; overflow: hidden;
+        }
+        .btn-gen:hover { transform: scale(1.02); box-shadow: 0 8px 25px var(--accent-glow); }
+        .btn-gen:active { transform: scale(0.98); }
+
+        /* MAIN VIEWPORT */
+        .main { flex: 1; padding: 40px; overflow-y: auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 30px; }
+
+        .art-card {
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 24px; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .art-card:hover { transform: translateY(-10px) scale(1.01); border-color: var(--accent); }
+        .art-card img { width: 100%; border-bottom: 1px solid var(--border); }
+
+        .about-card {
+            padding: 30px; background: rgba(255,255,255,0.03);
+            border-radius: 20px; border: 1px solid var(--border); line-height: 1.6;
+        }
+        
+        #creditDisplay { font-size: 32px; font-weight: 900; background: linear-gradient(to right, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body>
 
+    <div class="mesh-bg"></div>
+
     <nav class="tab-bar">
-        <div class="tab-icon active" onclick="switchTab('create')" title="Create">🎨</div>
-        <div class="tab-icon" onclick="switchTab('vault')" title="Vault/Payments">💎</div>
-        <div class="tab-icon" onclick="switchTab('about')" title="About Us">ℹ️</div>
+        <div class="tab-icon active" onclick="switchTab('create')" title="Neural Studio">🎨</div>
+        <div class="tab-icon" onclick="switchTab('vault')" title="Payment Vault">💎</div>
+        <div class="tab-icon" onclick="switchTab('about')" title="The Protocol">🧬</div>
     </nav>
 
     <aside id="tab-create" class="sidebar active">
-        <div class="brand"><span>◆</span> NEXUS STUDIO</div>
+        <div class="brand">NEXUS ARCHON</div>
         
-        <label>Primary Vision (Prompt)</label>
-        <textarea id="prompt" rows="4" placeholder="Deep sea bioluminescent city..."></textarea>
+        <label>Neural Vision Prompt</label>
+        <textarea id="prompt" rows="5" placeholder="Imagine something impossible..."></textarea>
         
-        <label>Negative Prompt (Forbidden elements)</label>
-        <textarea id="negPrompt" rows="2" placeholder="blurry, low quality, distorted..."></textarea>
-
-        <div style="display:flex; gap:10px;">
-            <div style="flex:1">
-                <label>Sampling Steps</label>
-                <input type="number" id="steps" value="20" min="1" max="50">
-            </div>
-            <div style="flex:1">
-                <label>CFG Scale</label>
-                <input type="number" id="cfg" value="7" step="0.5">
-            </div>
-        </div>
-
-        <label>Dimensions</label>
+        <label>Configuration</label>
         <select id="size">
-            <option value="512x512">Square (1:1)</option>
-            <option value="512x768">Portrait (2:3)</option>
-            <option value="768x512">Cinematic (3:2)</option>
+            <option value="512x512">1:1 Square</option>
+            <option value="512x768">2:3 Vertical</option>
+            <option value="768x512">3:2 Cinematic</option>
         </select>
 
-        <label>Sampler</label>
-        <select id="sampler">
-            <option value="Euler a">Euler a (Fast)</option>
-            <option value="DPM++ 2M Karras">DPM++ 2M Karras (Best Detail)</option>
-        </select>
-
-        <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-top:20px;">
+        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 18px; margin-top:25px; border: 1px solid var(--border);">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size: 13px; font-weight: 700;">Animation Mode</span>
-                <input type="checkbox" id="videoMode" style="width:20px;">
+                <span style="font-size: 14px; font-weight: 700;">Animation Sync</span>
+                <input type="checkbox" id="videoMode" style="width:24px; height:24px; accent-color: var(--pink);">
             </div>
+            <p style="font-size: 10px; color: var(--text-dim); margin-top:10px;">Requires 20 Neural Credits per sequence.</p>
         </div>
 
-        <button class="btn-gen" onclick="generate()">SYNTHESIZE VISION</button>
+        <button class="btn-gen" onclick="generate()">INITIATE SYNTHESIS</button>
     </aside>
 
     <aside id="tab-vault" class="sidebar">
-        <div class="brand"><span>💎</span> THE VAULT</div>
-        <p style="font-size: 13px; color: var(--dim);">Support the creator to unlock high-priority credits and animation sequences.</p>
+        <div class="brand">THE VAULT</div>
+        <div id="creditDisplay">50 CR</div>
+        <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 30px;">Powering the 3060 Neural Core</p>
         
-        <div style="margin: 20px 0; padding: 20px; background: #1e1b4b; border-radius: 15px; border: 1px solid var(--accent);">
-            <div style="font-size: 10px; color: var(--accent); font-weight: 800; margin-bottom: 5px;">CURRENT BALANCE</div>
-            <div id="creditDisplay" style="font-size: 24px; font-weight: 900;">50 CR</div>
+        <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 20px; border: 1px solid var(--border);">
+            <div id="paypal-container-U448X4TUAZ4EL"></div>
         </div>
-
-        <label>Top Up Credits</label>
-        <div id="paypal-container-U448X4TUAZ4EL"></div>
     </aside>
 
     <aside id="tab-about" class="sidebar">
-        <div class="brand"><span>ℹ️</span> PROTOCOL</div>
-        <div class="about-text">
-            <h2>About Nexus Archon</h2>
-            <p>Nexus Archon is an indie AI research studio dedicated to accessible neural synthesis. Unlike giant corporations, we run our entire operation on localized high-efficiency hardware (NVIDIA RTX 3060).</p>
-            
-            <h2>The Process</h2>
-            <p>Every pixel is generated using <strong>Stable Diffusion Forge</strong>. Our custom pipeline optimizes VRAM to allow high-quality <strong>AnimateDiff</strong> video sequences without the need for massive cloud server farms.</p>
-            
-            <h2>Our Mission</h2>
-            <p>To provide a sleek, distraction-free environment for artists, hobbyists, and dreamers to bring their mental visions into reality.</p>
+        <div class="brand">THE PROTOCOL</div>
+        <div class="about-card">
+            <h3 style="margin-top:0;">Indie Neural Research</h3>
+            <p style="font-size: 13px; color: var(--text-dim);">Nexus Archon is a localized AI experiment. By utilizing an optimized RTX 3060 pipeline, we provide high-fidelity video synthesis without the corporate overhead.</p>
+            <p style="font-size: 13px; color: var(--text-dim);">Built with <strong>Stable Diffusion Forge</strong> and <strong>AnimateDiff</strong>, this studio represents the future of decentralized creativity.</p>
         </div>
     </aside>
 
     <main class="main">
-        <div id="grid" class="grid"></div>
+        <div id="grid" class="grid">
+            <div class="about-card" style="grid-column: 1/-1; text-align: center; border: 1px dashed var(--accent);">
+                <h2 style="letter-spacing: 2px;">WAITING FOR INPUT</h2>
+                <p style="color: var(--text-dim);">Select a tab to begin your neural journey.</p>
+            </div>
+        </div>
     </main>
 
 <script>
     const API_URL = "http://127.0.0.1:7860";
-    let userCredits = parseInt(localStorage.getItem('nexus_credits')) || 50;
-
-    // --- TAB SYSTEM ---
+    
     function switchTab(tabName) {
         document.querySelectorAll('.sidebar').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.tab-icon').forEach(i => i.classList.remove('active'));
@@ -134,46 +197,44 @@
         event.currentTarget.classList.add('active');
     }
 
-    // --- PAYPAL RENDER ---
     paypal.HostedButtons({ hostedButtonId: "U448X4TUAZ4EL" }).render("#paypal-container-U448X4TUAZ4EL");
 
-    // --- GENERATION LOGIC ---
     async function generate() {
         const isVid = document.getElementById('videoMode').checked;
         const [w, h] = document.getElementById('size').value.split('x');
+        const grid = document.getElementById('grid');
+        
+        // Remove placeholder on first gen
+        if(grid.innerText.includes("WAITING")) grid.innerHTML = "";
 
-        let payload = {
+        const payload = {
             prompt: document.getElementById('prompt').value,
-            negative_prompt: document.getElementById('negPrompt').value,
-            steps: parseInt(document.getElementById('steps').value),
-            cfg_scale: parseFloat(document.getElementById('cfg').value),
-            sampler_name: document.getElementById('sampler').value,
+            steps: 20,
             width: parseInt(w), height: parseInt(h),
-            alwayson_scripts: {}
+            alwayson_scripts: isVid ? { "AnimateDiff": { args: [{ model: "mm_sd_v15_v2.ckpt", enable: true, video_length: 16, fps: 8, format: ["GIF"] }] } } : {}
         };
-
-        if (isVid) {
-            payload.alwayson_scripts["AnimateDiff"] = {
-                args: [{ model: "mm_sd_v15_v2.ckpt", enable: true, video_length: 16, fps: 8, format: ["GIF"] }]
-            };
-        }
 
         try {
             const res = await fetch(`${API_URL}/sdapi/v1/txt2img`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
             addCard(data.images[0], isVid);
-        } catch (e) { alert("Forge Connection Lost. Check API status."); }
+        } catch (e) { alert("Forge Connection Error. Please verify the API is active."); }
     }
 
     function addCard(img, isVid) {
         const type = isVid ? 'data:image/gif;base64,' : 'data:image/png;base64,';
         const card = document.createElement('div');
         card.className = 'art-card';
-        card.innerHTML = `<img src="${type}${img}"><div style="padding:15px; font-size:10px; color:var(--dim);"><button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:red; cursor:pointer;">DELETE</button></div>`;
+        card.innerHTML = `
+            <img src="${type}${img}">
+            <div style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:10px; font-weight:bold; color:var(--accent);">${isVid ? 'ANIMATION' : 'STILL'}</span>
+                <a href="${type}${img}" download="nexus.png" style="text-decoration:none; color:white; font-size:11px; background:rgba(255,255,255,0.1); padding:8px 15px; border-radius:10px;">DOWNLOAD</a>
+            </div>
+        `;
         document.getElementById('grid').prepend(card);
     }
 </script>
