@@ -17,7 +17,7 @@
             font-family: 'Inter', sans-serif; display: flex; overflow: hidden; color: var(--text-main);
         }
 
-        /* SIDEBAR WITH BRUSHED ALUMINUM TEXTURE */
+        /* BRUSHED ALUMINUM SIDEBAR */
         .sidebar {
             width: 380px; background: linear-gradient(145deg, #e6e9ef 0%, #d1d5db 100%);
             border-right: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column;
@@ -25,7 +25,7 @@
         }
 
         .sidebar::before {
-            content: ""; position: absolute; inset: 0; opacity: 0.04; pointer-events: none;
+            content: ""; position: absolute; inset: 0; opacity: 0.05; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
 
@@ -42,4 +42,177 @@
             background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.5);
             backdrop-filter: blur(5px);
         }
-        .track-info { font-family: 'Quicksand
+        .audio-controls { display: flex; align-items: center; gap: 15px; }
+        .vol-slider { width: 100%; accent-color: var(--accent); height: 4px; cursor: pointer; margin-top: 10px; }
+
+        .tab-nav { display: flex; padding: 10px 20px; gap: 8px; }
+        .tab-trigger {
+            flex: 1; padding: 10px; border-radius: 10px; border: none; font-family: 'Quicksand';
+            font-weight: 700; font-size: 10px; background: rgba(0,0,0,0.05); cursor: pointer; color: var(--text-sub);
+        }
+        .tab-trigger.active { background: white; color: var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        .image-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .canvas-frame {
+            width: 85%; max-width: 500px; aspect-ratio: 1/1; background: white; border-radius: 30px;
+            padding: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 1px solid #fff;
+        }
+        #outputImg { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; display: none; }
+
+        textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; background: rgba(255,255,255,0.6); margin-top: 10px; font-family: inherit; resize: none; }
+        
+        #gatekeeper { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+
+    <div id="gatekeeper">
+        <div style="text-align:center; width: 300px;">
+            <h1 style="font-family:'Quicksand'; color:var(--accent);">Nexus</h1>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 30px;">Authorized Access Only</p>
+            <input type="password" id="passKey" placeholder="••••••••" style="text-align:center; padding: 12px; border-radius: 10px; border: 1px solid #eee; width: 100%;">
+            <button class="btn-premium" style="width:100%; margin-top:20px;" onclick="unlock()">Start Session</button>
+        </div>
+    </div>
+
+    <aside class="sidebar">
+        <div style="padding: 30px 25px 10px 25px;">
+            <div style="font-family:'Quicksand'; font-size:22px; font-weight:700;">Nexus</div>
+        </div>
+
+        <div class="music-player">
+            <div style="font-family:'Quicksand'; font-weight:700; font-size:11px; margin-bottom:10px; color:var(--text-sub);">SYSTEM AUDIO</div>
+            <div class="audio-controls">
+                <button class="btn-premium" style="padding:10px 20px; flex: 1;" id="playBtn" onclick="togglePlay()">PAUSE AUDIO</button>
+            </div>
+            <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.2" oninput="setVolume(this.value)">
+        </div>
+
+        <nav class="tab-nav">
+            <button class="tab-trigger active" onclick="setTab('txt', this)">CREATE</button>
+            <button class="tab-trigger" onclick="setTab('id', this)">IDENTIFY</button>
+        </nav>
+
+        <div style="padding: 0 25px; flex: 1;">
+            <div id="tab-txt">
+                <label style="font-size:11px; font-weight:700; color:var(--text-sub);">PROMPT</label>
+                <textarea id="prompt" rows="5" placeholder="Imagine something..."></textarea>
+                <button class="btn-premium" style="width:100%; margin-top:15px;" onclick="generate()">Create Image</button>
+            </div>
+
+            <div id="tab-id" style="display:none;">
+                <label style="font-size:11px; font-weight:700; color:var(--text-sub);">SOURCE IMAGE</label>
+                <input type="file" id="fileIn" accept="image/*" onchange="previewImage(this)">
+                <button class="btn-premium" style="width:100%; margin-top:15px;" onclick="identify()">Analyze Vision</button>
+                <div id="idStatus" style="font-size:11px; margin-top:15px; color:var(--accent); font-weight: 600;"></div>
+            </div>
+        </div>
+        
+        <div style="padding: 20px; border-top: 1px solid rgba(0,0,0,0.05); font-size: 10px; color: var(--text-sub);">
+            STATUS: <span style="color:#2ecc71">ONLINE</span>
+            <button onclick="config()" style="float:right; background:none; border:none; cursor:pointer; opacity: 0.3;">⚙️</button>
+        </div>
+    </aside>
+
+    <main class="image-container">
+        <div class="canvas-frame">
+            <div id="placeholder" style="text-align:center; color:#ccc; font-family: 'Quicksand';">Ready for input</div>
+            <img id="outputImg">
+        </div>
+        <button id="saveBtn" onclick="save()" style="display:none; position:absolute; bottom:30px; right:30px;" class="btn-premium">💾 SAVE IMAGE</button>
+    </main>
+
+    <script>
+        let api_url = sessionStorage.getItem('nexus_api') || "";
+        let currentB64 = "";
+        
+        // 🎵 UPDATED TO .WAV
+        const audio = new Audio('ambient.wav'); 
+        audio.loop = true;
+        audio.volume = 0.2;
+
+        function togglePlay() {
+            if (audio.paused) { 
+                audio.play(); 
+                document.getElementById('playBtn').innerText = "PAUSE AUDIO"; 
+            } else { 
+                audio.pause(); 
+                document.getElementById('playBtn').innerText = "PLAY AUDIO"; 
+            }
+        }
+
+        function setVolume(v) { audio.volume = v; }
+
+        function unlock() { 
+            if(document.getElementById('passKey').value.toUpperCase()==="NEXUS77") {
+                document.getElementById('gatekeeper').style.display='none';
+                // Starts audio as soon as you unlock
+                audio.play().catch(e => console.log("Audio waiting for interaction"));
+            }
+        }
+        
+        function config() { 
+            let u = prompt("API URL:", api_url); 
+            if(u){api_url=u; sessionStorage.setItem('nexus_api',u);} 
+        }
+
+        function setTab(t, el) {
+            document.querySelectorAll('.tab-trigger').forEach(b=>b.classList.remove('active')); 
+            el.classList.add('active');
+            document.getElementById('tab-txt').style.display = t==='txt'?'block':'none';
+            document.getElementById('tab-id').style.display = t==='id'?'block':'none';
+        }
+
+        function previewImage(input) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                currentB64 = e.target.result;
+                document.getElementById('outputImg').src = currentB64;
+                document.getElementById('outputImg').style.display = 'block';
+                document.getElementById('placeholder').style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        async function identify() {
+            if(!api_url || !currentB64) return alert("Uplink or Image missing.");
+            const status = document.getElementById('idStatus');
+            status.innerText = "Analyzing vision...";
+            try {
+                const res = await fetch(api_url + "/sdapi/v1/interrogate", {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ image: currentB64.split(',')[1], model: "clip" })
+                });
+                const data = await res.json();
+                // FIX: Support both caption (Forge) and prompt (A1111) keys
+                const result = data.caption || data.prompt || "Identification failed.";
+                document.getElementById('prompt').value = result;
+                status.innerText = "Vision synchronized.";
+                setTimeout(() => setTab('txt', document.querySelector('.tab-trigger')), 800);
+            } catch(e) { status.innerText = "Connection error."; }
+        }
+
+        async function generate() {
+            if(!api_url) return alert("Configure Uplink ⚙️");
+            document.getElementById('placeholder').innerText = "Creating...";
+            document.getElementById('outputImg').style.display = "none";
+            document.getElementById('placeholder').style.display = "block";
+            
+            try {
+                const res = await fetch(api_url + "/sdapi/v1/txt2img", {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ "prompt": document.getElementById('prompt').value, "steps": 20 })
+                });
+                const data = await res.json();
+                currentB64 = "data:image/png;base64," + data.images[0];
+                document.getElementById('outputImg').src = currentB64;
+                document.getElementById('outputImg').style.display = 'block';
+                document.getElementById('placeholder').style.display = "none";
+                document.getElementById('saveBtn').style.display = 'block';
+            } catch(e) { alert("Generation failed."); }
+        }
+
+        function save() { const a = document.createElement('a'); a.href=currentB64; a.download=`nexus_${Date.now()}.png`; a.click(); }
+    </script>
+</body>
+</html>
