@@ -12,21 +12,14 @@
         body { 
             margin: 0; padding: 0; height: 100vh;
             background-color: #f0f2f5;
-            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
-                              radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%);
             font-family: 'Inter', sans-serif; display: flex; overflow: hidden; color: var(--text-main);
         }
 
-        /* BRUSHED ALUMINUM SIDEBAR */
         .sidebar {
             width: 380px; background: linear-gradient(145deg, #e6e9ef 0%, #d1d5db 100%);
             border-right: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column;
             position: relative; box-shadow: inset -5px 0 15px rgba(0,0,0,0.02);
-        }
-
-        .sidebar::before {
-            content: ""; position: absolute; inset: 0; opacity: 0.05; pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
 
         .btn-premium {
@@ -36,7 +29,6 @@
         }
         .btn-premium:active { transform: translateY(3px); box-shadow: 0 1px 0px #3f41b5; }
 
-        /* MODEST MUSIC PLAYER */
         .music-player {
             margin: 20px; padding: 18px; border-radius: 20px;
             background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.5);
@@ -83,7 +75,7 @@
         <div class="music-player">
             <div style="font-family:'Quicksand'; font-weight:700; font-size:11px; margin-bottom:10px; color:var(--text-sub);">SYSTEM AUDIO</div>
             <div class="audio-controls">
-                <button class="btn-premium" style="padding:10px 20px; flex: 1;" id="playBtn" onclick="togglePlay()">PAUSE AUDIO</button>
+                <button class="btn-premium" style="padding:10px 20px; flex: 1;" id="playBtn" onclick="togglePlay()">PLAY AUDIO</button>
             </div>
             <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.2" oninput="setVolume(this.value)">
         </div>
@@ -96,7 +88,7 @@
         <div style="padding: 0 25px; flex: 1;">
             <div id="tab-txt">
                 <label style="font-size:11px; font-weight:700; color:var(--text-sub);">PROMPT</label>
-                <textarea id="prompt" rows="5" placeholder="Imagine something..."></textarea>
+                <textarea id="prompt" rows="5" placeholder="Imagine..."></textarea>
                 <button class="btn-premium" style="width:100%; margin-top:15px;" onclick="generate()">Create Image</button>
             </div>
 
@@ -123,96 +115,106 @@
     </main>
 
     <script>
-        let api_url = sessionStorage.getItem('nexus_api') || "";
-        let currentB64 = "";
-        
-        // 🎵 UPDATED TO .WAV
-        const audio = new Audio('ambient.wav'); 
-        audio.loop = true;
-        audio.volume = 0.2;
-
-        function togglePlay() {
-            if (audio.paused) { 
-                audio.play(); 
-                document.getElementById('playBtn').innerText = "PAUSE AUDIO"; 
-            } else { 
-                audio.pause(); 
-                document.getElementById('playBtn').innerText = "PLAY AUDIO"; 
-            }
-        }
-
-        function setVolume(v) { audio.volume = v; }
-
-        function unlock() { 
-            if(document.getElementById('passKey').value.toUpperCase()==="NEXUS77") {
-                document.getElementById('gatekeeper').style.display='none';
-                // Starts audio as soon as you unlock
-                audio.play().catch(e => console.log("Audio waiting for interaction"));
-            }
-        }
-        
-        function config() { 
-            let u = prompt("API URL:", api_url); 
-            if(u){api_url=u; sessionStorage.setItem('nexus_api',u);} 
-        }
-
-        function setTab(t, el) {
-            document.querySelectorAll('.tab-trigger').forEach(b=>b.classList.remove('active')); 
-            el.classList.add('active');
-            document.getElementById('tab-txt').style.display = t==='txt'?'block':'none';
-            document.getElementById('tab-id').style.display = t==='id'?'block':'none';
-        }
-
-        function previewImage(input) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                currentB64 = e.target.result;
-                document.getElementById('outputImg').src = currentB64;
-                document.getElementById('outputImg').style.display = 'block';
-                document.getElementById('placeholder').style.display = 'none';
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-
-        async function identify() {
-            if(!api_url || !currentB64) return alert("Uplink or Image missing.");
-            const status = document.getElementById('idStatus');
-            status.innerText = "Analyzing vision...";
-            try {
-                const res = await fetch(api_url + "/sdapi/v1/interrogate", {
-                    method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ image: currentB64.split(',')[1], model: "clip" })
-                });
-                const data = await res.json();
-                // FIX: Support both caption (Forge) and prompt (A1111) keys
-                const result = data.caption || data.prompt || "Identification failed.";
-                document.getElementById('prompt').value = result;
-                status.innerText = "Vision synchronized.";
-                setTimeout(() => setTab('txt', document.querySelector('.tab-trigger')), 800);
-            } catch(e) { status.innerText = "Connection error."; }
-        }
-
-        async function generate() {
-            if(!api_url) return alert("Configure Uplink ⚙️");
-            document.getElementById('placeholder').innerText = "Creating...";
-            document.getElementById('outputImg').style.display = "none";
-            document.getElementById('placeholder').style.display = "block";
+        // Use try-catch to prevent "White Screen of Death" if a single line fails
+        try {
+            let api_url = sessionStorage.getItem('nexus_api') || "";
+            let currentB64 = "";
             
-            try {
-                const res = await fetch(api_url + "/sdapi/v1/txt2img", {
-                    method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ "prompt": document.getElementById('prompt').value, "steps": 20 })
-                });
-                const data = await res.json();
-                currentB64 = "data:image/png;base64," + data.images[0];
-                document.getElementById('outputImg').src = currentB64;
-                document.getElementById('outputImg').style.display = 'block';
-                document.getElementById('placeholder').style.display = "none";
-                document.getElementById('saveBtn').style.display = 'block';
-            } catch(e) { alert("Generation failed."); }
-        }
+            // Audio setup
+            const audio = new Audio('ambient.wav'); 
+            audio.loop = true;
+            audio.volume = 0.2;
 
-        function save() { const a = document.createElement('a'); a.href=currentB64; a.download=`nexus_${Date.now()}.png`; a.click(); }
+            function togglePlay() {
+                if (audio.paused) { 
+                    audio.play().catch(e => console.log("Audio not found yet")); 
+                    document.getElementById('playBtn').innerText = "PAUSE AUDIO"; 
+                } else { 
+                    audio.pause(); 
+                    document.getElementById('playBtn').innerText = "PLAY AUDIO"; 
+                }
+            }
+
+            function setVolume(v) { audio.volume = v; }
+
+            function unlock() { 
+                const pass = document.getElementById('passKey').value.toUpperCase();
+                if(pass === "NEXUS77") {
+                    document.getElementById('gatekeeper').style.display = 'none';
+                    audio.play().catch(e => console.log("Music file ambient.wav missing from repo"));
+                }
+            }
+            
+            function config() { 
+                let u = prompt("API URL:", api_url); 
+                if(u){ api_url = u; sessionStorage.setItem('nexus_api', u); } 
+            }
+
+            function setTab(t, el) {
+                document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active')); 
+                el.classList.add('active');
+                document.getElementById('tab-txt').style.display = (t === 'txt') ? 'block' : 'none';
+                document.getElementById('tab-id').style.display = (t === 'id') ? 'block' : 'none';
+            }
+
+            function previewImage(input) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    currentB64 = e.target.result;
+                    document.getElementById('outputImg').src = currentB64;
+                    document.getElementById('outputImg').style.display = 'block';
+                    document.getElementById('placeholder').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+
+            async function identify() {
+                if(!api_url || !currentB64) return alert("Uplink or Image missing.");
+                const status = document.getElementById('idStatus');
+                status.innerText = "Analyzing vision...";
+                try {
+                    const res = await fetch(api_url + "/sdapi/v1/interrogate", {
+                        method: 'POST', 
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ image: currentB64.split(',')[1], model: "clip" })
+                    });
+                    const data = await res.json();
+                    const result = data.caption || data.prompt || "Identification failed.";
+                    document.getElementById('prompt').value = result;
+                    status.innerText = "Vision synchronized.";
+                } catch(e) { status.innerText = "Connection error."; }
+            }
+
+            async function generate() {
+                if(!api_url) return alert("Configure Uplink ⚙️");
+                document.getElementById('placeholder').innerText = "Creating...";
+                document.getElementById('outputImg').style.display = "none";
+                document.getElementById('placeholder').style.display = "block";
+                
+                try {
+                    const res = await fetch(api_url + "/sdapi/v1/txt2img", {
+                        method: 'POST', 
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ "prompt": document.getElementById('prompt').value, "steps": 20 })
+                    });
+                    const data = await res.json();
+                    currentB64 = "data:image/png;base64," + data.images[0];
+                    document.getElementById('outputImg').src = currentB64;
+                    document.getElementById('outputImg').style.display = 'block';
+                    document.getElementById('placeholder').style.display = "none";
+                    document.getElementById('saveBtn').style.display = 'block';
+                } catch(e) { alert("Generation failed."); }
+            }
+
+            function save() { 
+                const a = document.createElement('a'); 
+                a.href = currentB64; 
+                a.download = `nexus_${Date.now()}.png`; 
+                a.click(); 
+            }
+        } catch (fatalError) {
+            console.error("Nexus system error:", fatalError);
+        }
     </script>
 </body>
 </html>
