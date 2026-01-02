@@ -79,8 +79,8 @@
     <header class="top-nav">
         <div class="logo">NEXUS <span style="font-size:8px; font-weight:300; opacity:0.5;">BY T.K. INDUSTRIES</span></div>
         <div style="display:flex; align-items:center; gap:20px;">
-            <div style="font-family:Orbitron; font-size:10px; color:var(--accent);">VOL: <span id="volLevel">5</span></div>
-            <input type="range" min="0" max="1" step="0.05" value="0.25" oninput="updateVolume(this.value)" style="width:80px; accent-color:var(--accent);">
+            <div style="font-family:Orbitron; font-size:10px; color:var(--accent);">VOL: <span id="volLevel">2</span></div>
+            <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.10" oninput="updateVolume(this.value)" style="width:80px; accent-color:var(--accent);">
             <button onclick="toggleSettings()" style="background:none; border:none; cursor:pointer; font-size:18px;">⚙️</button>
         </div>
     </header>
@@ -124,9 +124,9 @@
         <div style="opacity:0.2; font-size:7px; font-family:Orbitron;">© 2026 T.K. INDUSTRIES</div>
     </footer>
 
-  <script>
+    <script>
         // --- ADMIN BYPASS CONFIG ---
-        const DEFAULT_UPLINK = "PASTE_YOUR_LINK_HERE"; // <--- PASTE GRADIO LINK HERE
+        const DEFAULT_UPLINK = "PASTE_YOUR_LINK_HERE"; 
         // ---------------------------
 
         let FORGE_URL = localStorage.getItem('nexus_url') || DEFAULT_UPLINK || "";
@@ -148,16 +148,20 @@
             const pass = document.getElementById('passInput').value.toUpperCase();
             if (pass === MASTER_KEY) {
                 document.getElementById('gatekeeper').style.display = 'none';
+                
+                // Initialize Audio at Volume Level 2
                 const audio = document.getElementById('bgAudio');
+                audio.volume = 0.10; 
                 audio.play().catch(e => console.log("Audio needs interaction"));
+                
                 addLog("ACCESS GRANTED: WELCOME ADMIN");
                 
-                if(FORGE_URL && FORGE_URL !== "PASTE_YOUR_LINK_HERE") {
+                if(FORGE_URL && FORGE_URL !== "https://ca52b0ad1763dbfd61.gradio.live") {
                     document.getElementById('statusTag').innerText = "STABLE";
                     document.getElementById('statusTag').style.color = "#00ff88";
                     addLog("NEURAL BRIDGE ESTABLISHED");
                 } else {
-                    addLog("WARNING: NO UPLINK DETECTED");
+                    addLog("WARNING: NO NEURAL LINK DETECTED");
                 }
             } else {
                 alert("INVALID PASSKEY");
@@ -232,4 +236,3 @@
     </script>
 </body>
 </html>
-
