@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEXUS AI SUITE</title>
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <title>NEXUS | AI SUITE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;600&display=swap');
         
@@ -15,52 +20,102 @@
             --border: rgba(255, 255, 255, 0.08); 
         }
 
-        /* 🧪 RESTRAINED NEURAL FEEDBACK (Border Only) */
+        /* 🧪 REFINED NEURAL FEEDBACK (Halo Only) */
         @keyframes neural-glow {
             0% { box-shadow: 0 0 5px var(--accent); border-color: var(--accent); }
-            50% { box-shadow: 0 0 20px #ff00d2; border-color: #ff00d2; }
+            50% { box-shadow: 0 0 25px #ff00d2; border-color: #ff00d2; }
             100% { box-shadow: 0 0 5px var(--accent); border-color: var(--accent); }
         }
         .thinking-active #imageFrame { animation: neural-glow 2s infinite ease-in-out; }
 
         body { 
             margin: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; 
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: --accent 0.5s ease;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
+            transition: background 0.5s ease;
         }
 
-        /* PREMIUM UI ELEMENTS */
-        .top-nav { height: 65px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; backdrop-filter: blur(10px); }
+        /* PREMIUM LAYOUT */
+        .top-nav { 
+            height: 65px; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--border); 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 25px; backdrop-filter: blur(15px); z-index: 100;
+        }
+
         .studio-core { display: grid; grid-template-columns: 380px 1fr; flex: 1; overflow: hidden; }
         
         .sidebar { background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .tab-btn { flex: 1; background: transparent; border: none; color: #555; font-family: 'Orbitron'; font-size: 10px; padding: 18px 0; cursor: pointer; transition: 0.3s; letter-spacing: 1px; }
-        .tab-btn.active { color: var(--accent); background: var(--accent-dim); }
-
-        .preview-area { background: radial-gradient(circle at center, #111, #000); display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 20px; overflow-y: auto; }
         
-        /* THE IMAGE FRAME */
+        .tab-btn { 
+            flex: 1; background: transparent; border: none; color: #444; 
+            font-family: 'Orbitron'; font-size: 10px; padding: 20px 0; 
+            cursor: pointer; transition: 0.3s; letter-spacing: 2px;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: var(--accent-dim); }
+
+        .tab-content { padding: 30px; display: none; overflow-y: auto; flex: 1; }
+        .tab-content.active { display: block; }
+
+        .preview-area { 
+            background: radial-gradient(circle at center, #111, #000); 
+            display: flex; align-items: center; justify-content: center; 
+            flex-direction: column; padding: 20px; position: relative;
+        }
+        
+        /* IMAGE FRAME */
         #imageFrame { 
             width: 100%; max-width: 512px; aspect-ratio: 1/1; 
             border: 1px solid var(--border); background: #000; 
             display: flex; align-items: center; justify-content: center; position: relative;
-            transition: 0.5s;
+            transition: 0.5s; overflow: hidden; border-radius: 4px;
         }
-
         #mainImg { max-width: 100%; height: auto; display: none; }
 
-        /* LOGIN SCREEN UPGRADE */
+        /* BRANDED LOGIN */
         #gatekeeper { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-card { text-align: center; width: 90%; max-width: 400px; }
-        .brand-main { font-family: 'Orbitron'; font-size: 32px; font-weight: 900; letter-spacing: 4px; color: #fff; margin-bottom: 5px; }
-        .brand-sub { font-family: 'Inter'; font-size: 12px; font-weight: 300; letter-spacing: 8px; color: var(--accent); margin-bottom: 40px; }
+        .login-card { text-align: center; width: 90%; max-width: 400px; animation: fadeIn 1s ease; }
+        .brand-main { font-family: 'Orbitron'; font-size: 38px; font-weight: 900; letter-spacing: 6px; color: #fff; margin-bottom: 5px; }
+        .brand-sub { font-family: 'Inter'; font-size: 11px; font-weight: 300; letter-spacing: 10px; color: var(--accent); margin-bottom: 40px; text-transform: uppercase; }
         
-        .capability-list { text-align: left; background: #0a0b10; border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        .cap-item { font-size: 11px; color: #888; margin-bottom: 10px; display: flex; gap: 10px; }
-        .cap-item b { color: var(--accent); font-family: 'Orbitron'; font-size: 9px; }
+        .capability-list { text-align: left; background: #0a0b10; border: 1px solid var(--border); padding: 25px; border-radius: 12px; margin-bottom: 30px; }
+        .cap-item { font-size: 11px; color: #888; margin-bottom: 12px; display: flex; gap: 15px; align-items: center; }
+        .cap-item b { color: var(--accent); font-family: 'Orbitron'; font-size: 10px; min-width: 25px; }
 
-        input, textarea, select { background: #111; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 6px; font-size: 13px; }
-        .btn-gen { background: var(--accent); color: #000; border: none; font-family: 'Orbitron'; font-weight: 900; padding: 16px; border-radius: 6px; cursor: pointer; transition: 0.3s; }
-        .btn-gen:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        /* SYSTEM MONITOR */
+        .system-monitor {
+            position: fixed; bottom: 20px; left: 20px; width: 180px;
+            background: rgba(0, 0, 0, 0.8); border: 1px solid var(--border);
+            padding: 12px; border-radius: 8px; font-family: 'Orbitron'; font-size: 8px;
+            backdrop-filter: blur(10px); z-index: 1000;
+        }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; color: #555; }
+        .stat-row span { color: var(--accent); }
+        .bar-bg { width: 100%; height: 2px; background: #222; margin-top: 2px; }
+        .bar-fill { height: 100%; background: var(--accent); width: 10%; transition: 0.5s; }
+
+        /* INPUTS */
+        input, textarea, select { 
+            width: 100%; background: #000; border: 1px solid #222; color: #fff; 
+            padding: 14px; border-radius: 8px; font-size: 14px; margin-top: 10px;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--accent); outline: none; }
+
+        .btn-gen { 
+            background: var(--accent); color: #000; border: none; 
+            font-family: 'Orbitron'; font-weight: 900; padding: 18px; 
+            border-radius: 8px; cursor: pointer; transition: 0.3s; 
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-gen:hover { transform: translateY(-2px); box-shadow: 0 5px 20px var(--accent-dim); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 850px) {
+            .studio-core { grid-template-columns: 1fr; overflow-y: auto; }
+            .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+            .system-monitor { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -79,93 +134,175 @@
                 <div class="cap-item"><b>04</b> Secure Encrypted Session Uplink</div>
             </div>
 
-            <input type="password" id="passInput" placeholder="ENTER ACCESS KEY" style="text-align:center; margin-bottom:15px; width:100%;">
-            <button class="btn-gen" style="width:100%;" onclick="unlock()">AUTHORIZE ACCESS</button>
+            <input type="password" id="passInput" placeholder="ENTER ACCESS KEY" style="text-align:center;">
+            <button class="btn-gen" style="width:100%; margin-top:20px;" onclick="unlock()">AUTHORIZE ACCESS</button>
         </div>
     </div>
 
     <header class="top-nav">
-        <div style="font-family:Orbitron; font-weight:900; letter-spacing:2px;">NEXUS <span style="font-weight:100; opacity:0.5; font-size:10px;">AI SUITE</span></div>
-        <button onclick="toggleSettings()" style="background:none; border:none; cursor:pointer; font-size:20px;">⚙️</button>
+        <div style="font-family:Orbitron; font-weight:900; letter-spacing:3px; font-size:16px;">NEXUS <span style="font-weight:100; opacity:0.3; font-size:10px;">AI SUITE</span></div>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.1" oninput="updateVol(this.value)" style="width:60px; margin:0;">
+            <button onclick="toggleSettings()" style="background:none; border:none; cursor:pointer; font-size:20px; color:#fff; opacity:0.5;">⚙️</button>
+        </div>
     </header>
 
     <main class="studio-core">
         <div class="sidebar">
             <div style="display:flex; border-bottom:1px solid var(--border);">
-                <button class="tab-btn active" onclick="switchTab('neural', '#00d2ff')">NEURAL</button>
-                <button class="tab-btn" onclick="switchTab('archive', '#ffaa00')">ARCHIVE</button>
-                <button class="tab-btn" onclick="switchTab('system', '#a066ff')">SYSTEM</button>
+                <button class="tab-btn active" id="btn-neural" onclick="switchTab('neural', '#00d2ff')">NEURAL</button>
+                <button class="tab-btn" id="btn-archive" onclick="switchTab('archive', '#ffaa00')">ARCHIVE</button>
+                <button class="tab-btn" id="btn-system" onclick="switchTab('system', '#a066ff')">IDENTITY</button>
             </div>
             
-            <div id="neural-pane" style="padding:25px;">
-                <label style="font-family:Orbitron; font-size:9px; color:var(--accent);">PROMPT ENGINE</label>
-                <textarea id="promptIn" rows="4" style="width:100%; margin-top:10px;" placeholder="Describe your vision..."></textarea>
-                <button class="btn-gen" style="width:100%; margin-top:20px;" onclick="generate()">EXECUTE</button>
-                <div id="log" style="font-size:9px; color:#444; margin-top:20px; font-family:monospace;"></div>
+            <div id="tab-neural" class="tab-content active">
+                <label style="font-family:Orbitron; font-size:9px; color:var(--accent); letter-spacing:1px;">SYNTHESIS PROMPT</label>
+                <textarea id="promptIn" rows="5" placeholder="Describe your visual concept..."></textarea>
+                
+                <label style="font-family:Orbitron; font-size:9px; color:var(--accent); margin-top:25px;">NEURAL STEERING</label>
+                <select id="stylePreset">
+                    <option value="">RAW OUTPUT</option>
+                    <option value=", ultra photorealistic, 8k, highly detailed, masterwork">PHOTOREAL</option>
+                    <option value=", cyberpunk aesthetic, neon glow, sharp focus, cinematic">CYBERPUNK</option>
+                    <option value=", ethereal dreamscape, soft lighting, fantasy art style">ETHEREAL</option>
+                </select>
+
+                <button class="btn-gen" style="width:100%; margin-top:30px;" onclick="generate()">INITIALIZE</button>
+                <div id="log" style="font-size:8px; color:#444; margin-top:20px; font-family:monospace; line-height:1.5;"></div>
+            </div>
+
+            <div id="tab-archive" class="tab-content">
+                <div id="historyGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
+                <button class="btn-gen" style="width:100%; margin-top:20px; background:#222; color:#888; font-size:10px;" onclick="clearHistory()">PURGE ARCHIVE</button>
+            </div>
+
+            <div id="tab-system" class="tab-content">
+                <div style="font-family:Orbitron; font-size:14px; color:var(--accent); margin-bottom:15px;">TRISTEN // ARCHITECT</div>
+                <p style="font-size:13px; color:#888; line-height:1.6; border-left:2px solid var(--accent); padding-left:15px;">
+                    This interface is the bridge between human imagination and machine learning. Built on the Gemini Neural Engine for T.K. Industries.
+                </p>
+                <a href="https://www.youtube.com/@Southeast_Dreamscapes334" target="_blank" style="display:block; color:var(--accent); text-decoration:none; font-family:Orbitron; font-size:10px; margin-top:30px;">[ YOUTUBE TERMINAL ]</a>
             </div>
         </div>
 
         <div class="preview-area">
             <div id="imageFrame">
-                <div id="waitText" style="font-family:Orbitron; opacity:0.2; letter-spacing:4px;">STANDBY</div>
+                <div id="waitText" style="font-family:Orbitron; opacity:0.1; letter-spacing:8px;">STANDBY</div>
                 <img id="mainImg">
             </div>
-            <button id="dlBtn" class="btn-gen" style="display:none; margin-top:20px; width:200px; padding:10px; font-size:10px;" onclick="download()">SAVE IMAGE</button>
+            <button id="dlBtn" class="btn-gen" style="display:none; margin-top:20px; width:220px; padding:12px; font-size:10px;" onclick="download()">SAVE ARTIFACT</button>
         </div>
     </main>
+
+    <div class="system-monitor">
+        <div style="margin-bottom: 8px; color: #fff; letter-spacing: 1px;">SYSTEM STATUS</div>
+        <div class="stat-row">NEURAL LOAD <span id="loadVal">12%</span></div>
+        <div class="bar-bg"><div id="loadBar" class="bar-fill" style="width: 12%;"></div></div>
+        <div class="stat-row" style="margin-top:8px;">STABILITY <span id="stabVal">SECURE</span></div>
+        <div class="bar-bg"><div id="stabBar" class="bar-fill" style="width: 98%; background: #00ff88;"></div></div>
+        <button onclick="selfDestruct()" style="background:none; border:none; color:#f00; font-size:7px; font-family:'Orbitron'; margin-top:10px; cursor:pointer; opacity:0.4;">[ INITIALIZE SELF-DESTRUCT ]</button>
+    </div>
 
     <script>
         const MASTER_KEY = "NEXUS77";
         let FORGE_URL = sessionStorage.getItem('nexus_url') || "";
+        let sessionHistory = [];
+
+        function log(msg) {
+            const l = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.innerText = `> ${msg}`;
+            l.prepend(entry);
+        }
 
         function switchTab(tab, color) {
             document.documentElement.style.setProperty('--accent', color);
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            // Logic to swap panes would go here
+            document.getElementById('tab-'+tab).classList.add('active');
+            document.getElementById('btn-'+tab).classList.add('active');
         }
 
         function unlock() {
             if(document.getElementById('passInput').value.toUpperCase() === MASTER_KEY) {
                 document.getElementById('gatekeeper').style.display = 'none';
-                document.getElementById('bgAudio').volume = 0.1;
-                document.getElementById('bgAudio').play();
+                const audio = document.getElementById('bgAudio');
+                audio.volume = 0.1;
+                audio.play().catch(e => log("INTERACTION REQUIRED FOR AUDIO"));
+                log("UPLINK AUTHORIZED.");
             }
         }
 
         async function generate() {
-            if(!FORGE_URL) return alert("Uplink required in settings.");
+            if(!FORGE_URL) { alert("Configure Uplink in Settings ⚙️"); return; }
+            
             document.body.classList.add('thinking-active');
-            document.getElementById('waitText').innerText = "GENERATING...";
+            document.getElementById('waitText').innerText = "SYNTHESIZING...";
+            log("INITIALIZING NEURAL FETCH...");
             
             try {
                 const res = await fetch(`${FORGE_URL}/sdapi/v1/txt2img`, {
                     method: 'POST', headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({
-                        "prompt": document.getElementById('promptIn').value,
-                        "steps": 20
+                        "prompt": document.getElementById('promptIn').value + document.getElementById('stylePreset').value,
+                        "steps": 20, "width": 512, "height": 512
                     })
                 });
                 const data = await res.json();
-                const img = document.getElementById('mainImg');
-                img.src = "data:image/png;base64," + data.images[0];
-                img.style.display = "block";
+                const b64 = "data:image/png;base64," + data.images[0];
+                
+                document.getElementById('mainImg').src = b64;
+                document.getElementById('mainImg').style.display = "block";
                 document.getElementById('waitText').style.display = "none";
                 document.getElementById('dlBtn').style.display = "block";
-            } catch(e) { alert("Uplink error."); }
+                
+                sessionHistory.unshift(b64);
+                renderHistory();
+                log("SYNTHESIS COMPLETE.");
+            } catch(e) { log("UPLINK FAILED. CHECK API."); }
             
             document.body.classList.remove('thinking-active');
         }
 
-        function toggleSettings() {
-            let url = prompt("Enter Gradio URL:", FORGE_URL);
-            if(url) { FORGE_URL = url; sessionStorage.setItem('nexus_url', url); }
+        function renderHistory() {
+            const grid = document.getElementById('historyGrid');
+            grid.innerHTML = "";
+            sessionHistory.slice(0, 6).forEach(src => {
+                const div = document.createElement('div');
+                div.style = "border:1px solid #222; aspect-ratio:1; background:url("+src+"); background-size:cover; cursor:pointer;";
+                div.onclick = () => { document.getElementById('mainImg').src = src; };
+                grid.appendChild(div);
+            });
         }
+
+        function clearHistory() { sessionHistory = []; renderHistory(); }
+
+        function toggleSettings() {
+            let url = prompt("Input Neural Uplink (Gradio URL):", FORGE_URL);
+            if(url) { FORGE_URL = url; sessionStorage.setItem('nexus_url', url); log("API UPDATED."); }
+        }
+
+        function updateVol(v) { document.getElementById('bgAudio').volume = v; }
 
         function download() {
             const a = document.createElement('a'); a.href = document.getElementById('mainImg').src;
-            a.download = "nexus_output.png"; a.click();
+            a.download = `nexus_artifact_${Date.now()}.png`; a.click();
         }
+
+        function selfDestruct() {
+            if(confirm("WIPE ENTIRE SESSION AND LOGOUT?")) {
+                sessionStorage.clear();
+                location.reload();
+            }
+        }
+
+        // 📊 SYSTEM MONITOR SIMULATION
+        setInterval(() => {
+            let load = document.body.classList.contains('thinking-active') ? 
+                       Math.floor(Math.random()*15)+80 : Math.floor(Math.random()*10)+5;
+            document.getElementById('loadVal').innerText = load + "%";
+            document.getElementById('loadBar').style.width = load + "%";
+        }, 2000);
     </script>
 </body>
 </html>
