@@ -3,191 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus | Your Creative Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <title>Nexus | Creative Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
         :root { 
-            --accent: #6c5ce7; /* Soft Premium Purple */
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --glass: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --accent: #5d5fef; 
+            --accent-soft: rgba(93, 95, 239, 0.1);
+            --text-main: #2d3436;
+            --text-sub: #636e72;
+            --white: #ffffff;
         }
 
         body { 
-            margin: 0; padding: 0; min-height: 100vh;
-            background: var(--bg-gradient);
+            margin: 0; padding: 0; height: 100vh;
+            /* 🧵 SILK TEXTURE BACKGROUND */
+            background-color: #f0f2f5;
+            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
+                              radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
+                              radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
             font-family: 'Inter', sans-serif;
             display: flex; flex-direction: column; overflow: hidden;
-            color: #2d3436;
-        }
-
-        /* 🌫️ PREMIUM FROSTED TEXTURE */
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow);
-            border-radius: 24px;
+            color: var(--text-main);
         }
 
         /* 🔘 TACTILE 3D BUTTONS */
-        .btn-3d {
+        .btn-premium {
             font-family: 'Quicksand', sans-serif;
             font-weight: 700;
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             background: var(--accent);
             color: white;
-            box-shadow: 0 4px #4834d4, 0 8px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 0px #3f41b5, 0 10px 20px rgba(93, 95, 239, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
         }
 
-        .btn-3d:hover { transform: translateY(-1px); box-shadow: 0 5px #4834d4, 0 10px 20px rgba(0,0,0,0.1); }
-        .btn-3d:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px #4834d4, 0 2px 5px rgba(0,0,0,0.1);
+        .btn-premium:hover { transform: translateY(-1px); box-shadow: 0 6px 0px #3f41b5, 0 12px 24px rgba(93, 95, 239, 0.3); }
+        .btn-premium:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0px #3f41b5, 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* 📂 TABS */
-        .tab-bar {
-            display: flex; gap: 10px; margin-bottom: 20px;
-            background: rgba(0,0,0,0.03); padding: 5px; border-radius: 15px;
+        /* 📁 BRUSHED ALUMINUM SIDEBAR */
+        .sidebar {
+            width: 380px;
+            background: linear-gradient(145deg, #e6e9ef 0%, #d1d5db 100%);
+            border-right: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset -5px 0 15px rgba(0,0,0,0.02);
+            position: relative;
         }
 
+        .sidebar::before {
+            content: ""; position: absolute; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3仿真%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.04; pointer-events: none;
+        }
+
+        /* 📂 TAB SYSTEM */
+        .tab-nav { display: flex; padding: 20px; gap: 8px; }
         .tab-trigger {
-            flex: 1; padding: 10px; border-radius: 10px; border: none;
-            font-family: 'Quicksand'; font-size: 13px; cursor: pointer;
-            background: transparent; color: #636e72; transition: 0.3s;
+            flex: 1; padding: 12px 5px; border-radius: 10px; border: none;
+            font-family: 'Quicksand'; font-weight: 700; font-size: 11px;
+            background: rgba(0,0,0,0.05); color: var(--text-sub); cursor: pointer; transition: 0.3s;
+        }
+        .tab-trigger.active { background: var(--white); color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+        /* 🖼️ THE "LIVING" IMAGE FRAME */
+        .image-container {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 40px; position: relative;
         }
 
-        .tab-trigger.active { background: #fff; color: var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-
-        /* 🏠 LAYOUT */
-        header { padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
-        .brand { font-family: 'Quicksand'; font-size: 26px; font-weight: 700; color: var(--accent); }
-
-        .main-container {
-            display: grid; grid-template-columns: 380px 1fr;
-            gap: 30px; padding: 0 40px 40px 40px; flex: 1; overflow: hidden;
-        }
-
-        .workspace { padding: 30px; display: flex; flex-direction: column; overflow-y: auto; }
-        
-        .preview-pane {
+        .canvas-frame {
+            width: 100%; max-width: 550px; aspect-ratio: 1/1;
+            background: var(--white);
+            border-radius: 30px;
+            padding: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
             display: flex; align-items: center; justify-content: center;
-            flex-direction: column; background: rgba(255,255,255,0.3);
-            border-radius: 30px; position: relative;
+            position: relative; transition: 0.5s ease;
         }
 
-        #canvas {
-            width: 90%; max-width: 512px; aspect-ratio: 1/1;
-            background: #fff; border-radius: 20px; box-shadow: var(--shadow);
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden; position: relative; border: 8px solid #fff;
+        .thinking-active .canvas-frame {
+            box-shadow: 0 0 0 4px var(--accent-soft), 0 20px 50px rgba(93, 95, 239, 0.2);
+            transform: scale(1.01);
         }
 
-        #outputImg { width: 100%; height: 100%; object-fit: contain; display: none; }
+        #outputImg { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; display: none; }
 
-        /* INPUT STYLES */
-        input, textarea, select {
-            width: 100%; padding: 15px; border-radius: 14px; border: 1px solid #ddd;
-            background: rgba(255,255,255,0.5); font-family: inherit; margin-top: 10px;
-            box-sizing: border-box;
+        /* INPUTS */
+        .input-group { padding: 0 25px 25px 25px; }
+        label { font-family: 'Quicksand'; font-weight: 700; font-size: 12px; color: var(--text-sub); display: block; margin-bottom: 8px; }
+        textarea, select, input[type="file"] {
+            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.7); font-family: 'Inter'; font-size: 14px;
+            box-sizing: border-box; resize: none; margin-bottom: 20px;
         }
 
-        .hidden { display: none; }
-        
         /* 🔒 MODERN LOGIN */
         #gatekeeper {
-            position: fixed; inset: 0; background: var(--bg-gradient);
-            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            position: fixed; inset: 0; background: var(--white);
+            z-index: 2000; display: flex; align-items: center; justify-content: center;
+        }
+
+        @media (max-width: 850px) {
+            body { overflow-y: auto; }
+            .sidebar { width: 100%; height: auto; }
+            .image-container { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
     <div id="gatekeeper">
-        <div class="glass-panel" style="padding: 50px; text-align: center; width: 350px;">
-            <div class="brand" style="margin-bottom: 10px;">Nexus</div>
-            <p style="font-size: 14px; color: #636e72; margin-bottom: 30px;">Your friendly creative companion.</p>
-            <input type="password" id="passKey" placeholder="Passkey" style="text-align: center;">
-            <button class="btn-3d" style="width: 100%; margin-top: 20px;" onclick="unlock()">Enter Workspace</button>
+        <div style="text-align:center; width: 320px;">
+            <div style="font-family:'Quicksand'; font-size:32px; font-weight:700; color:var(--accent); margin-bottom:10px;">Nexus</div>
+            <p style="color:var(--text-sub); font-size:14px; margin-bottom:40px;">Please enter your passkey to begin.</p>
+            <input type="password" id="passKey" placeholder="••••••••" style="text-align:center; font-size:18px; letter-spacing:4px; padding:15px; border-radius:15px; border:1px solid #eee; width:100%;">
+            <button class="btn-premium" style="width:100%; margin-top:25px;" onclick="unlock()">Open Suite</button>
         </div>
     </div>
 
-    <header>
-        <div class="brand">Nexus</div>
-        <div style="display: flex; gap: 20px; align-items: center;">
-            <span style="font-size: 12px; color: #636e72;">● Systems Nominal</span>
-            <button onclick="config()" style="background:none; border:none; cursor:pointer; font-size:18px;">⚙️</button>
-        </div>
-    </header>
-
-    <main class="main-container">
-        <div class="glass-panel workspace">
-            <div class="tab-bar">
-                <button class="tab-trigger active" onclick="setTab('txt2img', this)">Text</button>
-                <button class="tab-trigger" onclick="setTab('img2img', this)">Vision</button>
-                <button class="tab-trigger" onclick="setTab('extras', this)">Upscale</button>
-                <button class="tab-trigger" onclick="setTab('interrogate', this)">Identify</button>
+    <div style="display:flex; flex:1; overflow:hidden;">
+        <aside class="sidebar">
+            <div style="padding: 30px 25px 10px 25px;">
+                <div style="font-family:'Quicksand'; font-size:22px; font-weight:700; color:var(--text-main);">Nexus <span style="font-weight:400; font-size:12px; color:var(--accent);">v6.5</span></div>
             </div>
 
-            <div id="txt2img" class="tab-content">
-                <label style="font-size: 13px; font-weight: 600; color: #636e72;">Describe your idea</label>
-                <textarea id="prompt" rows="5" placeholder="A beautiful sunset over a calm lake..."></textarea>
+            <nav class="tab-nav">
+                <button class="tab-trigger active" onclick="setTab('txt', this)">CREATE</button>
+                <button class="tab-trigger" onclick="setTab('img', this)">VISION</button>
+                <button class="tab-trigger" onclick="setTab('up', this)">UPSCALE</button>
+                <button class="tab-trigger" onclick="setTab('id', this)">IDENTIFY</button>
+            </nav>
+
+            <div class="input-group">
+                <div id="tab-txt">
+                    <label>YOUR VISION</label>
+                    <textarea id="prompt" rows="5" placeholder="Describe something beautiful..."></textarea>
+                </div>
+
+                <div id="tab-img" style="display:none;">
+                    <label>BASE IMAGE</label>
+                    <input type="file" id="imgRef" accept="image/*">
+                    <label>TRANSFORMATION STRENGTH</label>
+                    <input type="range" min="0" max="1" step="0.1" value="0.7">
+                </div>
+
+                <div id="tab-up" style="display:none;">
+                    <label>UPSCALE FACTOR</label>
+                    <select id="scale">
+                        <option>2x (High Definition)</option>
+                        <option>4x (Ultra Studio)</option>
+                    </select>
+                </div>
+
+                <button class="btn-premium" style="width:100%; margin-top:10px;" onclick="generate()">Create Image</button>
             </div>
 
-            <div id="img2img" class="tab-content hidden">
-                <label style="font-size: 13px; font-weight: 600; color: #636e72;">Reference Image</label>
-                <input type="file" id="imgInput" accept="image/*">
-                <p style="font-size: 11px; color: #b2bec3;">I'll use this to guide the new creation.</p>
+            <div style="margin-top:auto; padding:25px; border-top:1px solid rgba(0,0,0,0.05);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:10px; color:var(--text-sub); font-weight:600;">SYSTEM STATUS: <span style="color:#2ecc71;">ONLINE</span></span>
+                    <button onclick="config()" style="background:none; border:none; cursor:pointer; font-size:14px; opacity:0.3;">⚙️</button>
+                </div>
             </div>
+        </aside>
 
-            <div id="extras" class="tab-content hidden">
-                <label style="font-size: 13px; font-weight: 600; color: #636e72;">Enhance Quality</label>
-                <select id="upscaleFactor">
-                    <option value="2">2x Size (High Detail)</option>
-                    <option value="4">4x Size (Ultra HD)</option>
-                </select>
-                <p style="font-size: 11px; color: #b2bec3; margin-top: 10px;">Select an image from your collection to upscale.</p>
-            </div>
-
-            <button id="genBtn" class="btn-3d" style="margin-top: 30px;" onclick="handleAction()">Create Now</button>
-            
-            <div id="status" style="margin-top: 20px; font-size: 12px; color: var(--accent); font-weight: 600;"></div>
-        </div>
-
-        <div class="preview-pane">
-            <div id="canvas">
-                <div id="placeholder" style="text-align: center; color: #b2bec3;">
-                    <div style="font-size: 40px; margin-bottom: 10px;">✨</div>
-                    <div style="font-family: 'Quicksand';">Ready for your ideas.</div>
+        <main class="image-container">
+            <div class="canvas-frame">
+                <div id="placeholder" style="text-align:center; color:#b2bec3;">
+                    <div style="font-size:30px; margin-bottom:10px;">✨</div>
+                    <div style="font-family:'Quicksand'; font-weight:500;">Your creation will appear here</div>
                 </div>
                 <img id="outputImg">
             </div>
-            
-            <div style="margin-top: 20px; display: flex; gap: 15px;">
-                <button class="btn-3d" style="background: white; color: var(--accent); box-shadow: 0 4px #eee;" onclick="download()">Save Artwork</button>
-            </div>
-        </div>
-    </main>
+
+            <button id="saveBtn" onclick="save()" style="display:none; position:absolute; bottom:40px; right:40px; background:white; color:var(--accent); border:none; padding:15px 25px; border-radius:50px; font-family:'Quicksand'; font-weight:700; box-shadow:0 10px 20px rgba(0,0,0,0.1); cursor:pointer;">💾 SAVE TO DEVICE</button>
+        </main>
+    </div>
 
     <script>
-        let currentTab = 'txt2img';
         let api_url = sessionStorage.getItem('nexus_api') || "";
 
-        function setTab(tabId, el) {
-            currentTab = tabId;
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById(tabId).classList.remove('hidden');
+        function setTab(type, el) {
             document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
+            ['txt','img','up','id'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
+            document.getElementById('tab-'+type).style.display = 'block';
         }
 
         function unlock() {
@@ -197,43 +207,33 @@
         }
 
         function config() {
-            let u = prompt("Uplink URL (Gradio):", api_url);
+            let u = prompt("Gradio Uplink URL:", api_url);
             if(u) { api_url = u; sessionStorage.setItem('nexus_api', u); }
         }
 
-        async function handleAction() {
-            if(!api_url) return alert("Please set your link in settings ⚙️");
-            const status = document.getElementById('status');
-            status.innerText = "Thinking...";
+        async function generate() {
+            if(!api_url) return alert("Uplink required.");
+            document.body.classList.add('thinking-active');
             
-            let endpoint = "/sdapi/v1/txt2img";
-            let payload = { "prompt": document.getElementById('prompt').value, "steps": 20 };
-
-            if(currentTab === 'interrogate') endpoint = "/sdapi/v1/interrogate";
-            // Add other logic here as needed
-
             try {
-                const res = await fetch(api_url + endpoint, {
+                const res = await fetch(api_url + "/sdapi/v1/txt2img", {
                     method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ "prompt": document.getElementById('prompt').value, "steps": 20 })
                 });
                 const data = await res.json();
                 const b64 = "data:image/png;base64," + data.images[0];
-                
                 document.getElementById('outputImg').src = b64;
                 document.getElementById('outputImg').style.display = 'block';
                 document.getElementById('placeholder').style.display = 'none';
-                status.innerText = "Complete.";
-            } catch(e) {
-                status.innerText = "Connection lost.";
-            }
+                document.getElementById('saveBtn').style.display = 'block';
+            } catch(e) { alert("Link failed."); }
+            
+            document.body.classList.remove('thinking-active');
         }
 
-        function download() {
-            const a = document.createElement('a');
-            a.href = document.getElementById('outputImg').src;
-            a.download = "nexus_creation.png";
-            a.click();
+        function save() {
+            const a = document.createElement('a'); a.href = document.getElementById('outputImg').src;
+            a.download = `nexus_${Date.now()}.png`; a.click();
         }
     </script>
 </body>
