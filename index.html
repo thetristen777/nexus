@@ -3,128 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS ARCHON | Pro AI Studio</title>
+    <title>NEXUS ARCHON | Neural Video Studio</title>
     <script src="https://www.paypal.com/sdk/js?client-id=BAAmHnd5CiEDa90TY6DIL5eA9Xp5A8uUMNaYK4_uw3AwsFuLkJzoBNoeaTCsPWDZ2yn0u1or0aXuq64C6g&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
 
     <style>
-        :root { --bg: #050507; --panel: #101014; --accent: #6366f1; --accent-vid: #ec4899; --text: #fafafa; --dim: #71717a; --border: #27272a; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; }
-        
-        .sidebar { width: 340px; background: var(--panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; overflow-y: auto; }
-        .main { flex: 1; padding: 30px; overflow-y: auto; background-image: radial-gradient(circle at 2px 2px, #1a1a1a 1px, transparent 0); background-size: 32px 32px; }
-        
-        .brand { font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 25px; color: var(--accent); }
-        .credit-badge { background: #1e1b4b; color: #a5b4fc; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; margin-bottom: 20px; border: 1px solid #312e81; }
-        
-        label { font-size: 10px; color: var(--dim); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; display: block; }
-        textarea, select { width: 100%; background: #09090b; border: 1px solid var(--border); border-radius: 8px; color: white; padding: 12px; margin-bottom: 15px; box-sizing: border-box; }
-        
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .btn { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #18181b; color: white; cursor: pointer; font-size: 11px; font-weight: 600; transition: 0.2s; }
-        .btn:hover { background: #27272a; }
-        .btn-gen { grid-column: span 2; background: var(--accent); border: none; font-size: 14px; padding: 15px; }
-        .btn-gen:disabled { opacity: 0.5; }
+        :root { --bg: #07070a; --panel: #111116; --accent: #6366f1; --accent-vid: #ec4899; --text: #f4f4f5; --dim: #a1a1aa; --border: #27272a; }
+        * { box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .art-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; position: relative; }
-        .art-card img { width: 100%; height: auto; display: block; }
-        .card-actions { padding: 12px; display: flex; justify-content: space-between; align-items: center; background: #0c0c0e; }
-        
-        .paypal-box { margin-top: auto; padding: 15px; background: rgba(99, 102, 241, 0.05); border-radius: 12px; border: 1px solid #312e81; }
-        #loader { display: none; color: var(--accent); font-size: 12px; font-weight: 800; margin-bottom: 10px; }
+        /* TAB NAVIGATION */
+        .tab-bar { width: 70px; background: #000; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 20px; }
+        .tab-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--dim); transition: 0.2s; border: 1px solid transparent; }
+        .tab-icon:hover { color: var(--accent); background: #1a1a20; }
+        .tab-icon.active { color: var(--accent); background: #1a1a20; border-color: var(--accent); }
+
+        /* SIDEBAR PANELS */
+        .sidebar { width: 350px; background: var(--panel); border-right: 1px solid var(--border); padding: 25px; overflow-y: auto; display: none; }
+        .sidebar.active { display: flex; flex-direction: column; }
+
+        /* UI ELEMENTS */
+        .brand { font-weight: 900; font-size: 1.2rem; margin-bottom: 30px; display: flex; align-items: center; gap: 8px; }
+        .brand span { color: var(--accent); }
+        label { font-size: 10px; color: var(--dim); text-transform: uppercase; font-weight: 800; margin: 15px 0 8px 0; display: block; }
+        textarea, select, input { width: 100%; background: #09090b; border: 1px solid var(--border); border-radius: 8px; color: white; padding: 12px; font-family: inherit; }
+        .btn-gen { background: var(--accent); border: none; padding: 15px; border-radius: 10px; color: white; font-weight: 800; cursor: pointer; margin-top: 20px; }
+        .btn-gen:hover { filter: brightness(1.2); }
+
+        /* MAIN CONTENT AREA */
+        .main { flex: 1; padding: 40px; overflow-y: auto; background-image: radial-gradient(#1a1a1a 1px, transparent 0); background-size: 40px 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        .art-card { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+        .art-card img { width: 100%; display: block; }
+
+        /* ABOUT SECTION */
+        .about-text { line-height: 1.6; color: var(--dim); font-size: 14px; }
+        .about-text h2 { color: var(--text); }
     </style>
 </head>
 <body>
 
-<aside class="sidebar">
-    <div class="brand">◆ NEXUS ARCHON</div>
-    
-    <div id="creditDisplay" class="credit-badge">SYNCING CREDITS...</div>
+    <nav class="tab-bar">
+        <div class="tab-icon active" onclick="switchTab('create')" title="Create">🎨</div>
+        <div class="tab-icon" onclick="switchTab('vault')" title="Vault/Payments">💎</div>
+        <div class="tab-icon" onclick="switchTab('about')" title="About Us">ℹ️</div>
+    </nav>
 
-    <label>Visions & Concepts</label>
-    <textarea id="prompt" rows="4" placeholder="Enter prompt here..."></textarea>
+    <aside id="tab-create" class="sidebar active">
+        <div class="brand"><span>◆</span> NEXUS STUDIO</div>
+        
+        <label>Primary Vision (Prompt)</label>
+        <textarea id="prompt" rows="4" placeholder="Deep sea bioluminescent city..."></textarea>
+        
+        <label>Negative Prompt (Forbidden elements)</label>
+        <textarea id="negPrompt" rows="2" placeholder="blurry, low quality, distorted..."></textarea>
 
-    <div class="btn-row">
-        <button class="btn" onclick="randomPrompt()">🎲 RANDOM</button>
-        <button class="btn" onclick="clearPrompt()">🧹 CLEAR</button>
-    </div>
-
-    <label>Configuration</label>
-    <select id="size">
-        <option value="512x512">Square (1:1)</option>
-        <option value="512x768">Portrait (2:3)</option>
-        <option value="768x512">Cinema (3:2)</option>
-    </select>
-
-    <div style="background: #18181b; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border);">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size: 12px; font-weight: 600;">Neural Animation</span>
-            <input type="checkbox" id="videoMode" onchange="updateModeUI()">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1">
+                <label>Sampling Steps</label>
+                <input type="number" id="steps" value="20" min="1" max="50">
+            </div>
+            <div style="flex:1">
+                <label>CFG Scale</label>
+                <input type="number" id="cfg" value="7" step="0.5">
+            </div>
         </div>
-        <p style="font-size: 9px; color: var(--dim); margin: 5px 0 0 0;">Costs 20 Credits / Free for Image</p>
-    </div>
 
-    <div id="loader">⚡ NEURAL SYNC IN PROGRESS...</div>
-    <button id="genBtn" class="btn btn-gen" onclick="generate()">GENERATE VISION</button>
+        <label>Dimensions</label>
+        <select id="size">
+            <option value="512x512">Square (1:1)</option>
+            <option value="512x768">Portrait (2:3)</option>
+            <option value="768x512">Cinematic (3:2)</option>
+        </select>
 
-    <div class="paypal-box">
-        <label style="color: #818cf8;">Support Development</label>
-        <p style="font-size: 10px; color: var(--dim); margin-bottom: 10px;">Donate to get 500 Animation Credits.</p>
+        <label>Sampler</label>
+        <select id="sampler">
+            <option value="Euler a">Euler a (Fast)</option>
+            <option value="DPM++ 2M Karras">DPM++ 2M Karras (Best Detail)</option>
+        </select>
+
+        <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-top:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size: 13px; font-weight: 700;">Animation Mode</span>
+                <input type="checkbox" id="videoMode" style="width:20px;">
+            </div>
+        </div>
+
+        <button class="btn-gen" onclick="generate()">SYNTHESIZE VISION</button>
+    </aside>
+
+    <aside id="tab-vault" class="sidebar">
+        <div class="brand"><span>💎</span> THE VAULT</div>
+        <p style="font-size: 13px; color: var(--dim);">Support the creator to unlock high-priority credits and animation sequences.</p>
+        
+        <div style="margin: 20px 0; padding: 20px; background: #1e1b4b; border-radius: 15px; border: 1px solid var(--accent);">
+            <div style="font-size: 10px; color: var(--accent); font-weight: 800; margin-bottom: 5px;">CURRENT BALANCE</div>
+            <div id="creditDisplay" style="font-size: 24px; font-weight: 900;">50 CR</div>
+        </div>
+
+        <label>Top Up Credits</label>
         <div id="paypal-container-U448X4TUAZ4EL"></div>
-    </div>
-</aside>
+    </aside>
 
-<main class="main">
-    <div id="grid" class="grid"></div>
-</main>
+    <aside id="tab-about" class="sidebar">
+        <div class="brand"><span>ℹ️</span> PROTOCOL</div>
+        <div class="about-text">
+            <h2>About Nexus Archon</h2>
+            <p>Nexus Archon is an indie AI research studio dedicated to accessible neural synthesis. Unlike giant corporations, we run our entire operation on localized high-efficiency hardware (NVIDIA RTX 3060).</p>
+            
+            <h2>The Process</h2>
+            <p>Every pixel is generated using <strong>Stable Diffusion Forge</strong>. Our custom pipeline optimizes VRAM to allow high-quality <strong>AnimateDiff</strong> video sequences without the need for massive cloud server farms.</p>
+            
+            <h2>Our Mission</h2>
+            <p>To provide a sleek, distraction-free environment for artists, hobbyists, and dreamers to bring their mental visions into reality.</p>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div id="grid" class="grid"></div>
+    </main>
 
 <script>
-    let userCredits = parseInt(localStorage.getItem('nexus_credits')) || 50;
     const API_URL = "http://127.0.0.1:7860";
+    let userCredits = parseInt(localStorage.getItem('nexus_credits')) || 50;
 
-    // --- INITIALIZE UI ---
-    function updateCreditDisplay() {
-        document.getElementById('creditDisplay').innerText = `CREDITS: ${userCredits} CR`;
-        localStorage.setItem('nexus_credits', userCredits);
+    // --- TAB SYSTEM ---
+    function switchTab(tabName) {
+        document.querySelectorAll('.sidebar').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-icon').forEach(i => i.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+        event.currentTarget.classList.add('active');
     }
-    updateCreditDisplay();
 
+    // --- PAYPAL RENDER ---
     paypal.HostedButtons({ hostedButtonId: "U448X4TUAZ4EL" }).render("#paypal-container-U448X4TUAZ4EL");
-
-    // --- BUTTON FUNCTIONS ---
-    function randomPrompt() {
-        const prompts = [
-            "Cyberpunk street market, neon rain, volumetric lighting, 8k",
-            "Ancient overgrown robot in a mossy forest, studio ghibli style",
-            "Astronaut riding a horse in nebula space, digital art, hyper-detailed",
-            "Dark gothic cathedral, floating candles, dark fantasy cinematic"
-        ];
-        document.getElementById('prompt').value = prompts[Math.floor(Math.random() * prompts.length)];
-    }
-
-    function clearPrompt() { document.getElementById('prompt').value = ''; }
-
-    function updateModeUI() {
-        const isVid = document.getElementById('videoMode').checked;
-        document.getElementById('genBtn').style.background = isVid ? 'var(--accent-vid)' : 'var(--accent)';
-    }
 
     // --- GENERATION LOGIC ---
     async function generate() {
-        const prompt = document.getElementById('prompt').value;
         const isVid = document.getElementById('videoMode').checked;
         const [w, h] = document.getElementById('size').value.split('x');
 
-        if (isVid && userCredits < 20) return alert("Need 20 Credits for Animation!");
-
-        const btn = document.getElementById('genBtn');
-        const loader = document.getElementById('loader');
-        btn.disabled = true;
-        loader.style.display = 'block';
-
         let payload = {
-            prompt: prompt,
-            steps: 20,
+            prompt: document.getElementById('prompt').value,
+            negative_prompt: document.getElementById('negPrompt').value,
+            steps: parseInt(document.getElementById('steps').value),
+            cfg_scale: parseFloat(document.getElementById('cfg').value),
+            sampler_name: document.getElementById('sampler').value,
             width: parseInt(w), height: parseInt(h),
             alwayson_scripts: {}
         };
@@ -142,59 +165,17 @@
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
-            
-            if (isVid) userCredits -= 20;
-            updateCreditDisplay();
             addCard(data.images[0], isVid);
-        } catch (e) {
-            alert("Ensure Forge is running with --api");
-        } finally {
-            btn.disabled = false;
-            loader.style.display = 'none';
-        }
+        } catch (e) { alert("Forge Connection Lost. Check API status."); }
     }
 
-    // --- UPSCALE LOGIC ---
-    async function upscale(base64) {
-        const btn = event.target;
-        btn.innerText = "UPSCaling...";
-        
-        const payload = {
-            "upscaling_resize": 2,
-            "upscaler_1": "R-ESRGAN 4x+",
-            "image": base64
-        };
-
-        try {
-            const res = await fetch(`${API_URL}/sdapi/v1/extra-single-image`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            addCard(data.image, false, "UPSCALE COMPLETE");
-            btn.innerText = "UP 2X";
-        } catch (e) { alert("Upscale failed. Check if R-ESRGAN 4x+ is installed."); }
-    }
-
-    function addCard(imgData, isVid, label = null) {
-        const prefix = isVid ? 'data:image/gif;base64,' : 'data:image/png;base64,';
-        const grid = document.getElementById('grid');
+    function addCard(img, isVid) {
+        const type = isVid ? 'data:image/gif;base64,' : 'data:image/png;base64,';
         const card = document.createElement('div');
         card.className = 'art-card';
-        card.innerHTML = `
-            <img src="${prefix}${imgData}">
-            <div class="card-actions">
-                <span style="font-size: 9px; color: var(--dim);">${label || (isVid ? 'VIDEO' : 'STILL')}</span>
-                <div style="display:flex; gap:10px;">
-                    ${!isVid ? `<button class="btn" style="padding:4px 8px;" onclick="upscale('${imgData}')">UP 2X</button>` : ''}
-                    <a href="${prefix}${imgData}" download="nexus_art.png" style="color:var(--accent); font-size:10px; text-decoration:none; font-weight:bold;">SAVE</a>
-                </div>
-            </div>
-        `;
-        grid.prepend(card);
+        card.innerHTML = `<img src="${type}${img}"><div style="padding:15px; font-size:10px; color:var(--dim);"><button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:red; cursor:pointer;">DELETE</button></div>`;
+        document.getElementById('grid').prepend(card);
     }
 </script>
-
 </body>
 </html>
