@@ -124,9 +124,9 @@
         <div style="opacity:0.2; font-size:7px; font-family:Orbitron;">© 2026 T.K. INDUSTRIES</div>
     </footer>
 
-    <script>
+  <script>
         // --- ADMIN BYPASS CONFIG ---
-        const DEFAULT_UPLINK = "PASTE_YOUR_LINK_HERE"; 
+        const DEFAULT_UPLINK = "PASTE_YOUR_LINK_HERE"; // <--- PASTE GRADIO LINK HERE
         // ---------------------------
 
         let FORGE_URL = localStorage.getItem('nexus_url') || DEFAULT_UPLINK || "";
@@ -152,10 +152,12 @@
                 audio.play().catch(e => console.log("Audio needs interaction"));
                 addLog("ACCESS GRANTED: WELCOME ADMIN");
                 
-                if(FORGE_URL && FORGE_URL !== "https://ca52b0ad1763dbfd61.gradio.live") {
+                if(FORGE_URL && FORGE_URL !== "PASTE_YOUR_LINK_HERE") {
                     document.getElementById('statusTag').innerText = "STABLE";
                     document.getElementById('statusTag').style.color = "#00ff88";
                     addLog("NEURAL BRIDGE ESTABLISHED");
+                } else {
+                    addLog("WARNING: NO UPLINK DETECTED");
                 }
             } else {
                 alert("INVALID PASSKEY");
@@ -230,3 +232,4 @@
     </script>
 </body>
 </html>
+
