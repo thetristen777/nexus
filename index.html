@@ -3,321 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus | Apex Terminal v5.5</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Nexus | Archon v6.1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
         :root { 
             --accent: #5d5fef; 
-            --accent-glow: rgba(93, 95, 239, 0.4);
-            --text-main: #2d3436; 
-            --text-sub: #636e72; 
-            --white: #ffffff; 
-            --panel-bg: rgba(255, 255, 255, 0.7);
+            --accent-glow: rgba(93, 95, 239, 0.3);
+            --bg: #f8f9fd;
+            --panel: rgba(255, 255, 255, 0.8);
+            --text: #2d3436;
+            --sub: #636e72;
         }
 
         body { 
-            margin: 0; padding: 0; height: 100vh;
-            background-color: #f0f2f5;
-            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%);
-            font-family: 'Inter', sans-serif; display: flex; overflow: hidden; color: var(--text-main);
+            margin: 0; height: 100vh; background: var(--bg);
+            font-family: 'Inter', sans-serif; display: flex; overflow: hidden; color: var(--text);
+            background-image: radial-gradient(circle at 20% 20%, #e0e4ff 0%, transparent 40%),
+                              radial-gradient(circle at 80% 80%, #f0f2f5 0%, transparent 40%);
         }
 
-        /* SIDEBAR ARCHITECTURE */
+        /* GLASS SIDEBAR */
         .sidebar {
-            width: 400px; background: linear-gradient(145deg, #e6e9ef 0%, #d1d5db 100%);
-            border-right: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column;
-            position: relative; box-shadow: inset -5px 0 15px rgba(0,0,0,0.02);
-            transition: all 0.3s ease;
+            width: 380px; background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255,255,255,0.5); display: flex; flex-direction: column;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.02); z-index: 10;
         }
 
-        /* TAB SYSTEM */
-        .tab-nav { display: flex; padding: 10px; gap: 4px; background: rgba(0,0,0,0.03); }
+        .tab-nav { display: flex; padding: 15px; gap: 8px; background: rgba(0,0,0,0.02); }
         .tab-trigger {
-            flex: 1; padding: 12px 5px; border-radius: 8px; border: none; font-family: 'Quicksand';
-            font-weight: 700; font-size: 9px; background: transparent; cursor: pointer; color: var(--text-sub);
-            transition: 0.2s; letter-spacing: 0.5px;
+            flex: 1; padding: 10px; border-radius: 10px; border: none; font-family: 'Quicksand';
+            font-weight: 700; font-size: 10px; background: transparent; cursor: pointer; color: var(--sub);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 1px;
         }
-        .tab-trigger.active { background: white; color: var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .tab-trigger.active { background: white; color: var(--accent); box-shadow: 0 4px 15px rgba(93, 95, 239, 0.2); transform: translateY(-1px); }
 
-        .tab-content { 
-            display: none; padding: 20px 25px; overflow-y: auto; flex: 1; 
-            padding-bottom: 120px; /* EXTRA BREATHING ROOM */
+        .tab-content { display: none; padding: 25px; overflow-y: auto; flex: 1; scrollbar-width: none; }
+        .tab-content.active { display: block; animation: slideUp 0.4s ease-out; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* NEUMORPHIC INPUTS */
+        .input-group { background: white; padding: 15px; border-radius: 18px; margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        
+        label { font-size: 10px; font-weight: 800; color: var(--accent); display: block; margin-bottom: 8px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.8; }
+        
+        textarea, select, input { 
+            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee; 
+            background: #fafbfc; font-family: inherit; box-sizing: border-box; font-size: 13px; transition: border 0.2s;
         }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        textarea:focus, select:focus { outline: none; border-color: var(--accent); background: #fff; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* BUTTONS */
         .btn-premium {
-            font-family: 'Quicksand'; font-weight: 700; padding: 14px; border: none; border-radius: 12px;
-            cursor: pointer; transition: 0.1s; background: var(--accent); color: white;
-            box-shadow: 0 4px 0px #3f41b5; font-size: 11px; letter-spacing: 1px; width: 100%; margin-top: 10px;
+            font-family: 'Quicksand'; font-weight: 700; padding: 16px; border: none; border-radius: 14px;
+            cursor: pointer; transition: 0.3s; background: var(--accent); color: white;
+            box-shadow: 0 10px 20px var(--accent-glow); font-size: 12px; letter-spacing: 1px; width: 100%;
         }
-        .btn-premium:active { transform: translateY(3px); box-shadow: 0 1px 0px #3f41b5; }
-        .btn-secondary { background: #fff; color: var(--accent); border: 1px solid var(--accent); box-shadow: 0 4px 0px #ddd; }
+        .btn-premium:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 15px 25px var(--accent-glow); filter: brightness(1.1); }
+        .btn-premium:disabled { background: #b2bec3; box-shadow: none; cursor: not-allowed; opacity: 0.7; }
+
+        /* MAIN VIEWPORT */
+        .main-view { flex: 1; display: flex; flex-direction: column; align-items: center; overflow-y: auto; padding: 40px 20px; }
         
-        /* INPUTS */
-        label { font-size: 10px; font-weight: 800; color: var(--text-sub); display: block; margin-top: 15px; letter-spacing: 1px; text-transform: uppercase; }
-        textarea, select, input[type="text"], input[type="number"] { 
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; 
-            background: rgba(255,255,255,0.8); margin-top: 5px; font-family: inherit; box-sizing: border-box;
+        #statusIndicator { 
+            padding: 12px 25px; border-radius: 30px; background: white; font-family:'Quicksand'; 
+            font-weight:700; color:var(--sub); margin-bottom:30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            font-size: 12px; letter-spacing: 1px; transition: 0.3s;
         }
+        .status-active { color: var(--accent) !important; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* GRID FOR MULTI-GEN */
-        .main-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; padding: 50px 20px 150px 20px; }
-        .output-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px; width: 100%; max-width: 1100px;
-        }
-        .canvas-frame {
-            background: white; border-radius: 25px; padding: 12px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid #fff;
-        }
-        .canvas-frame img { width: 100%; height: auto; border-radius: 15px; display: block; }
-        
-        /* MUSIC WIDGET */
-        .music-mini { background: var(--panel-bg); border-radius: 15px; padding: 15px; margin: 0 20px 20px 20px; border: 1px solid rgba(255,255,255,0.5); }
-
-        /* IDENTITY CARD */
-        .bio-card { background: white; padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
-        .social-link { 
-            display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; 
-            text-decoration: none; color: var(--text-main); font-weight: 700; font-size: 12px;
-            margin-bottom: 8px; transition: 0.2s; background: #fff; border: 1px solid #eee;
-        }
-        .social-link:hover { transform: translateX(5px); border-color: var(--accent); }
-
-        /* MOBILE FIX */
-        @media (max-width: 850px) {
-            body { flex-direction: column; overflow-y: auto; }
-            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #ddd; }
-            .main-view { min-height: 100vh; padding-bottom: 200px; }
-        }
+        .output-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; width: 100%; max-width: 1200px; }
+        .canvas-frame { background: white; border-radius: 28px; padding: 15px; box-shadow: 0 25px 50px rgba(0,0,0,0.06); border: 1px solid #fff; transition: 0.3s; }
+        .canvas-frame:hover { transform: scale(1.02); }
+        .canvas-frame img { width: 100%; height: auto; border-radius: 20px; display: block; margin-bottom: 15px; }
 
         #gatekeeper { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        
+        /* MUSIC WIDGET */
+        .music-mini { background: white; border-radius: 20px; padding: 15px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+
+        @media (max-width: 850px) {
+            body { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; height: auto; border-right: none; }
+            .main-view { min-height: 100vh; padding-top: 20px; }
+        }
     </style>
 </head>
 <body>
 
     <div id="gatekeeper">
-        <div style="text-align:center; width: 300px;">
-            <h1 style="font-family:'Quicksand'; color:var(--accent); font-size: 32px; margin-bottom:5px;">NEXUS</h1>
-            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 30px; letter-spacing: 2px;">V5.5 APEX TERMINAL</p>
-            <input type="password" id="passKey" placeholder="ENTER PASSKEY" style="text-align:center; padding: 15px; border-radius: 12px; border: 1px solid #eee; width: 100%;">
-            <button class="btn-premium" onclick="unlock()">INITIALIZE SYSTEM</button>
+        <div style="text-align:center; width: 320px; animation: slideUp 0.6s ease;">
+            <h1 style="font-family:'Quicksand'; color:var(--accent); font-size: 38px; margin-bottom:5px; letter-spacing:-1px;">NEXUS</h1>
+            <p style="font-size: 10px; color: var(--sub); margin-bottom: 40px; letter-spacing: 3px; font-weight: 600;">TERMINAL V6.1 ARCHON</p>
+            <input type="password" id="passKey" placeholder="PROTOCOL CODE" style="text-align:center; margin-bottom:15px; border-radius:15px; padding:18px;">
+            <button class="btn-premium" onclick="unlock()">INITIATE SYSTEM</button>
         </div>
     </div>
 
     <aside class="sidebar">
-        <div style="padding: 25px;">
-            <div style="font-family:'Quicksand'; font-size:24px; font-weight:700; color:var(--accent);">Nexus <span style="font-weight:300; color:var(--text-sub)">Apex</span></div>
+        <div style="padding: 30px 25px 15px 25px;">
+            <div style="font-family:'Quicksand'; font-size:26px; font-weight:700; color:var(--accent); display:flex; align-items:center; gap:8px;">
+                Nexus <span style="font-weight:300; color:var(--sub); font-size:22px;">Archon</span>
+            </div>
         </div>
 
         <nav class="tab-nav">
-            <button class="tab-trigger active" onclick="setTab('neural', this)">NEURAL</button>
-            <button class="tab-trigger" onclick="setTab('refinery', this)">REFINERY</button>
-            <button class="tab-trigger" onclick="setTab('archive', this)">ARCHIVE</button>
-            <button class="tab-trigger" onclick="setTab('identity', this)">IDENTITY</button>
+            <button class="tab-trigger active" onclick="setTab('neural', this)">Create</button>
+            <button class="tab-trigger" onclick="setTab('refinery', this)">Refine</button>
+            <button class="tab-trigger" onclick="setTab('archive', this)">History</button>
+            <button class="tab-trigger" onclick="setTab('identity', this)">Info</button>
         </nav>
 
         <div id="tab-neural" class="tab-content active">
-            <label>Style Palette</label>
-            <select id="stylePreset">
-                <option value="">Raw Output</option>
-                <option value=", cyberpunk style, neon lights, highly detailed, futuristic">Cyberpunk</option>
-                <option value=", photorealistic, 8k, cinematic lighting, masterpiece">Photorealistic</option>
-                <option value=", studio ghibli style, anime, lush colors, whimsical">Studio Ghibli</option>
-                <option value=", oil painting, renaissance style, brush strokes, classical">Renaissance</option>
-            </select>
+            <div class="input-group">
+                <label>Vision Canvas</label>
+                <select id="aspectRatio">
+                    <option value="512x512">Square Artifact (1:1)</option>
+                    <option value="512x768">Portrait Mode (2:3)</option>
+                    <option value="768x512">Cinematic Wide (3:2)</option>
+                    <option value="448x800">Vertical Mobile (9:16)</option>
+                </select>
+            </div>
 
-            <label>Neural Prompt</label>
-            <textarea id="prompt" rows="3" placeholder="Describe your vision..."></textarea>
-            
-            <label>Negative Data</label>
-            <textarea id="negPrompt" rows="1" placeholder="blurry, distorted..."></textarea>
+            <div class="input-group">
+                <label>Neural Prompt</label>
+                <textarea id="prompt" rows="4" placeholder="Describe the unseen..."></textarea>
+                <label style="margin-top:15px;">Style Override</label>
+                <select id="stylePreset">
+                    <option value="">Raw Output</option>
+                    <option value=", cyberpunk, neon city, futuristic, blade runner style">Neon Cyberpunk</option>
+                    <option value=", highly detailed, photorealistic, 8k, canon eos r5">Hyper-Realistic</option>
+                    <option value=", studio ghibli, whimsical, watercolor, anime">Ghibli Dreams</option>
+                    <option value=", ethereal, dark fantasy, unreal engine 5, volumetric lighting">Dark Ethereal</option>
+                </select>
+            </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="input-group" style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <div>
-                    <label>Batch Count</label>
+                    <label>Batch</label>
                     <input type="number" id="batchSize" value="1" min="1" max="4">
                 </div>
                 <div>
-                    <label>Steps</label>
-                    <input type="number" id="steps" value="20" min="1">
+                    <label>Hires Fix</label>
+                    <select id="hires">
+                        <option value="false">Standard</option>
+                        <option value="true">Ultra (2x)</option>
+                    </select>
                 </div>
             </div>
 
-            <button class="btn-premium" onclick="generate('txt2img')">SYNTHESIZE BATCH</button>
+            <button class="btn-premium" id="genBtn" onclick="generate('txt2img')">SYNTHESIZE VISION</button>
         </div>
 
         <div id="tab-refinery" class="tab-content">
-            <label>Source Vision</label>
-            <div style="padding: 15px; border: 2px dashed #ccc; border-radius: 15px; text-align: center; background: rgba(255,255,255,0.5);">
+            <div class="input-group">
+                <label>Source Artifact</label>
                 <input type="file" id="fileIn" accept="image/*" onchange="previewSource(this)">
+                <button class="btn-premium" style="background:#eee; color:#666; box-shadow:none; margin-top:10px; padding:10px;" onclick="analyzeImage()">INTERROGATE IMAGE</button>
             </div>
-            
-            <button class="btn-premium btn-secondary" onclick="analyzeImage()">ANALYZE SOURCE (CLIP)</button>
-            
-            <label>Denoising (Variation Strength)</label>
-            <input type="range" id="denoising" min="0" max="1" step="0.05" value="0.7" style="width:100%; accent-color:var(--accent);">
-            
-            <button class="btn-premium" onclick="generate('img2img')">RE-SYNTHESIZE</button>
-        </div>
-
-        <div id="tab-archive" class="tab-content">
-            <label>Session Artifacts</label>
-            <div id="historyGrid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;"></div>
-        </div>
-
-        <div id="tab-identity" class="tab-content">
-            <div class="bio-card">
-                <strong>Hi, I'm Tristen.</strong><br>
-                Me and Gemini built this interface together. What started as an idea quickly became a high-performance creative project. Thank you for supporting the journey.
-            </div>
-
-            <label>Connect & Support</label>
-            <a href="https://www.youtube.com/@Southeast_Dreamscapes334" target="_blank" class="social-link">
-                <span style="font-size:18px;">📺</span> YouTube Channel
-            </a>
-            <a href="https://open.spotify.com/artist/2mQLY5gZx2VrUG6tCbdAdl?si=I1iF0xuTT9mANWi_vQMrmg" target="_blank" class="social-link">
-                <span style="font-size:18px;">🎧</span> Spotify Artist Page
-            </a>
-        </div>
-
-        <div class="music-mini">
-            <div style="font-size:9px; font-weight:800; color:var(--text-sub); margin-bottom:8px;">AMBIENT UPLINK</div>
-            <button class="btn-premium" style="padding:8px; margin:0;" id="playBtn" onclick="togglePlay()">PLAY AUDIO</button>
-            <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.2" oninput="audio.volume = this.value" style="width:100%; margin-top:10px;">
-        </div>
-    </aside>
-
-    <main class="main-view">
-        <div id="statusIndicator" style="font-family:'Quicksand'; font-weight:700; color:#ccc; margin-bottom:20px;">SYSTEM STANDBY</div>
-        <div id="outputGrid" class="output-grid">
-            </div>
-    </main>
-
-    <script>
-        // UPDATED DEFAULTS
-        let api_url = "https://3f115e20cf09132213.gradio.live";
-        let currentB64 = ""; 
-        let history = [];
-        const audio = new Audio('ambient.wav');
-        audio.loop = true;
-
-        function unlock() {
-            if(document.getElementById('passKey').value.toUpperCase() === "NEXUS77") {
-                document.getElementById('gatekeeper').style.display = 'none';
-                audio.play().catch(e => console.log("Audio waiting for user."));
-            }
-        }
-
-        function setTab(tab, el) {
-            document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById(`tab-${tab}`).classList.add('active');
-        }
-
-        function togglePlay() {
-            if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = "PAUSE AUDIO"; }
-            else { audio.pause(); document.getElementById('playBtn').innerText = "PLAY AUDIO"; }
-        }
-
-        function previewSource(input) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                currentB64 = e.target.result;
-                document.getElementById('statusIndicator').innerText = "SOURCE LOADED";
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-
-        async function analyzeImage() {
-            if(!currentB64) return alert("Upload a picture first");
-            document.getElementById('statusIndicator').innerText = "ANALYZING VISION...";
-            try {
-                const res = await fetch(api_url + "/sdapi/v1/interrogate", {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ image: currentB64.split(',')[1], model: "clip" })
-                });
-                const data = await res.json();
-                document.getElementById('prompt').value = data.caption || "Identification successful.";
-                document.getElementById('statusIndicator').innerText = "VISION SYNCHRONIZED";
-            } catch(e) { alert("Analysis failed. Link may be expired."); }
-        }
-
-        async function generate(mode) {
-            const grid = document.getElementById('outputGrid');
-            const status = document.getElementById('statusIndicator');
-            
-            grid.innerHTML = "";
-            status.innerText = "SYNTHESIZING NEURAL DATA...";
-
-            let endpoint = mode === 'txt2img' ? "/sdapi/v1/txt2img" : "/sdapi/v1/img2img";
-            let batchSize = parseInt(document.getElementById('batchSize').value);
-            
-            let payload = {
-                prompt: document.getElementById('prompt').value + document.getElementById('stylePreset').value,
-                negative_prompt: document.getElementById('negPrompt').value,
-                steps: parseInt(document.getElementById('steps').value),
-                batch_size: batchSize,
-                width: 512, height: 512
-            };
-
-            if(mode === 'img2img') {
-                if(!currentB64) return alert("No source image.");
-                payload.init_images = [currentB64.split(',')[1]];
-                payload.denoising_strength = parseFloat(document.getElementById('denoising').value);
-            }
-
-            try {
-                const res = await fetch(api_url + endpoint, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                
-                status.innerText = "BATCH COMPLETE";
-
-                data.images.forEach((imgData, index) => {
-                    const fullB64 = "data:image/png;base64," + imgData;
-                    const container = document.createElement('div');
-                    container.className = "canvas-frame";
-                    container.innerHTML = `
-                        <img src="${fullB64}">
-                        <button class="btn-premium" style="padding:8px; font-size:9px;" onclick="downloadSolo('${fullB64}')">SAVE ARTIFACT</button>
-                    `;
-                    grid.appendChild(container);
-                    addToArchive(fullB64);
-                });
-
-            } catch(e) { 
-                status.innerText = "UPLINK OFFLINE";
-                alert("Generation failed. Check Gradio link.");
-            }
-        }
-
-        function addToArchive(b64) {
-            history.unshift(b64);
-            const arch = document.getElementById('historyGrid');
-            arch.innerHTML = history.slice(0, 8).map(src => `<img src="${src}" style="width:100%; border-radius:8px; cursor:pointer;" onclick="restore(this.src)">`).join('');
-        }
-
-        function restore(src) {
-            const grid = document.getElementById('outputGrid');
-            grid.innerHTML = `<div class="canvas-frame"><img src="${src}"></div>`;
-        }
-
-        function downloadSolo(src) {
-            const a = document.createElement('a');
-            a.href = src;
-            a.download = `nexus_${Date.now()}.png`;
-            a.click();
-        }
-    </script>
-</body>
-</html>
+            <div class="input-group">
+                <label>Denoising (Variation)</label>
+                <input type="range" id="denoising" min="0" max="1" step="0.05" value="0.7" style="accent-color:var(--accent);">
+                <div style="display:flex; justify-content:space-between; font-size:9px; color:var(--sub);
