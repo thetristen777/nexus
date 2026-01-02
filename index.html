@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus | Archon v6.1</title>
+    <title>Nexus | Archon v6.1.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
@@ -11,7 +11,6 @@
             --accent: #5d5fef; 
             --accent-glow: rgba(93, 95, 239, 0.3);
             --bg: #f8f9fd;
-            --panel: rgba(255, 255, 255, 0.8);
             --text: #2d3436;
             --sub: #636e72;
         }
@@ -23,7 +22,6 @@
                               radial-gradient(circle at 80% 80%, #f0f2f5 0%, transparent 40%);
         }
 
-        /* GLASS SIDEBAR */
         .sidebar {
             width: 380px; background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -35,78 +33,65 @@
         .tab-trigger {
             flex: 1; padding: 10px; border-radius: 10px; border: none; font-family: 'Quicksand';
             font-weight: 700; font-size: 10px; background: transparent; cursor: pointer; color: var(--sub);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 1px;
+            transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
         }
-        .tab-trigger.active { background: white; color: var(--accent); box-shadow: 0 4px 15px rgba(93, 95, 239, 0.2); transform: translateY(-1px); }
+        .tab-trigger.active { background: white; color: var(--accent); box-shadow: 0 4px 15px rgba(93, 95, 239, 0.2); }
 
-        .tab-content { display: none; padding: 25px; overflow-y: auto; flex: 1; scrollbar-width: none; }
+        .tab-content { display: none; padding: 25px; overflow-y: auto; flex: 1; }
         .tab-content.active { display: block; animation: slideUp 0.4s ease-out; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* NEUMORPHIC INPUTS */
-        .input-group { background: white; padding: 15px; border-radius: 18px; margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        
-        label { font-size: 10px; font-weight: 800; color: var(--accent); display: block; margin-bottom: 8px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.8; }
+        .input-group { background: white; padding: 15px; border-radius: 18px; margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.03); }
+        label { font-size: 10px; font-weight: 800; color: var(--accent); display: block; margin-bottom: 8px; letter-spacing: 1.5px; text-transform: uppercase; }
         
         textarea, select, input { 
             width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee; 
-            background: #fafbfc; font-family: inherit; box-sizing: border-box; font-size: 13px; transition: border 0.2s;
+            background: #fafbfc; font-family: inherit; box-sizing: border-box; font-size: 13px;
         }
-        textarea:focus, select:focus { outline: none; border-color: var(--accent); background: #fff; }
 
         .btn-premium {
             font-family: 'Quicksand'; font-weight: 700; padding: 16px; border: none; border-radius: 14px;
             cursor: pointer; transition: 0.3s; background: var(--accent); color: white;
             box-shadow: 0 10px 20px var(--accent-glow); font-size: 12px; letter-spacing: 1px; width: 100%;
         }
-        .btn-premium:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 15px 25px var(--accent-glow); filter: brightness(1.1); }
-        .btn-premium:disabled { background: #b2bec3; box-shadow: none; cursor: not-allowed; opacity: 0.7; }
+        .btn-premium:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-premium:disabled { background: #b2bec3; cursor: not-allowed; }
 
-        /* MAIN VIEWPORT */
         .main-view { flex: 1; display: flex; flex-direction: column; align-items: center; overflow-y: auto; padding: 40px 20px; }
         
         #statusIndicator { 
             padding: 12px 25px; border-radius: 30px; background: white; font-family:'Quicksand'; 
-            font-weight:700; color:var(--sub); margin-bottom:30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            font-size: 12px; letter-spacing: 1px; transition: 0.3s;
+            font-weight:700; color:var(--sub); margin-bottom:30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); font-size: 12px;
         }
-        .status-active { color: var(--accent) !important; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         .output-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; width: 100%; max-width: 1200px; }
-        .canvas-frame { background: white; border-radius: 28px; padding: 15px; box-shadow: 0 25px 50px rgba(0,0,0,0.06); border: 1px solid #fff; transition: 0.3s; }
-        .canvas-frame:hover { transform: scale(1.02); }
+        .canvas-frame { background: white; border-radius: 28px; padding: 15px; box-shadow: 0 25px 50px rgba(0,0,0,0.06); border: 1px solid #fff; }
         .canvas-frame img { width: 100%; height: auto; border-radius: 20px; display: block; margin-bottom: 15px; }
 
         #gatekeeper { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        
-        /* MUSIC WIDGET */
         .music-mini { background: white; border-radius: 20px; padding: 15px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
 
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; }
-            .sidebar { width: 100%; height: auto; border-right: none; }
-            .main-view { min-height: 100vh; padding-top: 20px; }
+            .sidebar { width: 100%; height: auto; }
         }
     </style>
 </head>
 <body>
 
     <div id="gatekeeper">
-        <div style="text-align:center; width: 320px; animation: slideUp 0.6s ease;">
-            <h1 style="font-family:'Quicksand'; color:var(--accent); font-size: 38px; margin-bottom:5px; letter-spacing:-1px;">NEXUS</h1>
-            <p style="font-size: 10px; color: var(--sub); margin-bottom: 40px; letter-spacing: 3px; font-weight: 600;">TERMINAL V6.1 ARCHON</p>
+        <div style="text-align:center; width: 320px;">
+            <h1 style="font-family:'Quicksand'; color:var(--accent); font-size: 38px; margin-bottom:5px;">NEXUS</h1>
+            <p style="font-size: 10px; color: var(--sub); margin-bottom: 40px; letter-spacing: 3px;">V6.1.1 ARCHON</p>
             <input type="password" id="passKey" placeholder="PROTOCOL CODE" style="text-align:center; margin-bottom:15px; border-radius:15px; padding:18px;">
-            <button class="btn-premium" onclick="unlock()">INITIATE SYSTEM</button>
+            <button class="btn-premium" onclick="handleLogin()">LOGIN</button>
         </div>
     </div>
 
     <aside class="sidebar">
         <div style="padding: 30px 25px 15px 25px;">
-            <div style="font-family:'Quicksand'; font-size:26px; font-weight:700; color:var(--accent); display:flex; align-items:center; gap:8px;">
-                Nexus <span style="font-weight:300; color:var(--sub); font-size:22px;">Archon</span>
-            </div>
+            <div style="font-family:'Quicksand'; font-size:26px; font-weight:700; color:var(--accent);">Nexus <span style="font-weight:300; color:var(--sub);">Archon</span></div>
         </div>
 
         <nav class="tab-nav">
@@ -120,50 +105,153 @@
             <div class="input-group">
                 <label>Vision Canvas</label>
                 <select id="aspectRatio">
-                    <option value="512x512">Square Artifact (1:1)</option>
-                    <option value="512x768">Portrait Mode (2:3)</option>
-                    <option value="768x512">Cinematic Wide (3:2)</option>
-                    <option value="448x800">Vertical Mobile (9:16)</option>
+                    <option value="512x512">Square (1:1)</option>
+                    <option value="512x768">Portrait (2:3)</option>
+                    <option value="768x512">Wide (3:2)</option>
+                    <option value="448x800">Mobile (9:16)</option>
                 </select>
             </div>
-
             <div class="input-group">
                 <label>Neural Prompt</label>
-                <textarea id="prompt" rows="4" placeholder="Describe the unseen..."></textarea>
+                <textarea id="prompt" rows="4" placeholder="Describe the vision..."></textarea>
                 <label style="margin-top:15px;">Style Override</label>
                 <select id="stylePreset">
                     <option value="">Raw Output</option>
-                    <option value=", cyberpunk, neon city, futuristic, blade runner style">Neon Cyberpunk</option>
-                    <option value=", highly detailed, photorealistic, 8k, canon eos r5">Hyper-Realistic</option>
-                    <option value=", studio ghibli, whimsical, watercolor, anime">Ghibli Dreams</option>
-                    <option value=", ethereal, dark fantasy, unreal engine 5, volumetric lighting">Dark Ethereal</option>
+                    <option value=", cyberpunk, neon city">Neon Cyberpunk</option>
+                    <option value=", photorealistic, 8k">Hyper-Realistic</option>
+                    <option value=", studio ghibli, anime">Ghibli Dreams</option>
                 </select>
             </div>
-
             <div class="input-group" style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div>
-                    <label>Batch</label>
-                    <input type="number" id="batchSize" value="1" min="1" max="4">
-                </div>
-                <div>
-                    <label>Hires Fix</label>
-                    <select id="hires">
-                        <option value="false">Standard</option>
-                        <option value="true">Ultra (2x)</option>
-                    </select>
-                </div>
+                <div><label>Batch</label><input type="number" id="batchSize" value="1" min="1" max="4"></div>
+                <div><label>Hires Fix</label><select id="hires"><option value="false">Off</option><option value="true">On</option></select></div>
             </div>
-
             <button class="btn-premium" id="genBtn" onclick="generate('txt2img')">SYNTHESIZE VISION</button>
         </div>
 
         <div id="tab-refinery" class="tab-content">
             <div class="input-group">
-                <label>Source Artifact</label>
+                <label>Source Image</label>
                 <input type="file" id="fileIn" accept="image/*" onchange="previewSource(this)">
-                <button class="btn-premium" style="background:#eee; color:#666; box-shadow:none; margin-top:10px; padding:10px;" onclick="analyzeImage()">INTERROGATE IMAGE</button>
             </div>
-            <div class="input-group">
-                <label>Denoising (Variation)</label>
-                <input type="range" id="denoising" min="0" max="1" step="0.05" value="0.7" style="accent-color:var(--accent);">
-                <div style="display:flex; justify-content:space-between; font-size:9px; color:var(--sub);
+            <button class="btn-premium" onclick="generate('img2img')">RE-SYNTHESIZE</button>
+        </div>
+
+        <div id="tab-archive" class="tab-content"><div id="historyGrid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;"></div></div>
+
+        <div id="tab-identity" class="tab-content">
+            <div style="background:white; padding:20px; border-radius:20px; font-size:13px;">
+                <strong>Tristen | Lead Designer</strong><br>Nexus Archon Terminal v6.1.1
+            </div>
+        </div>
+
+        <div class="music-mini">
+            <button class="btn-premium" id="playBtn" onclick="togglePlay()" style="padding:10px; font-size:10px;">PLAY AUDIO</button>
+            <input type="range" min="0" max="1" step="0.01" value="0.2" oninput="audio.volume = this.value" style="margin-top:10px;">
+        </div>
+    </aside>
+
+    <main class="main-view">
+        <div id="statusIndicator">SYSTEM STANDBY</div>
+        <div id="outputGrid" class="output-grid"></div>
+    </main>
+
+    <script>
+        const api_url = "https://3f115e20cf09132213.gradio.live";
+        let currentB64 = ""; 
+        let history = [];
+        let isProcessing = false;
+        const audio = new Audio('ambient.wav');
+        audio.loop = true;
+
+        // FIXED LOGIN LOGIC
+        function handleLogin() {
+            const val = document.getElementById('passKey').value.toUpperCase();
+            if(val === "NEXUS77") {
+                document.getElementById('gatekeeper').style.display = 'none';
+                audio.play().catch(e => console.log("Audio play blocked by browser."));
+            } else {
+                alert("ACCESS DENIED");
+            }
+        }
+
+        // Allow "Enter" key to login
+        document.getElementById('passKey').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        function setTab(tab, el) {
+            document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        function togglePlay() {
+            if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = "PAUSE AUDIO"; }
+            else { audio.pause(); document.getElementById('playBtn').innerText = "PLAY AUDIO"; }
+        }
+
+        function previewSource(input) {
+            const reader = new FileReader();
+            reader.onload = e => { currentB64 = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        async function generate(mode) {
+            if(isProcessing) return;
+            isProcessing = true;
+            const btn = document.getElementById('genBtn');
+            const status = document.getElementById('statusIndicator');
+            const grid = document.getElementById('outputGrid');
+            
+            btn.disabled = true;
+            status.innerText = "SYNTHESIZING...";
+            grid.innerHTML = "";
+
+            const [w, h] = document.getElementById('aspectRatio').value.split('x');
+            const hires = document.getElementById('hires').value === "true";
+
+            let payload = {
+                prompt: document.getElementById('prompt').value + document.getElementById('stylePreset').value,
+                steps: 25,
+                batch_size: parseInt(document.getElementById('batchSize').value),
+                width: parseInt(w), height: parseInt(h),
+                enable_hr: hires, hr_scale: 2, hr_upscaler: "Latent",
+                denoising_strength: 0.65
+            };
+
+            if(mode === 'img2img') {
+                if(!currentB64) { alert("No image loaded"); isProcessing = false; btn.disabled = false; return; }
+                payload.init_images = [currentB64.split(',')[1]];
+            }
+
+            try {
+                const res = await fetch(api_url + (mode === 'txt2img' ? "/sdapi/v1/txt2img" : "/sdapi/v1/img2img"), {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                data.images.forEach(imgData => {
+                    const b64 = "data:image/png;base64," + imgData;
+                    const card = document.createElement('div');
+                    card.className = "canvas-frame";
+                    card.innerHTML = `<img src="${b64}"><button class="btn-premium" style="padding:10px; font-size:10px;" onclick="downloadSolo('${b64}')">SAVE</button>`;
+                    grid.appendChild(card);
+                    addToArchive(b64);
+                });
+                status.innerText = "COMPLETE";
+            } catch(e) { status.innerText = "ERROR"; }
+            finally { isProcessing = false; btn.disabled = false; }
+        }
+
+        function addToArchive(src) {
+            history.unshift(src);
+            document.getElementById('historyGrid').innerHTML = history.slice(0, 10).map(s => `<img src="${s}" style="width:100%; border-radius:12px; cursor:pointer;" onclick="restore('${s}')">`).join('');
+        }
+        function restore(src) { document.getElementById('outputGrid').innerHTML = `<div class="canvas-frame"><img src="${src}"></div>`; }
+        function downloadSolo(src) { const a = document.createElement('a'); a.href = src; a.download = `nexus_${Date.now()}.png`; a.click(); }
+    </script>
+</body>
+</html>
