@@ -3,255 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS ARCHON | Neural Video Studio</title>
-    
+    <title>NEXUS ARCHON | Pro AI Studio</title>
     <script src="https://www.paypal.com/sdk/js?client-id=BAAmHnd5CiEDa90TY6DIL5eA9Xp5A8uUMNaYK4_uw3AwsFuLkJzoBNoeaTCsPWDZ2yn0u1or0aXuq64C6g&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
 
     <style>
-        :root {
-            --bg: #09090b;
-            --panel: #121217;
-            --accent: #6366f1;
-            --accent-vid: #ec4899; /* Pink for Video Mode */
-            --text-main: #fafafa;
-            --text-dim: #a1a1aa;
-            --border: #27272a;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text-main);
-            font-family: 'Inter', system-ui, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: 320px;
-            background: var(--panel);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .brand {
-            font-weight: 800;
-            letter-spacing: -1px;
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand span { color: var(--accent); }
-
-        /* Control Groups */
-        .control-group { margin-bottom: 20px; }
-        label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; }
+        :root { --bg: #050507; --panel: #101014; --accent: #6366f1; --accent-vid: #ec4899; --text: #fafafa; --dim: #71717a; --border: #27272a; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; }
         
-        textarea, select {
-            width: 100%;
-            background: #1c1c24;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: white;
-            padding: 12px;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        /* Custom Toggle for Video */
-        .mode-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255,255,255,0.03);
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px dashed var(--border);
-            margin-bottom: 20px;
-        }
-
-        /* Action Button */
-        .gen-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--accent);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .gen-btn.video-mode { background: var(--accent-vid); }
-
-        /* Main Workspace */
-        .main { flex: 1; padding: 40px; overflow-y: auto; position: relative; }
+        .sidebar { width: 340px; background: var(--panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; overflow-y: auto; }
+        .main { flex: 1; padding: 30px; overflow-y: auto; background-image: radial-gradient(circle at 2px 2px, #1a1a1a 1px, transparent 0); background-size: 32px 32px; }
         
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
+        .brand { font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 25px; color: var(--accent); }
+        .credit-badge { background: #1e1b4b; color: #a5b4fc; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; margin-bottom: 20px; border: 1px solid #312e81; }
+        
+        label { font-size: 10px; color: var(--dim); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; display: block; }
+        textarea, select { width: 100%; background: #09090b; border: 1px solid var(--border); border-radius: 8px; color: white; padding: 12px; margin-bottom: 15px; box-sizing: border-box; }
+        
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .btn { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #18181b; color: white; cursor: pointer; font-size: 11px; font-weight: 600; transition: 0.2s; }
+        .btn:hover { background: #27272a; }
+        .btn-gen { grid-column: span 2; background: var(--accent); border: none; font-size: 14px; padding: 15px; }
+        .btn-gen:disabled { opacity: 0.5; }
 
-        .art-card {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-
-        .art-card img { width: 100%; display: block; }
-
-        /* PayPal Area */
-        .pro-box {
-            margin-top: auto;
-            padding: 15px;
-            background: linear-gradient(145deg, #1e1e26, #121217);
-            border: 1px solid #333;
-            border-radius: 12px;
-        }
-
-        #loader { 
-            display: none; 
-            position: fixed; top: 20px; right: 20px; 
-            background: var(--accent); padding: 10px 20px; border-radius: 20px;
-            font-size: 12px; font-weight: bold; animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .art-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; position: relative; }
+        .art-card img { width: 100%; height: auto; display: block; }
+        .card-actions { padding: 12px; display: flex; justify-content: space-between; align-items: center; background: #0c0c0e; }
+        
+        .paypal-box { margin-top: auto; padding: 15px; background: rgba(99, 102, 241, 0.05); border-radius: 12px; border: 1px solid #312e81; }
+        #loader { display: none; color: var(--accent); font-size: 12px; font-weight: 800; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div id="loader">NEURAL SYNC IN PROGRESS...</div>
-
 <aside class="sidebar">
-    <div class="brand"><span>◆</span> NEXUS ARCHON</div>
+    <div class="brand">◆ NEXUS ARCHON</div>
+    
+    <div id="creditDisplay" class="credit-badge">SYNCING CREDITS...</div>
 
-    <div class="control-group">
-        <label>Neural Prompt</label>
-        <textarea id="prompt" rows="4" placeholder="Describe the vision..."></textarea>
+    <label>Visions & Concepts</label>
+    <textarea id="prompt" rows="4" placeholder="Enter prompt here..."></textarea>
+
+    <div class="btn-row">
+        <button class="btn" onclick="randomPrompt()">🎲 RANDOM</button>
+        <button class="btn" onclick="clearPrompt()">🧹 CLEAR</button>
     </div>
 
-    <div class="mode-toggle">
-        <span style="font-size: 13px; font-weight: 600;">Enable Animation</span>
-        <input type="checkbox" id="videoMode" onchange="toggleModeUI()">
-    </div>
+    <label>Configuration</label>
+    <select id="size">
+        <option value="512x512">Square (1:1)</option>
+        <option value="512x768">Portrait (2:3)</option>
+        <option value="768x512">Cinema (3:2)</option>
+    </select>
 
-    <div class="control-group">
-        <label>Resolution</label>
-        <select id="size">
-            <option value="512x512">Square (Standard)</option>
-            <option value="512x768">Portrait (Mobile)</option>
-            <option value="768x512">Landscape (Cinematic)</option>
-        </select>
-    </div>
-
-    <button id="genBtn" class="gen-btn" onclick="runGeneration()">GENERATE VISION</button>
-
-    <div class="pro-box">
-        <label style="color: #0070ba;">Support Project</label>
-        <p style="font-size: 10px; color: var(--text-dim); margin-bottom: 12px;">Get 500 High-Priority Credits</p>
-        
-        <div id="paypal-container-U448X4TUAZ4EL"></div>
-        <script>
-          paypal.HostedButtons({
-            hostedButtonId: "U448X4TUAZ4EL",
-          }).render("#paypal-container-U448X4TUAZ4EL");
-        </script>
+    <div style="background: #18181b; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size: 12px; font-weight: 600;">Neural Animation</span>
+            <input type="checkbox" id="videoMode" onchange="updateModeUI()">
         </div>
+        <p style="font-size: 9px; color: var(--dim); margin: 5px 0 0 0;">Costs 20 Credits / Free for Image</p>
+    </div>
+
+    <div id="loader">⚡ NEURAL SYNC IN PROGRESS...</div>
+    <button id="genBtn" class="btn btn-gen" onclick="generate()">GENERATE VISION</button>
+
+    <div class="paypal-box">
+        <label style="color: #818cf8;">Support Development</label>
+        <p style="font-size: 10px; color: var(--dim); margin-bottom: 10px;">Donate to get 500 Animation Credits.</p>
+        <div id="paypal-container-U448X4TUAZ4EL"></div>
+    </div>
 </aside>
 
 <main class="main">
-    <div id="outputGrid" class="grid">
-        </div>
+    <div id="grid" class="grid"></div>
 </main>
 
 <script>
-    const API_URL = "http://127.0.0.1:7860"; // Change this if your Forge port is different
+    let userCredits = parseInt(localStorage.getItem('nexus_credits')) || 50;
+    const API_URL = "http://127.0.0.1:7860";
 
-    function toggleModeUI() {
-        const isVideo = document.getElementById('videoMode').checked;
-        const btn = document.getElementById('genBtn');
-        btn.innerText = isVideo ? "SYNTHESIZE VIDEO" : "GENERATE VISION";
-        btn.classList.toggle('video-mode', isVideo);
+    // --- INITIALIZE UI ---
+    function updateCreditDisplay() {
+        document.getElementById('creditDisplay').innerText = `CREDITS: ${userCredits} CR`;
+        localStorage.setItem('nexus_credits', userCredits);
+    }
+    updateCreditDisplay();
+
+    paypal.HostedButtons({ hostedButtonId: "U448X4TUAZ4EL" }).render("#paypal-container-U448X4TUAZ4EL");
+
+    // --- BUTTON FUNCTIONS ---
+    function randomPrompt() {
+        const prompts = [
+            "Cyberpunk street market, neon rain, volumetric lighting, 8k",
+            "Ancient overgrown robot in a mossy forest, studio ghibli style",
+            "Astronaut riding a horse in nebula space, digital art, hyper-detailed",
+            "Dark gothic cathedral, floating candles, dark fantasy cinematic"
+        ];
+        document.getElementById('prompt').value = prompts[Math.floor(Math.random() * prompts.length)];
     }
 
-    async function runGeneration() {
+    function clearPrompt() { document.getElementById('prompt').value = ''; }
+
+    function updateModeUI() {
+        const isVid = document.getElementById('videoMode').checked;
+        document.getElementById('genBtn').style.background = isVid ? 'var(--accent-vid)' : 'var(--accent)';
+    }
+
+    // --- GENERATION LOGIC ---
+    async function generate() {
         const prompt = document.getElementById('prompt').value;
-        const isVideo = document.getElementById('videoMode').checked;
+        const isVid = document.getElementById('videoMode').checked;
         const [w, h] = document.getElementById('size').value.split('x');
+
+        if (isVid && userCredits < 20) return alert("Need 20 Credits for Animation!");
+
         const btn = document.getElementById('genBtn');
         const loader = document.getElementById('loader');
-
-        if (!prompt) return alert("Please enter a prompt.");
-
         btn.disabled = true;
         loader.style.display = 'block';
 
         let payload = {
             prompt: prompt,
             steps: 20,
-            width: parseInt(w),
-            height: parseInt(h),
+            width: parseInt(w), height: parseInt(h),
             alwayson_scripts: {}
         };
 
-        if (isVideo) {
-            // Updated AnimateDiff API logic for Forge
+        if (isVid) {
             payload.alwayson_scripts["AnimateDiff"] = {
-                args: [{
-                    model: "mm_sd_v15_v2.ckpt",
-                    enable: true,
-                    video_length: 16,
-                    fps: 8,
-                    format: ["GIF"]
-                }]
+                args: [{ model: "mm_sd_v15_v2.ckpt", enable: true, video_length: 16, fps: 8, format: ["GIF"] }]
             };
         }
 
         try {
-            const response = await fetch(`${API_URL}/sdapi/v1/txt2img`, {
+            const res = await fetch(`${API_URL}/sdapi/v1/txt2img`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-
-            const data = await response.json();
-            displayResult(data.images[0], isVideo);
-
-        } catch (error) {
-            console.error(error);
-            alert("Connection Error. Ensure Forge is running with --api");
+            const data = await res.json();
+            
+            if (isVid) userCredits -= 20;
+            updateCreditDisplay();
+            addCard(data.images[0], isVid);
+        } catch (e) {
+            alert("Ensure Forge is running with --api");
         } finally {
             btn.disabled = false;
             loader.style.display = 'none';
         }
     }
 
-    function displayResult(base64Data, isVideo) {
-        const grid = document.getElementById('outputGrid');
+    // --- UPSCALE LOGIC ---
+    async function upscale(base64) {
+        const btn = event.target;
+        btn.innerText = "UPSCaling...";
+        
+        const payload = {
+            "upscaling_resize": 2,
+            "upscaler_1": "R-ESRGAN 4x+",
+            "image": base64
+        };
+
+        try {
+            const res = await fetch(`${API_URL}/sdapi/v1/extra-single-image`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            addCard(data.image, false, "UPSCALE COMPLETE");
+            btn.innerText = "UP 2X";
+        } catch (e) { alert("Upscale failed. Check if R-ESRGAN 4x+ is installed."); }
+    }
+
+    function addCard(imgData, isVid, label = null) {
+        const prefix = isVid ? 'data:image/gif;base64,' : 'data:image/png;base64,';
+        const grid = document.getElementById('grid');
         const card = document.createElement('div');
         card.className = 'art-card';
-        
-        const mediaTag = isVideo ? 'data:image/gif;base64,' : 'data:image/png;base64,';
-        
         card.innerHTML = `
-            <img src="${mediaTag}${base64Data}">
-            <div style="padding: 15px; font-size: 10px; color: var(--text-dim); display: flex; justify-content: space-between;">
-                <span>${isVideo ? 'NEURAL VIDEO' : 'STILL FRAME'}</span>
-                <a href="${mediaTag}${base64Data}" download="nexus_art.png" style="color: var(--accent); text-decoration: none;">SAVE</a>
+            <img src="${prefix}${imgData}">
+            <div class="card-actions">
+                <span style="font-size: 9px; color: var(--dim);">${label || (isVid ? 'VIDEO' : 'STILL')}</span>
+                <div style="display:flex; gap:10px;">
+                    ${!isVid ? `<button class="btn" style="padding:4px 8px;" onclick="upscale('${imgData}')">UP 2X</button>` : ''}
+                    <a href="${prefix}${imgData}" download="nexus_art.png" style="color:var(--accent); font-size:10px; text-decoration:none; font-weight:bold;">SAVE</a>
+                </div>
             </div>
         `;
         grid.prepend(card);
