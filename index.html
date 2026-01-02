@@ -12,28 +12,45 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600&display=swap');
         :root { --accent: #00d2ff; --bg: #020204; --border: rgba(0, 210, 255, 0.2); }
-        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        .top-nav { height: 60px; background: #000; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        body { 
+            margin: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; 
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+        
+        .top-nav { height: 60px; background: #000; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; }
+        
         .studio-core { display: grid; grid-template-columns: 350px 1fr; flex: 1; overflow: hidden; }
-        .sidebar { background: #08090d; border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
-        .preview-area { background: #000; position: relative; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        
+        .sidebar { 
+            background: #08090d; border-right: 1px solid var(--border); padding: 20px; 
+            overflow-y: auto; display: flex; flex-direction: column;
+            padding-bottom: 100px; /* ⬅️ BREATHING ROOM FOR MOBILE */
+        }
+        
+        .preview-area { 
+            background: #000; position: relative; display: flex; align-items: center; 
+            justify-content: center; flex-direction: column; overflow-y: auto; padding: 20px;
+        }
         
         @media (max-width: 768px) {
             .studio-core { grid-template-columns: 1fr; display: block; overflow-y: auto; }
-            .sidebar { width: 100%; }
+            .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
         }
 
         .btn-gen { background: var(--accent); color: #000; border: none; font-family: 'Orbitron'; font-weight: 900; padding: 15px; cursor: pointer; width: 100%; margin: 10px 0; border-radius: 4px; }
-        .btn-opt { flex: 1; background: #111; border: 1px solid var(--border); color: #fff; padding: 8px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; border-radius: 2px; }
+        .btn-opt { background: #111; border: 1px solid var(--border); color: #fff; padding: 10px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; border-radius: 2px; }
         .btn-opt.active { border-color: var(--accent); color: var(--accent); background: rgba(0,210,255,0.1); }
         
         select, textarea, input { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; margin: 5px 0; box-sizing: border-box; border-radius: 4px; }
         label { font-family: 'Orbitron'; font-size: 9px; color: var(--accent); margin-top: 15px; display: block; letter-spacing: 1px; }
         
         .security-log { position: absolute; bottom: 10px; left: 10px; width: 220px; font-family: 'Orbitron'; font-size: 7px; color: var(--accent); opacity: 0.7; pointer-events: none; }
-        #mainImg { max-width: 90%; max-height: 60vh; border: 1px solid var(--border); display: none; }
+        
+        #mainImg { max-width: 100%; height: auto; border: 1px solid var(--border); display: none; margin-bottom: 20px; }
         #gatekeeper { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        
+        footer { height: 40px; background: #000; border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; justify-content: space-between; font-family: 'Orbitron'; font-size: 7px; color: var(--accent); flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -41,15 +58,15 @@
     <audio id="bgAudio" loop src="ambient.wav"></audio>
 
     <div id="gatekeeper">
-        <div style="text-align: center; border: 1px solid var(--accent); padding: 40px; background: #050508;">
+        <div style="text-align: center; border: 1px solid var(--accent); padding: 40px; background: #050508; width: 80%; max-width: 300px;">
             <div style="font-family:Orbitron; color:var(--accent); font-weight:900; margin-bottom:10px;">NEXUS SYSTEM</div>
-            <input type="password" id="passInput" style="text-align:center; font-family:Orbitron; font-size:20px; margin:20px 0; width: 250px;" placeholder="PASSKEY">
+            <input type="password" id="passInput" style="text-align:center; font-family:Orbitron; font-size:20px; margin:20px 0;" placeholder="PASSKEY">
             <button class="btn-gen" onclick="unlock()">AUTHORIZE ACCESS</button>
         </div>
     </div>
 
     <header class="top-nav">
-        <div style="font-family:Orbitron; color:var(--accent); font-weight:900; font-size:14px;">NEXUS <span style="font-size:8px; opacity:0.5;">V3.7</span></div>
+        <div style="font-family:Orbitron; color:var(--accent); font-weight:900; font-size:14px;">NEXUS <span style="font-size:8px; opacity:0.5;">V3.8</span></div>
         <div style="display:flex; align-items:center; gap:10px;">
             <div style="font-family:Orbitron; font-size:10px; color:var(--accent);">VOL: <span id="volLevel">2</span></div>
             <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.10" oninput="updateVolume(this.value)" style="width:60px; accent-color:var(--accent);">
@@ -79,9 +96,9 @@
 
             <label>ASPECT RATIO</label>
             <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <button class="btn-opt active" onclick="setRatio(this, 512, 512)">1:1</button>
-                <button class="btn-opt" onclick="setRatio(this, 512, 768)">2:3</button>
-                <button class="btn-opt" onclick="setRatio(this, 768, 512)">3:2</button>
+                <button class="btn-opt active" style="flex:1" onclick="setRatio(this, 512, 512)">1:1</button>
+                <button class="btn-opt" style="flex:1" onclick="setRatio(this, 512, 768)">2:3</button>
+                <button class="btn-opt" style="flex:1" onclick="setRatio(this, 768, 512)">3:2</button>
             </div>
 
             <label>NEURAL INTENSITY (CFG)</label>
@@ -93,18 +110,19 @@
             </div>
 
             <button class="btn-gen" onclick="generate()">EXECUTE SYNTHESIS</button>
+            
             <div id="sidebarLog" style="font-size:7px; color:#444; font-family:Orbitron; line-height:1.5; margin-top:20px;"></div>
         </div>
 
         <div class="preview-area">
             <div id="placeholder" style="font-family:Orbitron; opacity:0.1; letter-spacing:5px;">SYSTEM STANDBY</div>
             <img id="mainImg" src="">
-            <button id="dlBtn" class="btn-opt" style="display:none; margin-top:20px; width:200px;" onclick="downloadImg()">💾 SAVE ARTIFACT</button>
+            <button id="dlBtn" class="btn-opt" style="display:none; margin: 20px 0 60px 0; width:220px; border: 1px solid var(--accent); background: rgba(0,210,255,0.05);" onclick="downloadImg()">💾 SAVE ARTIFACT</button>
             <div id="secLog" class="security-log"></div>
         </div>
     </main>
 
-    <footer style="height:40px; background:#000; border-top:1px solid var(--border); display:flex; align-items:center; padding:0 20px; justify-content:space-between; font-family:Orbitron; font-size:7px; color:var(--accent);">
+    <footer>
         <div>UPLINK: <span id="statusTag">OFFLINE</span></div>
         <div style="opacity:0.5;">POWERED BY GEMINI | T.K. INDUSTRIES</div>
     </footer>
@@ -140,8 +158,8 @@
             if(document.getElementById('passInput').value.toUpperCase() === MASTER_KEY) {
                 document.getElementById('gatekeeper').style.display = 'none';
                 const audio = document.getElementById('bgAudio');
-                audio.volume = 0.10; // Explicitly Level 2
-                audio.play();
+                audio.volume = 0.10; 
+                audio.play().catch(e => console.log("User must interact"));
                 addLog("ACCESS GRANTED - UPLINK STABLE");
                 document.getElementById('statusTag').innerText = "STABLE";
                 document.getElementById('statusTag').style.color = "#00ff88";
@@ -195,6 +213,9 @@
                 document.getElementById('placeholder').style.display = "none";
                 document.getElementById('dlBtn').style.display = "block";
                 addLog("SUCCESS");
+                
+                // Scroll the button into view automatically
+                document.getElementById('dlBtn').scrollIntoView({ behavior: 'smooth' });
             } catch(e) { addLog("TIMEOUT - CHECK GRADIO LINK"); }
         }
 
