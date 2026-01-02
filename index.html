@@ -17,7 +17,6 @@
 
         body { 
             margin: 0; padding: 0; height: 100vh;
-            /* 🧵 SILK TEXTURE BACKGROUND */
             background-color: #f0f2f5;
             background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
                               radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
@@ -27,7 +26,6 @@
             color: var(--text-main);
         }
 
-        /* 🔘 TACTILE 3D BUTTONS */
         .btn-premium {
             font-family: 'Quicksand', sans-serif;
             font-weight: 700;
@@ -41,55 +39,44 @@
             box-shadow: 0 5px 0px #3f41b5, 0 10px 20px rgba(93, 95, 239, 0.3);
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .btn-premium:hover { transform: translateY(-1px); box-shadow: 0 6px 0px #3f41b5, 0 12px 24px rgba(93, 95, 239, 0.3); }
-        .btn-premium:active {
-            transform: translateY(4px);
-            box-shadow: 0 1px 0px #3f41b5, 0 2px 5px rgba(0,0,0,0.1);
-        }
+        .btn-premium:active { transform: translateY(4px); box-shadow: 0 1px 0px #3f41b5, 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-premium:disabled { background: #ccc; box-shadow: none; cursor: wait; transform: none; }
 
-        /* 📁 BRUSHED ALUMINUM SIDEBAR */
         .sidebar {
             width: 380px;
             background: linear-gradient(145deg, #e6e9ef 0%, #d1d5db 100%);
             border-right: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             box-shadow: inset -5px 0 15px rgba(0,0,0,0.02);
             position: relative;
         }
 
         .sidebar::before {
             content: ""; position: absolute; inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3仿真%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             opacity: 0.04; pointer-events: none;
         }
 
-        /* 📂 TAB SYSTEM */
         .tab-nav { display: flex; padding: 20px; gap: 8px; }
         .tab-trigger {
             flex: 1; padding: 12px 5px; border-radius: 10px; border: none;
-            font-family: 'Quicksand'; font-weight: 700; font-size: 11px;
+            font-family: 'Quicksand'; font-weight: 700; font-size: 10px;
             background: rgba(0,0,0,0.05); color: var(--text-sub); cursor: pointer; transition: 0.3s;
         }
         .tab-trigger.active { background: var(--white); color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
-        /* 🖼️ THE "LIVING" IMAGE FRAME */
-        .image-container {
-            flex: 1; display: flex; align-items: center; justify-content: center;
-            padding: 40px; position: relative;
-        }
-
+        .image-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; position: relative; }
+        
         .canvas-frame {
             width: 100%; max-width: 550px; aspect-ratio: 1/1;
-            background: var(--white);
-            border-radius: 30px;
-            padding: 12px;
+            background: var(--white); border-radius: 30px; padding: 12px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.1);
             display: flex; align-items: center; justify-content: center;
-            position: relative; transition: 0.5s ease;
+            position: relative; transition: 0.5s ease; overflow: hidden;
         }
 
         .thinking-active .canvas-frame {
@@ -99,26 +86,22 @@
 
         #outputImg { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; display: none; }
 
-        /* INPUTS */
-        .input-group { padding: 0 25px 25px 25px; }
-        label { font-family: 'Quicksand'; font-weight: 700; font-size: 12px; color: var(--text-sub); display: block; margin-bottom: 8px; }
+        .input-group { padding: 0 25px 25px 25px; flex: 1; overflow-y: auto; }
+        label { font-family: 'Quicksand'; font-weight: 700; font-size: 11px; color: var(--text-sub); display: block; margin-bottom: 8px; letter-spacing: 0.5px; }
+        
         textarea, select, input[type="file"] {
             width: 100%; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08);
-            background: rgba(255,255,255,0.7); font-family: 'Inter'; font-size: 14px;
+            background: rgba(255,255,255,0.7); font-family: 'Inter'; font-size: 13px;
             box-sizing: border-box; resize: none; margin-bottom: 20px;
         }
 
-        /* 🔒 MODERN LOGIN */
-        #gatekeeper {
-            position: fixed; inset: 0; background: var(--white);
-            z-index: 2000; display: flex; align-items: center; justify-content: center;
-        }
+        #gatekeeper { position: fixed; inset: 0; background: var(--white); z-index: 2000; display: flex; align-items: center; justify-content: center; }
 
-        @media (max-width: 850px) {
-            body { overflow-y: auto; }
-            .sidebar { width: 100%; height: auto; }
-            .image-container { padding: 20px; }
+        .loader-ring {
+            display: none; width: 40px; height: 40px; border: 4px solid var(--accent-soft);
+            border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -126,52 +109,57 @@
     <div id="gatekeeper">
         <div style="text-align:center; width: 320px;">
             <div style="font-family:'Quicksand'; font-size:32px; font-weight:700; color:var(--accent); margin-bottom:10px;">Nexus</div>
-            <p style="color:var(--text-sub); font-size:14px; margin-bottom:40px;">Please enter your passkey to begin.</p>
+            <p style="color:var(--text-sub); font-size:14px; margin-bottom:40px;">Please enter your passkey.</p>
             <input type="password" id="passKey" placeholder="••••••••" style="text-align:center; font-size:18px; letter-spacing:4px; padding:15px; border-radius:15px; border:1px solid #eee; width:100%;">
-            <button class="btn-premium" style="width:100%; margin-top:25px;" onclick="unlock()">Open Suite</button>
+            <button class="btn-premium" style="width:100%; margin-top:25px;" onclick="unlock()">Enter Suite</button>
         </div>
     </div>
 
     <div style="display:flex; flex:1; overflow:hidden;">
         <aside class="sidebar">
             <div style="padding: 30px 25px 10px 25px;">
-                <div style="font-family:'Quicksand'; font-size:22px; font-weight:700; color:var(--text-main);">Nexus <span style="font-weight:400; font-size:12px; color:var(--accent);">v6.5</span></div>
+                <div style="font-family:'Quicksand'; font-size:22px; font-weight:700; color:var(--text-main);">Nexus <span style="font-weight:400; font-size:10px; color:var(--accent);">v6.6</span></div>
             </div>
 
             <nav class="tab-nav">
                 <button class="tab-trigger active" onclick="setTab('txt', this)">CREATE</button>
-                <button class="tab-trigger" onclick="setTab('img', this)">VISION</button>
-                <button class="tab-trigger" onclick="setTab('up', this)">UPSCALE</button>
                 <button class="tab-trigger" onclick="setTab('id', this)">IDENTIFY</button>
+                <button class="tab-trigger" onclick="setTab('up', this)">UPSCALE</button>
             </nav>
 
             <div class="input-group">
                 <div id="tab-txt">
-                    <label>YOUR VISION</label>
-                    <textarea id="prompt" rows="5" placeholder="Describe something beautiful..."></textarea>
+                    <label>DESCRIBE YOUR IDEA</label>
+                    <textarea id="prompt" rows="6" placeholder="A cozy library with floating candles..."></textarea>
+                    <button class="btn-premium" id="genBtn" style="width:100%;" onclick="generate()">Create Image</button>
                 </div>
 
-                <div id="tab-img" style="display:none;">
-                    <label>BASE IMAGE</label>
-                    <input type="file" id="imgRef" accept="image/*">
-                    <label>TRANSFORMATION STRENGTH</label>
-                    <input type="range" min="0" max="1" step="0.1" value="0.7">
+                <div id="tab-id" style="display:none;">
+                    <label>UPLOAD IMAGE TO ANALYZE</label>
+                    <input type="file" id="idFile" accept="image/*" onchange="previewFile(this)">
+                    <p style="font-size:11px; color:var(--text-sub); margin-bottom:20px;">Nexus will analyze this image and generate a descriptive prompt for you.</p>
+                    <button class="btn-premium" id="idBtn" style="width:100%;" onclick="identifyImage()">Analyze Image</button>
+                    
+                    <div id="idResult" style="display:none; margin-top:20px;">
+                        <label>ANALYSIS RESULT</label>
+                        <div id="resultText" style="font-size:12px; background:white; padding:15px; border-radius:10px; border:1px solid #ddd; line-height:1.5;"></div>
+                        <button class="btn-premium" style="width:100%; margin-top:10px; background:#fff; color:var(--accent); border:1px solid var(--accent); box-shadow:none;" onclick="copyToPrompt()">Use as Prompt</button>
+                    </div>
                 </div>
 
                 <div id="tab-up" style="display:none;">
-                    <label>UPSCALE FACTOR</label>
-                    <select id="scale">
-                        <option>2x (High Definition)</option>
-                        <option>4x (Ultra Studio)</option>
+                    <label>ENHANCEMENT LEVEL</label>
+                    <select id="scaleSize">
+                        <option value="2">2x (High Definition)</option>
+                        <option value="4">4x (Ultra HD Studio)</option>
                     </select>
+                    <button class="btn-premium" style="width:100%;" onclick="alert('Ready to upscale current image.')">Enhance Quality</button>
                 </div>
-
-                <button class="btn-premium" style="width:100%; margin-top:10px;" onclick="generate()">Create Image</button>
             </div>
 
-            <div style="margin-top:auto; padding:25px; border-top:1px solid rgba(0,0,0,0.05);">
+            <div style="padding:25px; border-top:1px solid rgba(0,0,0,0.05);">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:10px; color:var(--text-sub); font-weight:600;">SYSTEM STATUS: <span style="color:#2ecc71;">ONLINE</span></span>
+                    <span style="font-size:9px; color:var(--text-sub); font-weight:700;">STATUS: <span style="color:#2ecc71;">CONNECTED</span></span>
                     <button onclick="config()" style="background:none; border:none; cursor:pointer; font-size:14px; opacity:0.3;">⚙️</button>
                 </div>
             </div>
@@ -179,24 +167,25 @@
 
         <main class="image-container">
             <div class="canvas-frame">
+                <div id="loader" class="loader-ring"></div>
                 <div id="placeholder" style="text-align:center; color:#b2bec3;">
                     <div style="font-size:30px; margin-bottom:10px;">✨</div>
-                    <div style="font-family:'Quicksand'; font-weight:500;">Your creation will appear here</div>
+                    <div style="font-family:'Quicksand'; font-weight:500;">Waiting for your input</div>
                 </div>
                 <img id="outputImg">
             </div>
-
-            <button id="saveBtn" onclick="save()" style="display:none; position:absolute; bottom:40px; right:40px; background:white; color:var(--accent); border:none; padding:15px 25px; border-radius:50px; font-family:'Quicksand'; font-weight:700; box-shadow:0 10px 20px rgba(0,0,0,0.1); cursor:pointer;">💾 SAVE TO DEVICE</button>
+            <button id="saveBtn" onclick="save()" style="display:none; position:absolute; bottom:40px; right:40px; background:white; color:var(--accent); border:none; padding:15px 25px; border-radius:50px; font-family:'Quicksand'; font-weight:700; box-shadow:0 10px 20px rgba(0,0,0,0.1); cursor:pointer;">💾 SAVE IMAGE</button>
         </main>
     </div>
 
     <script>
         let api_url = sessionStorage.getItem('nexus_api') || "";
+        let currentB64 = "";
 
         function setTab(type, el) {
             document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-            ['txt','img','up','id'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
+            ['txt','id','up'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
             document.getElementById('tab-'+type).style.display = 'block';
         }
 
@@ -207,33 +196,82 @@
         }
 
         function config() {
-            let u = prompt("Gradio Uplink URL:", api_url);
+            let u = prompt("Gradio Link:", api_url);
             if(u) { api_url = u; sessionStorage.setItem('nexus_api', u); }
+        }
+
+        // Preview local file in the frame
+        function previewFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentB64 = e.target.result;
+                    document.getElementById('outputImg').src = currentB64;
+                    document.getElementById('outputImg').style.display = 'block';
+                    document.getElementById('placeholder').style.display = 'none';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function identifyImage() {
+            if(!api_url || !currentB64) return alert("Please upload an image first.");
+            
+            const btn = document.getElementById('idBtn');
+            const loader = document.getElementById('loader');
+            btn.disabled = true;
+            loader.style.display = 'block';
+            document.getElementById('outputImg').style.opacity = '0.3';
+
+            try {
+                const cleanB64 = currentB64.split(',')[1];
+                const res = await fetch(api_url + "/sdapi/v1/interrogate", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ image: cleanB64, model: "clip" })
+                });
+                const data = await res.json();
+                document.getElementById('idResult').style.display = 'block';
+                document.getElementById('resultText').innerText = data.caption;
+            } catch(e) { alert("Analysis failed. Ensure Forge is running."); }
+            
+            btn.disabled = false;
+            loader.style.display = 'none';
+            document.getElementById('outputImg').style.opacity = '1';
+        }
+
+        function copyToPrompt() {
+            document.getElementById('prompt').value = document.getElementById('resultText').innerText;
+            setTab('txt', document.querySelector('.tab-trigger'));
+            alert("Prompt loaded into Create tab!");
         }
 
         async function generate() {
             if(!api_url) return alert("Uplink required.");
             document.body.classList.add('thinking-active');
-            
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('outputImg').style.display = 'none';
+
             try {
                 const res = await fetch(api_url + "/sdapi/v1/txt2img", {
                     method: 'POST', headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ "prompt": document.getElementById('prompt').value, "steps": 20 })
                 });
                 const data = await res.json();
-                const b64 = "data:image/png;base64," + data.images[0];
-                document.getElementById('outputImg').src = b64;
+                currentB64 = "data:image/png;base64," + data.images[0];
+                document.getElementById('outputImg').src = currentB64;
                 document.getElementById('outputImg').style.display = 'block';
-                document.getElementById('placeholder').style.display = 'none';
                 document.getElementById('saveBtn').style.display = 'block';
-            } catch(e) { alert("Link failed."); }
+            } catch(e) { alert("Generation failed."); }
             
             document.body.classList.remove('thinking-active');
+            document.getElementById('loader').style.display = 'none';
         }
 
         function save() {
-            const a = document.createElement('a'); a.href = document.getElementById('outputImg').src;
-            a.download = `nexus_${Date.now()}.png`; a.click();
+            const a = document.createElement('a'); a.href = currentB64;
+            a.download = `nexus_creation.png`; a.click();
         }
     </script>
 </body>
