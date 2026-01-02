@@ -2,65 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NEXUS | T.K. Industries</title>
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600&display=swap');
-
-        :root {
-            --accent: #00d2ff;
-            --accent-glow: rgba(0, 210, 255, 0.7);
-            --bg-dark: #020204;
-            --panel-bg: rgba(10, 11, 16, 0.95);
-            --border: rgba(0, 210, 255, 0.2);
-        }
-
-        body {
-            margin: 0; background: var(--bg-dark); color: #fff;
-            font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden;
-        }
-
-        /* 🔐 GATEKEEPER */
-        #gatekeeper {
-            position: fixed; inset: 0; background: #000;
-            z-index: 10000; display: flex; align-items: center; justify-content: center;
-        }
-        .gate-card {
-            background: #050508; padding: 40px; border: 1px solid var(--accent);
-            text-align: center; box-shadow: 0 0 40px rgba(0, 210, 255, 0.1);
-        }
-        .gate-input {
-            background: #000; border: 1px solid var(--accent); color: var(--accent); padding: 15px;
-            font-family: 'Orbitron'; text-align: center; font-size: 20px; width: 250px; outline: none; margin: 20px 0;
-        }
-
-        /* UI ELEMENTS */
-        .top-nav { height: 60px; background: #000; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
-        .logo { font-family: 'Orbitron'; color: var(--accent); font-weight: 900; letter-spacing: 4px; font-size: 14px; }
+        :root { --accent: #00d2ff; --bg: #020204; --border: rgba(0, 210, 255, 0.2); }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        .studio-core { display: grid; grid-template-columns: 350px 1fr; height: calc(100vh - 110px); }
-        
-        .sidebar { background: #08090d; border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
-        .preview-area { background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-
-        /* NEON VOLUME */
-        #volLevel { font-family: 'Orbitron'; font-weight: 900; color: var(--accent); transition: 0.3s; }
-        
-        /* SECURITY LOG */
-        .security-log {
-            position: absolute; bottom: 20px; left: 20px; width: 280px; height: 100px;
-            background: rgba(0,0,0,0.8); border-left: 2px solid var(--accent);
-            font-family: 'Orbitron'; font-size: 8px; color: var(--accent); padding: 10px;
-            overflow-y: hidden; line-height: 1.5; pointer-events: none;
+        /* MOBILE OPTIMIZATION */
+        .studio-core { display: grid; grid-template-columns: 350px 1fr; flex: 1; overflow: hidden; }
+        @media (max-width: 768px) {
+            .studio-core { grid-template-columns: 1fr; overflow-y: auto; display: block; }
+            .sidebar { width: 100%; box-sizing: border-box; }
+            .preview-area { min-height: 400px; padding: 20px 0; }
         }
 
-        .btn-gen { background: var(--accent); color: #000; border: none; font-family: 'Orbitron'; font-weight: 900; padding: 15px; cursor: pointer; width: 100%; margin-top: 10px; }
-        textarea, input[type="text"] { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; margin: 5px 0; box-sizing: border-box; }
-        label { font-family: 'Orbitron'; font-size: 9px; color: var(--accent); opacity: 0.8; margin-top: 15px; display: block; }
+        /* UI COMPONENTS */
+        .top-nav { height: 60px; background: #000; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .sidebar { background: #08090d; border-right: 1px solid var(--border); padding: 20px; }
+        .logo { font-family: 'Orbitron'; color: var(--accent); font-weight: 900; letter-spacing: 2px; font-size: 14px; }
         
-        #mainImg { max-width: 90%; max-height: 70vh; box-shadow: 0 0 50px rgba(0,0,0,1); display: none; }
-        #dlBtn { display: none; background: transparent; border: 1px solid var(--accent); color: var(--accent); font-family: 'Orbitron'; padding: 10px 20px; margin-top: 20px; cursor: pointer; }
+        .btn-gen { background: var(--accent); color: #000; border: none; font-family: 'Orbitron'; font-weight: 900; padding: 15px; cursor: pointer; width: 100%; margin: 10px 0; border-radius: 4px; }
+        .control-group { display: flex; gap: 5px; margin-bottom: 10px; }
+        .btn-opt { flex: 1; background: #111; border: 1px solid var(--border); color: #fff; padding: 8px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; }
+        .btn-opt.active { border-color: var(--accent); color: var(--accent); background: rgba(0,210,255,0.1); }
+        
+        select, textarea, input { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; margin: 5px 0; box-sizing: border-box; border-radius: 4px; }
+        label { font-family: 'Orbitron'; font-size: 9px; color: var(--accent); margin-top: 15px; display: block; letter-spacing: 1px; }
+        
+        .security-log { position: absolute; bottom: 10px; left: 10px; width: 200px; font-family: 'Orbitron'; font-size: 7px; color: var(--accent); pointer-events: none; opacity: 0.7; }
+        #mainImg { max-width: 90%; max-height: 60vh; border: 1px solid var(--border); display: none; margin: 0 auto; }
+
+        #gatekeeper { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -68,171 +41,145 @@
     <audio id="bgAudio" loop src="ambient.wav"></audio>
 
     <div id="gatekeeper">
-        <div class="gate-card">
-            <div class="logo" style="margin-bottom:10px;">NEXUS SYSTEM</div>
-            <div style="font-size:8px; color:var(--accent); opacity:0.5; letter-spacing:2px;">T.K. INDUSTRIES SECURITY HUB</div>
-            <input type="password" id="passInput" class="gate-input" placeholder="PASSKEY" autofocus>
-            <button class="btn-gen" onclick="unlock()">AUTHORIZE ACCESS</button>
+        <div style="text-align: center; border: 1px solid var(--accent); padding: 40px; background: #050508;">
+            <div class="logo">NEXUS SYSTEM</div>
+            <input type="password" id="passInput" style="text-align:center; font-family:Orbitron; font-size:20px; margin:20px 0;" placeholder="PASSKEY">
+            <button class="btn-gen" onclick="unlock()">AUTHORIZE</button>
         </div>
     </div>
 
     <header class="top-nav">
-        <div class="logo">NEXUS <span style="font-size:8px; font-weight:300; opacity:0.5;">BY T.K. INDUSTRIES</span></div>
-        <div style="display:flex; align-items:center; gap:20px;">
+        <div class="logo">NEXUS <span style="font-size:8px; opacity:0.5;">V3.5</span></div>
+        <div style="display:flex; align-items:center; gap:10px;">
             <div style="font-family:Orbitron; font-size:10px; color:var(--accent);">VOL: <span id="volLevel">2</span></div>
-            <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.10" oninput="updateVolume(this.value)" style="width:80px; accent-color:var(--accent);">
-            <button onclick="toggleSettings()" style="background:none; border:none; cursor:pointer; font-size:18px;">⚙️</button>
+            <input type="range" min="0" max="1" step="0.05" value="0.10" oninput="updateVolume(this.value)" style="width:60px;">
+            <button onclick="toggleSettings()" style="background:none; border:none; cursor:pointer;">⚙️</button>
         </div>
     </header>
 
-    <div id="settingsBox" style="display:none; position:fixed; top:70px; right:20px; background:#0a0b10; border:1px solid var(--accent); padding:20px; z-index:5000; width:300px;">
-        <label>NEURAL UPLINK (GRADIO URL)</label>
+    <div id="settingsBox" style="display:none; position:fixed; top:70px; right:20px; background:#0a0b10; border:1px solid var(--accent); padding:20px; z-index:5000; width:280px;">
+        <label>NEURAL UPLINK</label>
         <input type="text" id="urlInput" placeholder="https://....gradio.live">
-        <button class="btn-gen" onclick="saveURL()">SAVE CONFIG</button>
+        <button class="btn-gen" onclick="saveURL()">SAVE</button>
     </div>
 
     <main class="studio-core">
         <div class="sidebar">
+            <label>STEERING MODE</label>
+            <select id="stylePreset">
+                <option value="">RAW SYNTHESIS</option>
+                <option value=", highly detailed, 8k, photorealistic, cinematic lighting">PHOTOREAL</option>
+                <option value=", cyberpunk style, neon lights, intricate mechanical detail, synthwave">CYBERPUNK</option>
+                <option value=", ethereal, dreamlike, soft focus, masterwork, digital art">ETHEREAL</option>
+            </select>
+
             <label>VISION PROMPT</label>
-            <textarea id="promptIn" rows="5" placeholder="Enter descriptors..."></textarea>
-            
-            <label>NEGATIVE ARCHITECTURE</label>
-            <input type="text" id="negPrompt" placeholder="blur, text, low quality...">
-            
+            <textarea id="promptIn" rows="3" placeholder="Enter vision..."></textarea>
+
+            <label>ASPECT RATIO</label>
+            <div class="control-group">
+                <button class="btn-opt active" onclick="setRatio(this, 512, 512)">1:1</button>
+                <button class="btn-opt" onclick="setRatio(this, 512, 768)">2:3</button>
+                <button class="btn-opt" onclick="setRatio(this, 768, 512)">3:2</button>
+            </div>
+
+            <label>NEURAL INTENSITY (STRICTNESS)</label>
+            <input type="range" id="cfgScale" min="1" max="20" value="7" style="accent-color:var(--accent);">
+
+            <div style="display:flex; align-items:center; gap:10px; margin: 10px 0;">
+                <input type="checkbox" id="upscale" style="width:20px;">
+                <label style="margin:0;">HI-RES ENHANCE (2X)</label>
+            </div>
+
             <button class="btn-gen" onclick="generate()">EXECUTE SYNTHESIS</button>
-            
-            <label>SESSION LOGS</label>
-            <div id="sidebarLog" style="font-size:7px; color:#555; font-family:Orbitron; margin-top:10px; line-height:1.8;"></div>
+            <div id="sidebarLog" style="font-size:7px; color:#444; font-family:Orbitron; line-height:1.5;"></div>
         </div>
 
-        <div class="preview-area">
-            <div id="placeholder" style="font-family:Orbitron; opacity:0.1; letter-spacing:10px;">SYSTEM IDLE</div>
+        <div class="preview-area" style="position:relative; background:#000; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+            <div id="placeholder" style="font-family:Orbitron; opacity:0.1; letter-spacing:5px;">SYSTEM STANDBY</div>
             <img id="mainImg" src="">
-            <button id="dlBtn" onclick="downloadImg()">💾 SAVE ARTIFACT</button>
-            
-            <div id="secLog" class="security-log">
-                <div>> INITIALIZING...</div>
-                <div>> STANDBY FOR AUTHENTICATION</div>
-            </div>
+            <button id="dlBtn" class="btn-opt" style="display:none; margin-top:20px; width:200px;" onclick="downloadImg()">💾 SAVE ARTIFACT</button>
+            <div id="secLog" class="security-log"></div>
         </div>
     </main>
 
-    <footer style="position:fixed; bottom:0; width:100%; height:50px; background:#000; border-top:1px solid var(--border); display:flex; align-items:center; padding:0 40px; justify-content:space-between;">
-        <div style="font-family:Orbitron; font-size:8px; color:var(--accent); letter-spacing:1px;">
-            UPLINK: <span id="statusTag">DISCONNECTED</span> // ENCRYPTION: AES-256
-        </div>
-        <div style="opacity:0.2; font-size:7px; font-family:Orbitron;">© 2026 T.K. INDUSTRIES</div>
+    <footer style="height:40px; background:#000; border-top:1px solid var(--border); display:flex; align-items:center; padding:0 20px; justify-content:space-between; font-family:Orbitron; font-size:7px; color:var(--accent);">
+        <div>UPLINK: <span id="statusTag">OFFLINE</span></div>
+        <div style="opacity:0.5;">POWERED BY GEMINI | T.K. INDUSTRIES</div>
     </footer>
 
     <script>
-        // --- ADMIN BYPASS CONFIG ---
+        // --- ADMIN CONFIG ---
         const DEFAULT_UPLINK = "PASTE_YOUR_LINK_HERE"; 
-        // ---------------------------
+        const MASTER_KEY = "NEXUS77";
+        // --------------------
 
         let FORGE_URL = localStorage.getItem('nexus_url') || DEFAULT_UPLINK || "";
-        const MASTER_KEY = "NEXUS77";
+        let currentW = 512, currentH = 512;
 
         function addLog(msg) {
-            const log = document.getElementById('secLog');
             const entry = document.createElement('div');
             entry.innerText = `> ${new Date().toLocaleTimeString()}: ${msg}`;
-            log.prepend(entry);
-            
-            const side = document.getElementById('sidebarLog');
-            const sEntry = document.createElement('div');
-            sEntry.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
-            side.prepend(sEntry);
+            document.getElementById('secLog').prepend(entry);
         }
 
         function unlock() {
-            const pass = document.getElementById('passInput').value.toUpperCase();
-            if (pass === MASTER_KEY) {
+            if(document.getElementById('passInput').value.toUpperCase() === MASTER_KEY) {
                 document.getElementById('gatekeeper').style.display = 'none';
-                
-                // Initialize Audio at Volume Level 2
                 const audio = document.getElementById('bgAudio');
-                audio.volume = 0.10; 
-                audio.play().catch(e => console.log("Audio needs interaction"));
-                
-                addLog("ACCESS GRANTED: WELCOME ADMIN");
-                
-                if(FORGE_URL && FORGE_URL !== "https://ca52b0ad1763dbfd61.gradio.live") {
+                audio.volume = 0.10; audio.play();
+                if(FORGE_URL && FORGE_URL !== "PASTE_YOUR_LINK_HERE") {
                     document.getElementById('statusTag').innerText = "STABLE";
                     document.getElementById('statusTag').style.color = "#00ff88";
-                    addLog("NEURAL BRIDGE ESTABLISHED");
-                } else {
-                    addLog("WARNING: NO NEURAL LINK DETECTED");
                 }
-            } else {
-                alert("INVALID PASSKEY");
             }
         }
 
-        function updateVolume(val) {
-            const audio = document.getElementById('bgAudio');
-            audio.volume = val;
-            const level = Math.round(val * 20);
-            const disp = document.getElementById('volLevel');
-            disp.innerText = level;
-            disp.style.textShadow = `0 0 ${level * 2}px var(--accent), 0 0 ${level}px #fff`;
-        }
+        function updateVolume(v) { document.getElementById('bgAudio').volume = v; document.getElementById('volLevel').innerText = Math.round(v*20); }
+        function toggleSettings() { const s = document.getElementById('settingsBox'); s.style.display = s.style.display === 'none' ? 'block' : 'none'; }
+        function saveURL() { FORGE_URL = document.getElementById('urlInput').value; localStorage.setItem('nexus_url', FORGE_URL); toggleSettings(); }
 
-        function toggleSettings() {
-            const s = document.getElementById('settingsBox');
-            s.style.display = s.style.display === 'none' ? 'block' : 'none';
-            document.getElementById('urlInput').value = FORGE_URL;
-        }
-
-        function saveURL() {
-            FORGE_URL = document.getElementById('urlInput').value;
-            localStorage.setItem('nexus_url', FORGE_URL);
-            addLog("UPLINK ADDR UPDATED");
-            document.getElementById('statusTag').innerText = "STABLE";
-            document.getElementById('statusTag').style.color = "#00ff88";
-            toggleSettings();
+        function setRatio(btn, w, h) {
+            document.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentW = w; currentH = h;
         }
 
         async function generate() {
-            if(!FORGE_URL || FORGE_URL === "PASTE_YOUR_LINK_HERE") return alert("Uplink missing. Set Gradio URL in Settings Gear.");
-            addLog("INITIATING NEURAL SYNTHESIS...");
-            document.getElementById('placeholder').innerText = "SYNTHESIZING...";
+            if(!FORGE_URL || FORGE_URL === "https://ca52b0ad1763dbfd61.gradio.live") return alert("Uplink Missing.");
+            addLog("SYNTHESIZING...");
+            document.getElementById('placeholder').innerText = "PROCESSING...";
             
+            const payload = {
+                "prompt": document.getElementById('promptIn').value + document.getElementById('stylePreset').value,
+                "steps": 20,
+                "width": currentW,
+                "height": currentH,
+                "cfg_scale": document.getElementById('cfgScale').value,
+                "enable_hr": document.getElementById('upscale').checked,
+                "hr_scale": 2,
+                "hr_upscaler": "R-ESRGAN 4x+"
+            };
+
             try {
                 const res = await fetch(`${FORGE_URL}/sdapi/v1/txt2img`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        "prompt": document.getElementById('promptIn').value,
-                        "negative_prompt": document.getElementById('negPrompt').value,
-                        "steps": 20
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
                 const data = await res.json();
-                if(data.images) {
-                    const img = document.getElementById('mainImg');
-                    img.src = "data:image/png;base64," + data.images[0];
-                    img.style.display = "block";
-                    document.getElementById('placeholder').style.display = "none";
-                    document.getElementById('dlBtn').style.display = "block";
-                    addLog("ARTIFACT GENERATED SUCCESSFULLY");
-                }
-            } catch(e) {
-                addLog("ERROR: UPLINK TIMEOUT");
-                alert("Gradio Link is expired or inactive.");
-            }
+                const img = document.getElementById('mainImg');
+                img.src = "data:image/png;base64," + data.images[0];
+                img.style.display = "block";
+                document.getElementById('placeholder').style.display = "none";
+                document.getElementById('dlBtn').style.display = "block";
+                addLog("SUCCESS");
+            } catch(e) { addLog("TIMEOUT"); }
         }
 
         function downloadImg() {
-            const a = document.createElement('a');
-            a.href = document.getElementById('mainImg').src;
-            a.download = `nexus_${Date.now()}.png`;
-            a.click();
-            addLog("ARTIFACT SAVED TO DISK");
+            const a = document.createElement('a'); a.href = document.getElementById('mainImg').src;
+            a.download = `nexus_${Date.now()}.png`; a.click();
         }
-
-        document.getElementById('passInput').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') unlock();
-        });
     </script>
 </body>
 </html>
