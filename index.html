@@ -125,7 +125,11 @@
     </footer>
 
     <script>
-        let FORGE_URL = localStorage.getItem('nexus_url') || "";
+        // --- ADMIN BYPASS CONFIG ---
+        const DEFAULT_UPLINK = "https://ca52b0ad1763dbfd61.gradio.live"; 
+        // ---------------------------
+
+        let FORGE_URL = localStorage.getItem('nexus_url') || DEFAULT_UPLINK || "";
         const MASTER_KEY = "NEXUS77";
 
         function addLog(msg) {
@@ -147,9 +151,11 @@
                 const audio = document.getElementById('bgAudio');
                 audio.play().catch(e => console.log("Audio needs interaction"));
                 addLog("ACCESS GRANTED: WELCOME ADMIN");
-                if(FORGE_URL) {
+                
+                if(FORGE_URL && FORGE_URL !== "PASTE_YOUR_LINK_HERE") {
                     document.getElementById('statusTag').innerText = "STABLE";
                     document.getElementById('statusTag').style.color = "#00ff88";
+                    addLog("NEURAL BRIDGE ESTABLISHED");
                 }
             } else {
                 alert("INVALID PASSKEY");
@@ -181,7 +187,7 @@
         }
 
         async function generate() {
-            if(!FORGE_URL) return alert("Open Settings (Gear) and paste your Gradio URL");
+            if(!FORGE_URL || FORGE_URL === "PASTE_YOUR_LINK_HERE") return alert("Uplink missing. Set Gradio URL in Settings Gear.");
             addLog("INITIATING NEURAL SYNTHESIS...");
             document.getElementById('placeholder').innerText = "SYNTHESIZING...";
             
@@ -218,7 +224,6 @@
             addLog("ARTIFACT SAVED TO DISK");
         }
 
-        // Enter key for login
         document.getElementById('passInput').addEventListener('keypress', (e) => {
             if(e.key === 'Enter') unlock();
         });
