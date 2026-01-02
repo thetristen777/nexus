@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <title>NEXUS | T.K. Industries</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600&display=swap');
         :root { --accent: #00d2ff; --bg: #020204; --border: rgba(0, 210, 255, 0.2); }
         body { margin: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* UI BOXES */
         .top-nav { height: 60px; background: #000; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
         .studio-core { display: grid; grid-template-columns: 350px 1fr; flex: 1; overflow: hidden; }
         .sidebar { background: #08090d; border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
@@ -20,8 +24,8 @@
             .sidebar { width: 100%; }
         }
 
-        /* BUTTONS & INPUTS */
-        .btn-gen { background: var(--accent); color: #000; border: none; font-family: 'Orbitron'; font-weight: 900; padding: 15px; cursor: pointer; width: 100%; margin: 10px 0; border-radius: 4px; }
+        .btn-gen { background: var(--accent); color: #000; border: none; font-family: 'Orbitron'; font-weight: 900; padding: 15px; cursor: pointer; width: 100%; margin: 10px 0; border-radius: 4px; transition: 0.2s; }
+        .btn-gen:hover { background: #fff; box-shadow: 0 0 20px var(--accent); }
         .btn-opt { flex: 1; background: #111; border: 1px solid var(--border); color: #fff; padding: 8px; font-size: 10px; font-family: 'Orbitron'; cursor: pointer; }
         .btn-opt.active { border-color: var(--accent); color: var(--accent); background: rgba(0,210,255,0.1); }
         
@@ -35,7 +39,7 @@
 </head>
 <body>
 
-    <audio id="bgAudio" loop src="ambient.wav"></audio>
+    <audio id="bgAudio" loop src="ambient.wav?v=1.1"></audio>
 
     <div id="gatekeeper">
         <div style="text-align: center; border: 1px solid var(--accent); padding: 40px; background: #050508;">
@@ -46,7 +50,7 @@
     </div>
 
     <header class="top-nav">
-        <div style="font-family:Orbitron; color:var(--accent); font-weight:900; font-size:14px;">NEXUS <span style="font-size:8px; opacity:0.5;">V3.5</span></div>
+        <div style="font-family:Orbitron; color:var(--accent); font-weight:900; font-size:14px;">NEXUS <span style="font-size:8px; opacity:0.5;">V3.6 (AUTO-REFRESH)</span></div>
         <div style="display:flex; align-items:center; gap:10px;">
             <div style="font-family:Orbitron; font-size:10px; color:var(--accent);">VOL: <span id="volLevel">2</span></div>
             <input type="range" min="0" max="1" step="0.05" value="0.10" oninput="updateVolume(this.value)" style="width:60px; accent-color:var(--accent);">
@@ -72,6 +76,8 @@
 
             <label>VISION PROMPT</label>
             <textarea id="promptIn" rows="3" placeholder="Enter vision..."></textarea>
+            
+            <button class="btn-opt" style="margin-top:5px; background:#1a1a1a;" onclick="randomPrompt()">🎲 SURPRISE ME</button>
 
             <label>ASPECT RATIO</label>
             <div style="display:flex; gap:5px; margin-bottom:10px;">
@@ -80,7 +86,7 @@
                 <button class="btn-opt" onclick="setRatio(this, 768, 512)">3:2</button>
             </div>
 
-            <label>NEURAL INTENSITY (STRICTNESS)</label>
+            <label>NEURAL INTENSITY</label>
             <input type="range" id="cfgScale" min="1" max="20" value="7" style="accent-color:var(--accent);">
 
             <div style="display:flex; align-items:center; gap:10px; margin: 15px 0;">
@@ -112,6 +118,20 @@
         let FORGE_URL = localStorage.getItem('nexus_url') || DEFAULT_UPLINK || "";
         let currentW = 512, currentH = 512;
 
+        const randomIdeas = [
+            "A futuristic city built inside a giant glass dome on Mars",
+            "A robotic knight kneeling in a garden of glowing flowers",
+            "A portrait of a person with liquid gold skin and neon eyes",
+            "A massive space station shaped like a DNA strand",
+            "A cyberpunk street market in the rain at night",
+            "A floating island with waterfalls falling into the clouds"
+        ];
+
+        function randomPrompt() {
+            const idea = randomIdeas[Math.floor(Math.random() * randomIdeas.length)];
+            document.getElementById('promptIn').value = idea;
+        }
+
         function addLog(msg) {
             const entry = document.createElement('div');
             entry.innerText = `> ${new Date().toLocaleTimeString()}: ${msg}`;
@@ -122,7 +142,7 @@
             if(document.getElementById('passInput').value.toUpperCase() === MASTER_KEY) {
                 document.getElementById('gatekeeper').style.display = 'none';
                 const audio = document.getElementById('bgAudio');
-                audio.volume = 0.10; // Set to 10% (Level 2)
+                audio.volume = 0.10; 
                 audio.play().catch(e => console.log("User must interact"));
                 addLog("ACCESS GRANTED");
                 if(FORGE_URL && FORGE_URL !== "PASTE_YOUR_LINK_HERE") {
