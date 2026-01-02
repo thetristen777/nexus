@@ -42,4 +42,274 @@
         .tab-content { display: none; padding: 25px; overflow-y: auto; flex: 1; scrollbar-width: none; }
         .tab-content.active { display: block; animation: slideUp 0.4s ease-out; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1;
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .input-group { background: white; padding: 15px; border-radius: 18px; margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 4px 6px rgba(0,0,0,0.01); }
+        label { font-size: 9px; font-weight: 800; color: var(--accent); display: block; margin-bottom: 8px; letter-spacing: 1.5px; text-transform: uppercase; }
+        
+        textarea, select, input { 
+            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee; 
+            background: #fafbfc; font-family: inherit; box-sizing: border-box; font-size: 13px; outline: none; transition: 0.2s;
+        }
+        textarea:focus { border-color: var(--accent); background: white; }
+
+        .btn-premium {
+            font-family: 'Quicksand'; font-weight: 700; padding: 16px; border: none; border-radius: 14px;
+            cursor: pointer; transition: 0.3s; background: var(--accent); color: white;
+            box-shadow: 0 10px 20px var(--accent-glow); font-size: 11px; letter-spacing: 1px; width: 100%;
+        }
+        .btn-premium:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-premium:disabled { background: #b2bec3; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* PROGRESS BAR */
+        .progress-container { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin: 20px 0; overflow: hidden; display: none; }
+        #progressBar { width: var(--progress-w); height: 100%; background: var(--accent); transition: width 0.4s ease; }
+
+        /* MAIN VIEWPORT */
+        /* Updated: Increased bottom padding significantly for mobile headroom */
+        .main-view { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            overflow-y: auto; 
+            padding: 40px 20px 150px 20px; /* Added extra bottom padding */
+        }
+        
+        #statusIndicator { 
+            padding: 10px 20px; border-radius: 30px; background: white; font-family:'Quicksand'; 
+            font-weight:700; color:var(--sub); margin-bottom:25px; box-shadow: 0 8px 20px rgba(0,0,0,0.04); font-size: 11px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .output-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; width: 100%; max-width: 1400px; }
+        
+        /* CARDS & SKELETONS */
+        .canvas-frame { background: white; border-radius: 28px; padding: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid #fff; position: relative; }
+        .canvas-frame img { width: 100%; height: auto; border-radius: 20px; display: block; margin-bottom: 15px; transition: 0.5s; }
+        
+        .skeleton { width: 100%; aspect-ratio: 1/1; background: #eee; border-radius: 20px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+        #gatekeeper { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; align-items: center; justify-content: center; transition: 0.5s; }
+
+        .music-mini { background: white; border-radius: 20px; padding: 15px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+
+        @media (max-width: 850px) {
+            /* Updated: Changed body to allow natural scrolling on mobile */
+            body { 
+                flex-direction: column; 
+                overflow-y: auto; 
+                height: auto; 
+                min-height: 100vh;
+            }
+            .sidebar { width: 100%; height: auto; border-right: none; }
+            .main-view { 
+                height: auto; 
+                overflow: visible; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="gatekeeper">
+        <div style="text-align:center; width: 320px;">
+            <h1 style="font-family:'Quicksand'; color:var(--accent); font-size: 42px; margin-bottom:5px; letter-spacing:-2px;">NEXUS</h1>
+            <p style="font-size: 10px; color: var(--sub); margin-bottom: 40px; letter-spacing: 4px; font-weight:700;">PROTOTYPE v6.2.1</p>
+            <input type="password" id="passKey" placeholder="ACCESS CODE" style="text-align:center; margin-bottom:15px; border-radius:18px; padding:18px; border:2px solid #f0f0f0;">
+            <button class="btn-premium" onclick="handleLogin()">LOGIN</button>
+        </div>
+    </div>
+
+    <aside class="sidebar">
+        <div style="padding: 30px 25px 15px 25px;">
+            <div style="font-family:'Quicksand'; font-size:26px; font-weight:700; color:var(--accent);">Nexus <span style="font-weight:300; color:var(--sub);">Archon</span></div>
+        </div>
+
+        <nav class="tab-nav">
+            <button class="tab-trigger active" onclick="setTab('neural', this)">Create</button>
+            <button class="tab-trigger" onclick="setTab('refinery', this)">Refine</button>
+            <button class="tab-trigger" onclick="setTab('archive', this)">Archive</button>
+        </nav>
+
+        <div id="tab-neural" class="tab-content active">
+            <div class="input-group">
+                <label>Canvas Dimensions</label>
+                <select id="aspectRatio">
+                    <option value="512x512">1:1 Standard</option>
+                    <option value="768x512">3:2 Cinematic</option>
+                    <option value="512x768">2:3 Portrait</option>
+                    <option value="448x800">9:16 Mobile</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Neural Instruction</label>
+                <textarea id="prompt" rows="4" placeholder="Envision something grand..."></textarea>
+                <label style="margin-top:12px;">Artistic Direction</label>
+                <select id="stylePreset">
+                    <option value="">None (Raw)</option>
+                    <option value=", cyberpunk, neon glow, intricate details, 8k">Cyber-Neon</option>
+                    <option value=", film grain, kodak portra 400, hyperrealistic, raw photo">Analog Photo</option>
+                    <option value=", studio ghibli style, watercolor, lush environment">Ghibli Art</option>
+                </select>
+            </div>
+            <div class="input-group" style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div><label>Samples</label><input type="number" id="batchSize" value="1" min="1" max="4"></div>
+                <div><label>Upscale</label><select id="hires"><option value="false">Off</option><option value="true">2x Hires</option></select></div>
+            </div>
+            
+            <div class="progress-container" id="progBox"><div id="progressBar"></div></div>
+            <button class="btn-premium" id="genBtn" onclick="generate('txt2img')">SYNTHESIZE VISION</button>
+        </div>
+
+        <div id="tab-refinery" class="tab-content">
+            <div class="input-group">
+                <label>Upload Base Artifact</label>
+                <input type="file" id="fileIn" accept="image/*" onchange="previewSource(this)">
+            </div>
+            <div class="input-group">
+                <label>Influence Strength (0.75 recommended)</label>
+                <input type="range" id="denoising" min="0" max="1" step="0.01" value="0.75">
+            </div>
+            <button class="btn-premium" onclick="generate('img2img')">TRANSFORM ARTIFACT</button>
+        </div>
+
+        <div id="tab-archive" class="tab-content">
+            <div id="historyGrid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;"></div>
+        </div>
+
+        <div class="music-mini">
+            <button class="btn-premium" id="playBtn" onclick="togglePlay()" style="padding:10px; font-size:10px; background:#f0f2f5; color:#555; box-shadow:none;">PLAY AMBIENT</button>
+        </div>
+    </aside>
+
+    <main class="main-view">
+        <div id="statusIndicator">⚡ SYSTEM READY</div>
+        <div id="outputGrid" class="output-grid"></div>
+    </main>
+
+    <script>
+        const api_url = "https://3f115e20cf09132213.gradio.live";
+        let currentB64 = ""; 
+        let history = [];
+        let isProcessing = false;
+        let progressInterval;
+        const audio = new Audio('ambient.wav'); audio.loop = true;
+
+        function handleLogin() {
+            if(document.getElementById('passKey').value.toUpperCase() === "NEXUS77") {
+                document.getElementById('gatekeeper').style.opacity = '0';
+                setTimeout(() => document.getElementById('gatekeeper').style.display = 'none', 500);
+            } else { alert("INVALID PROTOCOL"); }
+        }
+
+        document.getElementById('passKey').addEventListener('keypress', e => e.key === 'Enter' && handleLogin());
+
+        function setTab(tab, el) {
+            document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        function togglePlay() {
+            if (audio.paused) { audio.play(); document.getElementById('playBtn').innerText = "PAUSE AMBIENT"; }
+            else { audio.pause(); document.getElementById('playBtn').innerText = "PLAY AMBIENT"; }
+        }
+
+        function previewSource(input) {
+            const reader = new FileReader();
+            reader.onload = e => currentB64 = e.target.result;
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        // POLLING FUNCTION FOR PROGRESS & PREVIEWS
+        async function checkProgress() {
+            try {
+                const res = await fetch(api_url + "/sdapi/v1/progress");
+                const data = await res.json();
+                const percent = Math.round(data.progress * 100);
+                document.getElementById('progressBar').style.width = percent + "%";
+                document.getElementById('statusIndicator').innerText = `SYNTHESIZING: ${percent}%`;
+                
+                // If there's a live preview image, show it in the first skeleton
+                if(data.current_image) {
+                    const firstImg = document.querySelector('.output-grid img');
+                    if(firstImg) firstImg.src = "data:image/png;base64," + data.current_image;
+                }
+            } catch(e) {}
+        }
+
+        async function generate(mode) {
+            if(isProcessing) return;
+            isProcessing = true;
+            
+            const btn = document.getElementById('genBtn');
+            const status = document.getElementById('statusIndicator');
+            const grid = document.getElementById('outputGrid');
+            const progBox = document.getElementById('progBox');
+            
+            btn.disabled = true;
+            progBox.style.display = 'block';
+            grid.innerHTML = `<div class="canvas-frame"><div class="skeleton"></div><img src="" style="position:absolute; top:15px; left:15px; width:calc(100% - 30px); opacity:0.3; filter:blur(10px);"></div>`;
+
+            const [w, h] = document.getElementById('aspectRatio').value.split('x');
+            const hires = document.getElementById('hires').value === "true";
+
+            let payload = {
+                prompt: document.getElementById('prompt').value + document.getElementById('stylePreset').value,
+                steps: 25,
+                batch_size: parseInt(document.getElementById('batchSize').value),
+                width: parseInt(w), height: parseInt(h),
+                enable_hr: hires, hr_scale: 2, hr_upscaler: "Latent",
+                denoising_strength: 0.6
+            };
+
+            if(mode === 'img2img') {
+                if(!currentB64) { alert("No base artifact found."); endGen(); return; }
+                payload.init_images = [currentB64.split(',')[1]];
+                payload.denoising_strength = parseFloat(document.getElementById('denoising').value);
+            }
+
+            progressInterval = setInterval(checkProgress, 800);
+
+            try {
+                const res = await fetch(api_url + (mode === 'txt2img' ? "/sdapi/v1/txt2img" : "/sdapi/v1/img2img"), {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                grid.innerHTML = ""; // Clear skeletons
+                
+                data.images.forEach(imgData => {
+                    const b64 = "data:image/png;base64," + imgData;
+                    const card = document.createElement('div');
+                    card.className = "canvas-frame";
+                    card.innerHTML = `<img src="${b64}"><button class="btn-premium" style="padding:10px; font-size:10px;" onclick="downloadSolo('${b64}')">DOWNLOAD</button>`;
+                    grid.appendChild(card);
+                    addToArchive(b64);
+                });
+                status.innerText = "✨ SYNTHESIS COMPLETE";
+            } catch(e) { status.innerText = "❌ UPLINK DISRUPTED"; }
+            finally { endGen(); }
+        }
+
+        function endGen() {
+            isProcessing = false;
+            document.getElementById('genBtn').disabled = false;
+            document.getElementById('progBox').style.display = 'none';
+            document.getElementById('progressBar').style.width = "0%";
+            clearInterval(progressInterval);
+        }
+
+        function addToArchive(src) {
+            history.unshift(src);
+            document.getElementById('historyGrid').innerHTML = history.slice(0, 10).map(s => `<img src="${s}" style="width:100%; border-radius:12px; cursor:pointer; margin-bottom:5px;" onclick="restore('${s}')">`).join('');
+        }
+        function restore(src) { document.getElementById('outputGrid').innerHTML = `<div class="canvas-frame"><img src="${src}"></div>`; }
+        function downloadSolo(src) { const a = document.createElement('a'); a.href = src; a.download = `nexus_${Date.now()}.png`; a.click(); }
+    </script>
+</body>
+</html>
