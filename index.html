@@ -1,350 +1,259 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>NEXUS ARCHON | Neural Workshop</title>
+<meta charset="UTF-8" />
+<title>NEXUS ARCHON</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
 <style>
-/* --- CORE THEME --- */
-:root {
-    --bg:#030304;
-    --panel:rgba(18,18,22,.95);
-    --accent:#6366f1;
-    --accent-dim:rgba(99,102,241,.12);
-    --success:#10b981;
-    --text-main:#f1f5f9;
-    --text-dim:#64748b;
-    --border:rgba(255,255,255,.08);
-
-    --font-main:'Inter',sans-serif;
-    --font-tech:'Share Tech Mono',monospace;
-    --font-display:'Rajdhani',sans-serif;
+:root{
+  --bg:#0b0d10;
+  --panel:#131722;
+  --accent:#00ffe1;
+  --text:#e6e6e6;
+  --text-dim:#8b8f9a;
+  --border:#1f2433;
 }
 
-*{box-sizing:border-box}
+*{box-sizing:border-box;font-family:Inter,system-ui,monospace}
 body{
-    margin:0;
-    display:flex;
-    height:100vh;
-    background:var(--bg);
-    color:var(--text-main);
-    font-family:var(--font-main);
-    overflow:hidden;
+  margin:0;
+  background:radial-gradient(circle at top,#121722,#07090d);
+  color:var(--text);
+  overflow:hidden;
 }
-
-nav{
-    width:70px;
-    background:#050507;
-    border-right:1px solid var(--border);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:20px 0;
-    gap:20px;
+header{
+  height:60px;
+  display:flex;
+  align-items:center;
+  padding:0 20px;
+  border-bottom:1px solid var(--border);
+  background:#0d1018;
 }
-
-.nav-item{
-    width:46px;height:46px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:12px;
-    cursor:pointer;
-    color:var(--text-dim);
+header h1{
+  font-size:14px;
+  letter-spacing:3px;
+  color:var(--accent);
 }
-.nav-item.active{
-    background:var(--accent);
-    color:#fff;
+main{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  height:calc(100vh - 60px);
 }
-
 aside{
-    width:420px;
-    background:var(--panel);
-    border-right:1px solid var(--border);
-    display:none;
-    flex-direction:column;
+  background:var(--panel);
+  border-right:1px solid var(--border);
+  padding:15px;
+  overflow:auto;
 }
-aside.active{display:flex}
-
-.sidebar-header{
-    padding:20px;
-    font-family:var(--font-display);
-    font-weight:700;
-    border-bottom:1px solid var(--border);
+section{
+  padding:15px;
+  overflow:auto;
 }
-
-.sidebar-content{
-    padding:20px;
-    overflow-y:auto;
-    flex:1;
+.module-box{
+  border:1px solid var(--border);
+  padding:12px;
+  margin-bottom:14px;
 }
-
-.module{
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:15px;
-    margin-bottom:20px;
+.module-label{
+  font-size:10px;
+  letter-spacing:2px;
+  color:var(--accent);
+  display:block;
+  margin-bottom:8px;
 }
-
-textarea,input,select{
-    width:100%;
-    background:#000;
-    border:1px solid var(--border);
-    color:var(--text-main);
-    padding:10px;
-    margin-bottom:10px;
-    font-family:var(--font-tech);
+label{
+  font-size:11px;
+  color:var(--text-dim);
 }
-
+input,select,textarea,button{
+  width:100%;
+  margin:6px 0 10px;
+  background:#0e1220;
+  color:var(--text);
+  border:1px solid var(--border);
+  padding:6px;
+}
 button{
-    width:100%;
-    padding:12px;
-    background:var(--accent);
-    color:#fff;
-    border:none;
-    cursor:pointer;
-    font-family:var(--font-display);
-    margin-top:6px;
+  cursor:pointer;
+  background:linear-gradient(145deg,#00ffe1,#00c9b7);
+  color:#00110e;
+  font-weight:600;
 }
-
-.main{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-}
-
 .grid{
-    padding:30px;
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:20px;
-    overflow-y:auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:12px;
 }
-
-.card{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:8px;
-    overflow:hidden;
+.art-card{
+  border:1px solid var(--border);
+  background:#0d1018;
 }
-.card img{width:100%}
-
-.card-body{padding:12px;font-size:11px}
-
-.log{
-    height:110px;
-    background:#020202;
-    font-family:var(--font-tech);
-    font-size:11px;
-    color:var(--success);
-    padding:10px;
-    overflow-y:auto;
+.art-card img{
+  width:100%;
+  display:block;
 }
 </style>
 </head>
 
 <body>
+<header>
+  <h1>NEXUS ARCHON</h1>
+</header>
 
-<nav>
-    <div class="nav-item active" onclick="nav('create',this)"><i class="fa fa-wand-magic"></i></div>
-    <div class="nav-item" onclick="nav('vault',this)"><i class="fa fa-toolbox"></i></div>
-</nav>
+<main>
+<aside>
 
-<aside id="create" class="active">
-<div class="sidebar-header">Neural Studio</div>
-<div class="sidebar-content">
-
-<div class="module">
-<textarea id="prompt" rows="4" placeholder="Prompt"></textarea>
-<textarea id="neg" rows="2" placeholder="Negative prompt"></textarea>
-
-<label style="font-size:11px">
-<input type="checkbox" id="useCrop"> Use Workshop Image
-</label>
-
-<button onclick="runRender()">Execute Render</button>
+<div class="module-box">
+  <span class="module-label">Prompt</span>
+  <textarea id="prompt" rows="4" placeholder="Describe the image..."></textarea>
+  <textarea id="negative" rows="2" placeholder="Negative prompt"></textarea>
 </div>
 
+<div class="module-box">
+  <span class="module-label">Generation Dynamics</span>
+
+  <label>Steps: <span id="stepsVal">25</span></label>
+  <input type="range" min="5" max="60" value="25" id="steps">
+
+  <label>CFG Scale: <span id="cfgVal">7</span></label>
+  <input type="range" min="1" max="15" step="0.5" value="7" id="cfg">
+
+  <label>Denoise (img2img): <span id="denoiseVal">0.55</span></label>
+  <input type="range" min="0.1" max="0.9" step="0.05" value="0.55" id="denoise">
+
+  <label>Seed</label>
+  <input type="number" id="seed" placeholder="-1 = random">
+
+  <label>Sampler</label>
+  <select id="sampler">
+    <option>Euler a</option>
+    <option>DPM++ 2M Karras</option>
+    <option>DPM++ SDE</option>
+    <option>DDIM</option>
+  </select>
+
+  <label style="display:flex;gap:6px;align-items:center;">
+    <input type="checkbox" id="useWorkshopImage">
+    Use Workshop Image (img2img)
+  </label>
+
+  <button onclick="runRender()">EXECUTE RENDER</button>
 </div>
-<div class="log" id="syslog"></div>
+
 </aside>
 
-<aside id="vault">
-<div class="sidebar-header">Workshop</div>
-<div class="sidebar-content">
-
-<div class="module">
-<input type="file" id="imgInput" accept="image/*" hidden>
-<button onclick="imgInput.click()">Load Image</button>
-
-<div id="cropWrap" style="display:none;margin-top:10px">
-<img id="cropImg" style="max-width:100%">
-</div>
-
-<button onclick="saveCrop()">Finalize Crop</button>
-
-<select id="upscaler">
-<option>R-ESRGAN 4x+</option>
-<option>4x-UltraSharp</option>
-<option>Latent</option>
-</select>
-
-<button onclick="runUpscale()">Run Upscale</button>
-</div>
-
-</div>
-<div class="log" id="vaultlog"></div>
-</aside>
-
-<div class="main">
-<div class="grid" id="grid"></div>
-</div>
+<section>
+  <div class="grid" id="mainGrid"></div>
+</section>
+</main>
 
 <script>
-let API="http://127.0.0.1:7860";
-let cropper, activeCrop=null;
+// ================= IMAGE VAULT (IndexedDB) =================
+let vaultDB;
+const VAULT_DB="nexus_image_vault";
+const VAULT_STORE="images";
 
-/* ---------- IndexedDB Vault ---------- */
-let db;
-const DB="nexusVault", STORE="images";
-
-indexedDB.open(DB,1).onupgradeneeded=e=>{
-    e.target.result.createObjectStore(STORE,{keyPath:"id"});
-};
-indexedDB.open(DB,1).onsuccess=e=>{
-    db=e.target.result;
-    loadVault();
-};
-
-function saveVault(obj){
-    const tx=db.transaction(STORE,"readwrite");
-    tx.objectStore(STORE).put(obj);
+function initVault(){
+  const req=indexedDB.open(VAULT_DB,1);
+  req.onupgradeneeded=e=>{
+    e.target.result.createObjectStore(VAULT_STORE,{keyPath:"id"});
+  };
+  req.onsuccess=e=>{
+    vaultDB=e.target.result;
+    restoreVault();
+  };
 }
 
-function loadVault(){
-    const tx=db.transaction(STORE,"readonly");
-    tx.objectStore(STORE).getAll().onsuccess=e=>{
-        e.target.result.forEach(renderCard);
-    };
+function saveToVault(record){
+  if(!vaultDB)return;
+  const tx=vaultDB.transaction(VAULT_STORE,"readwrite");
+  tx.objectStore(VAULT_STORE).put(record);
 }
 
-/* ---------- UI ---------- */
-function nav(id,el){
-    document.querySelectorAll("aside").forEach(a=>a.classList.remove("active"));
-    document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-    el.classList.add("active");
+function restoreVault(){
+  const tx=vaultDB.transaction(VAULT_STORE,"readonly");
+  tx.objectStore(VAULT_STORE).getAll().onsuccess=e=>{
+    e.target.result.forEach(r=>addArt(r.src,r.prompt,true,r.id));
+  };
 }
 
-function log(id,msg){
-    const l=document.getElementById(id);
-    l.innerHTML+=`<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
-    l.scrollTop=l.scrollHeight;
-}
+// ================= ART GRID =================
+function addArt(src,p,restoring=false,id=null){
+  const uid=id||crypto.randomUUID();
 
-/* ---------- Workshop ---------- */
-imgInput.onchange=e=>{
-    const r=new FileReader();
-    r.onload=x=>{
-        cropImg.src=x.target.result;
-        cropWrap.style.display="block";
-        cropper?.destroy();
-        cropper=new Cropper(cropImg,{viewMode:1});
-        log("vaultlog","Image loaded");
-    };
-    r.readAsDataURL(e.target.files[0]);
-};
-
-function saveCrop(){
-    activeCrop=cropper.getCroppedCanvas().toDataURL("image/png");
-    log("vaultlog","Crop buffered");
-}
-
-/* ---------- Render ---------- */
-async function runRender(){
-    const useCrop=useCropEl.checked && activeCrop;
-    const payload={
-        prompt:prompt.value,
-        negative_prompt:neg.value,
-        steps:25,
-        cfg_scale:7,
-        sampler_name:"Euler a"
-    };
-
-    let endpoint="txt2img";
-    if(useCrop){
-        payload.init_images=[activeCrop.split(",")[1]];
-        payload.denoising_strength=.55;
-        endpoint="img2img";
-    }else{
-        payload.width=512;
-        payload.height=512;
-    }
-
-    const r=await fetch(`${API}/sdapi/v1/${endpoint}`,{
-        method:"POST",
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
+  if(!restoring){
+    saveToVault({
+      id:uid,
+      src,
+      prompt:p,
+      time:Date.now(),
+      parent:null
     });
-    const j=await r.json();
-    const src="data:image/png;base64,"+j.images[0];
-    addImage(src,prompt.value);
-}
+  }
 
-/* ---------- Upscale ---------- */
-async function runUpscale(){
-    const b64=activeCrop.split(",")[1];
-    const r=await fetch(`${API}/sdapi/v1/extra-single-image`,{
-        method:"POST",
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-            image:b64,
-            upscaling_resize:4,
-            upscaler_1:upscaler.value
-        })
-    });
-    const j=await r.json();
-    addImage("data:image/png;base64,"+j.image,"Upscaled");
-}
-
-/* ---------- Vault ---------- */
-function addImage(src,prompt){
-    const obj={
-        id:crypto.randomUUID(),
-        src,
-        prompt,
-        time:Date.now(),
-        parent:null // 🔜 version stacks ready
-    };
-    saveVault(obj);
-    renderCard(obj);
-}
-
-function renderCard(o){
-    const c=document.createElement("div");
-    c.className="card";
-    c.innerHTML=`
-    <img src="${o.src}">
-    <div class="card-body">
-        <div>${o.prompt.slice(0,80)}</div>
-        <button onclick="reuse('${o.src}')">Reuse</button>
+  const card=document.createElement("div");
+  card.className="art-card";
+  card.innerHTML=`
+    <img src="${src}">
+    <div style="padding:10px">
+      <div style="font-size:10px;color:var(--accent)">ID ${uid.slice(0,8)}</div>
+      <div style="font-size:11px;color:var(--text-dim)">${p.slice(0,60)}</div>
     </div>`;
-    grid.prepend(c);
+  document.getElementById("mainGrid").prepend(card);
 }
 
-function reuse(src){
-    activeCrop=src;
-    nav("create",document.querySelector(".nav-item"));
-    log("syslog","Image reused for render");
+// ================= GENERATION =================
+async function runRender(){
+  const prompt=document.getElementById("prompt").value;
+  const neg=document.getElementById("negative").value;
+
+  const steps=+stepsEl.value;
+  const cfg_scale=+cfgEl.value;
+  const denoise=+denoiseEl.value;
+  const sampler_name=samplerEl.value;
+  const seedVal=seedEl.value;
+
+  let payload={
+    prompt,
+    negative_prompt:neg,
+    steps,
+    cfg_scale,
+    sampler_name,
+    subseed_strength:0.15
+  };
+
+  if(seedVal) payload.seed=+seedVal;
+
+  // 🔴 MOCK GENERATION (replace with real API)
+  const canvas=document.createElement("canvas");
+  canvas.width=512; canvas.height=512;
+  const ctx=canvas.getContext("2d");
+  ctx.fillStyle="#111";
+  ctx.fillRect(0,0,512,512);
+  ctx.fillStyle="#00ffe1";
+  ctx.font="16px monospace";
+  ctx.fillText("NEXUS RENDER",20,40);
+  ctx.fillText(prompt.slice(0,40),20,80);
+
+  addArt(canvas.toDataURL(),prompt);
 }
 
-const useCropEl=document.getElementById("useCrop");
+// ================= UI POLISH =================
+const stepsEl=steps;
+const cfgEl=cfg;
+const denoiseEl=denoise;
+
+[stepsEl,cfgEl,denoiseEl].forEach(el=>{
+  el.oninput=()=>{
+    document.getElementById(el.id+"Val").innerText=el.value;
+  };
+});
+
+// ================= INIT =================
+window.onload=()=>{
+  initVault();
+};
 </script>
 </body>
 </html>
