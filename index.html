@@ -4,308 +4,271 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXUS ARCHON | Secure Neural Interface</title>
+    
     <script src="https://www.paypal.com/sdk/js?client-id=BAAmHnd5CiEDa90TY6DIL5eA9Xp5A8uUMNaYK4_uw3AwsFuLkJzoBNoeaTCsPWDZ2yn0u1or0aXuq64C6g&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
     <style>
+        /* --- ARCHITECTURE --- */
         :root {
-            --bg: #020203; --panel: rgba(13, 13, 16, 0.95); --accent: #6366f1;
-            --accent-dim: rgba(99, 102, 241, 0.15); --success: #10b981;
-            --warning: #f59e0b; --danger: #ef4444; --text: #e2e8f0;
-            --text-dim: #64748b; --border: rgba(255, 255, 255, 0.08);
-            --font-tech: 'Share Tech Mono', monospace;
+            --bg: #020203; --panel: rgba(13, 13, 16, 0.98); --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3); --accent-dim: rgba(99, 102, 241, 0.1);
+            --success: #10b981; --warning: #f59e0b; --text-main: #e2e8f0;
+            --text-dim: #64748b; --border-color: rgba(255, 255, 255, 0.08);
+            --font-tech: 'Share Tech Mono', monospace; --font-main: 'Inter', sans-serif;
+            --sidebar-width: 420px; --nav-width: 70px;
         }
 
         * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg); }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        body { background-color: var(--bg); color: var(--text-main); font-family: var(--font-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        .grid-bg { position: fixed; inset: 0; z-index: -2; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.15; }
-        .scanline { position: fixed; inset: 0; z-index: 999; background: linear-gradient(to bottom, transparent, transparent 50%, rgba(0,0,0,0.1) 50%); background-size: 100% 4px; pointer-events: none; }
+        /* FX OVERLAYS */
+        .grid-overlay { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px); background-size: 50px 50px; opacity: 0.15; pointer-events: none; }
+        .crt-scanline { position: fixed; inset: 0; z-index: 1000; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%); background-size: 100% 4px; pointer-events: none; opacity: 0.3; }
 
         /* NAV */
-        .tab-bar { width: 70px; background: #050507; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 15px; z-index: 10; }
-        .tab-icon { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dim); transition: 0.2s; border: 1px solid transparent; }
-        .tab-icon.active { background: var(--accent); color: white; box-shadow: 0 0 15px var(--accent-dim); }
+        .primary-nav { width: var(--nav-width); background: #050507; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 20px; z-index: 100; }
+        .nav-item { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dim); transition: 0.3s; border: 1px solid transparent; }
+        .nav-item:hover { color: var(--accent); background: var(--accent-dim); }
+        .nav-item.active { background: var(--accent); color: #fff; box-shadow: 0 0 20px var(--accent-glow); }
 
-        /* SIDEBAR */
-        .sidebar { width: 400px; background: var(--panel); backdrop-filter: blur(20px); border-right: 1px solid var(--border); display: none; flex-direction: column; animation: slide 0.3s ease; }
-        .sidebar.active { display: flex; }
-        @keyframes slide { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        /* SIDEBARS */
+        .sidebar-container { width: var(--sidebar-width); background: var(--panel); backdrop-filter: blur(30px); border-right: 1px solid var(--border-color); display: none; flex-direction: column; z-index: 90; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        .sidebar-container.active { display: flex; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
 
-        .panel-header { padding: 20px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.3); }
-        .panel-title { font-family: var(--font-tech); font-size: 18px; color: var(--accent); letter-spacing: 2px; }
-        .panel-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .sidebar-header { padding: 24px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-color); }
+        .sidebar-header h2 { margin: 0; font-family: var(--font-tech); font-size: 18px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; }
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 20px; }
 
-        /* PRESET MATRIX */
-        .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .preset-btn { 
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-dim); 
-            font-size: 9px; padding: 8px 4px; border-radius: 4px; cursor: pointer; text-align: center;
-            font-family: var(--font-tech); transition: 0.2s;
-        }
-        .preset-btn:hover { border-color: var(--accent); color: var(--text); background: var(--accent-dim); }
-
-        /* UI ELEMENTS */
-        .control-group { margin-bottom: 15px; border: 1px solid var(--border); padding: 12px; border-radius: 6px; background: rgba(0,0,0,0.4); }
-        .group-label { font-family: var(--font-tech); font-size: 10px; color: var(--text-dim); display: block; border-bottom: 1px solid var(--border); margin-bottom: 10px; padding-bottom: 4px; text-transform: uppercase; }
-        label { font-size: 11px; color: var(--text-dim); display: block; margin-bottom: 5px; }
-        input, select, textarea { width: 100%; background: #000; border: 1px solid var(--border); color: var(--text); padding: 8px; font-family: var(--font-tech); font-size: 12px; border-radius: 4px; outline: none; margin-bottom: 10px; }
+        /* COMPONENTS */
+        .module-box { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+        .module-label { display: block; font-family: var(--font-tech); font-size: 10px; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
         
-        .btn-main { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; font-family: var(--font-tech); cursor: pointer; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); font-weight: bold; }
-        .btn-main:hover { background: #4f46e5; }
+        textarea, input { width: 100%; background: #000; border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; font-family: var(--font-tech); font-size: 12px; border-radius: 4px; outline: none; margin-bottom: 10px; }
+        .btn-action { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; font-family: var(--font-tech); font-weight: 800; cursor: pointer; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); transition: 0.3s; text-transform: uppercase; }
+        .btn-action:hover { background: #4f46e5; transform: translateY(-2px); }
 
-        /* LOGS */
-        .console-log { height: 100px; background: #000; font-family: var(--font-tech); font-size: 10px; padding: 10px; color: var(--success); overflow-y: auto; border-top: 1px solid var(--border); }
-        .log-entry::before { content: "> "; color: var(--text-dim); }
+        /* CROPPER AREA */
+        #crop-container { width: 100%; height: 250px; background: #000; margin-bottom: 10px; overflow: hidden; display: none; border: 1px solid var(--accent); }
+        #crop-preview { max-width: 100%; }
+
+        /* PROJECT LIST */
+        .project-item { background: rgba(255,255,255,0.03); padding: 10px; margin-bottom: 8px; border-radius: 4px; font-size: 11px; border-left: 2px solid var(--accent); cursor: pointer; }
+        .project-item:hover { background: var(--accent-dim); }
 
         /* VIEWPORT */
-        .viewport { flex: 1; display: flex; flex-direction: column; background: radial-gradient(circle at center, transparent, #000); }
-        .top-bar { height: 40px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; font-family: var(--font-tech); font-size: 10px; color: var(--text-dim); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 25px; }
-        .art-card { background: #08080a; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-        .art-card img { width: 100%; display: block; }
-
-        #gatekeeper { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .main-viewport { flex: 1; display: flex; flex-direction: column; }
+        .status-bar { height: 45px; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; font-family: var(--font-tech); font-size: 11px; color: var(--text-dim); }
+        .content-scroll { flex: 1; overflow-y: auto; padding: 30px; background: radial-gradient(circle at center, transparent 0%, #000 100%); }
+        .art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        
+        .terminal-output { height: 100px; background: #000; border-top: 1px solid var(--border-color); padding: 10px; font-family: var(--font-tech); font-size: 10px; color: var(--success); overflow-y: auto; }
+        #auth-layer { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
     </style>
 </head>
 <body>
 
-    <div id="gatekeeper">
-        <h1 style="font-family:var(--font-tech); color:var(--accent); letter-spacing:8px;">NEXUS ARCHON</h1>
-        <input type="password" id="passKey" placeholder="ENCRYPTION KEY" style="width:250px; text-align:center;">
-        <button class="btn-main" style="width:250px;" onclick="unlock()">ACCESS INTERFACE</button>
+    <div id="auth-layer">
+        <h1 style="font-family:var(--font-tech); color:var(--accent); letter-spacing:10px;">NEXUS ARCHON</h1>
+        <div style="width:300px; text-align:center;">
+            <input type="password" id="accessCode" placeholder="ENCRYPTION KEY" style="text-align:center;">
+            <button class="btn-action" onclick="authenticate()">ESTABLISH LINK</button>
+        </div>
     </div>
 
-    <div class="grid-bg"></div>
-    <div class="scanline"></div>
+    <div class="grid-overlay"></div>
+    <div class="crt-scanline"></div>
 
-    <nav class="tab-bar">
-        <div class="tab-icon active" onclick="switchTab('create')" id="nav-create"><i class="fa-solid fa-microchip"></i></div>
-        <div class="tab-icon" onclick="switchTab('vault')" id="nav-vault"><i class="fa-solid fa-shield-halved"></i></div>
-        <div class="tab-icon" onclick="switchTab('logs')" id="nav-logs"><i class="fa-solid fa-terminal"></i></div>
-        <div style="margin-top:auto;">
-            <div class="tab-icon" onclick="togglePlay()"><i class="fa-solid fa-music" id="musicIcon"></i></div>
-        </div>
+    <nav class="primary-nav">
+        <div class="nav-item active" onclick="navTo('create', this)"><i class="fa-solid fa-microchip"></i></div>
+        <div class="nav-item" onclick="navTo('vault', this)"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="nav-item" onclick="navTo('diag', this)"><i class="fa-solid fa-gauge-high"></i></div>
+        <div style="margin-top:auto;"><div class="nav-item" onclick="toggleAudio()"><i class="fa-solid fa-volume-high" id="audioToggle"></i></div></div>
     </nav>
 
-    <aside id="tab-create" class="sidebar active">
-        <div class="panel-header">
-            <div class="panel-title">NEURAL STUDIO</div>
-            <div style="font-size:10px; color:var(--text-dim);">UPLINK: <span style="color:var(--success)">STABLE</span></div>
+    <aside id="side-create" class="sidebar-container active">
+        <div class="sidebar-header"><h2>Neural Studio</h2></div>
+        <div class="sidebar-content">
+            <div class="module-box">
+                <span class="module-label">Style Matrix</span>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px;">
+                    <button class="btn-action" style="font-size:8px; padding:5px;" onclick="applyPreset('cinematic')">CINEMA</button>
+                    <button class="btn-action" style="font-size:8px; padding:5px;" onclick="applyPreset('cyberpunk')">CYBER</button>
+                    <button class="btn-action" style="font-size:8px; padding:5px;" onclick="applyPreset('realism')">REAL</button>
+                </div>
+            </div>
+            <div class="module-box">
+                <span class="module-label">Active Prompt</span>
+                <textarea id="promptField" rows="3"></textarea>
+                <textarea id="negPromptField" rows="2">blur, lowres, text</textarea>
+                <button class="btn-action" onclick="saveProject()">Store in Ledger</button>
+            </div>
+            <button class="btn-action" style="background:var(--success);" onclick="runRender()">Execute Render</button>
         </div>
-        <div class="panel-content">
-            <div class="control-group">
-                <span class="group-label">Style Matrix</span>
-                <div class="preset-grid">
-                    <button class="preset-btn" onclick="applyStyle('cinematic')">CINEMATIC</button>
-                    <button class="preset-btn" onclick="applyStyle('anime')">ANIME</button>
-                    <button class="preset-btn" onclick="applyStyle('cyberpunk')">CYBER</button>
-                    <button class="preset-btn" onclick="applyStyle('realism')">REALISM</button>
-                    <button class="preset-btn" onclick="applyStyle('vaporwave')">VAPOR</button>
-                    <button class="preset-btn" onclick="applyStyle('dark')">NOIR</button>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <span class="group-label">Vision Input</span>
-                <textarea id="prompt" rows="3" placeholder="Positive Prompt..."></textarea>
-                <textarea id="neg_prompt" rows="2" placeholder="Negative Prompt...">blur, lowres, text, cropped</textarea>
-                <input type="file" id="visionInput" accept="image/*" onchange="previewVision(this)" style="font-size:10px;">
-                <button class="btn-main" style="padding:5px; font-size:10px; background:rgba(255,255,255,0.05); color:var(--text-dim);" onclick="identify()">ANALYZE SOURCE VISION</button>
-            </div>
-
-            <div class="control-group">
-                <span class="group-label">Render Settings</span>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <input type="number" id="steps" value="25" title="Steps">
-                    <input type="number" id="cfg" value="7" title="CFG">
-                </div>
-                <div style="display:flex; align-items:center; gap:10px; font-size:11px;">
-                    <input type="checkbox" id="isVid" style="width:auto; margin:0;"> Temporal Mode (AnimateDiff)
-                </div>
-            </div>
-            <button class="btn-main" onclick="generate()">INITIALIZE CYCLE</button>
-        </div>
-        <div class="console-log" id="sysLog"></div>
+        <div class="terminal-output" id="sysLog"></div>
     </aside>
 
-    <aside id="tab-vault" class="sidebar">
-        <div class="panel-header">
-            <div class="panel-title">SECURE VAULT</div>
-            <div style="font-size:10px; color:var(--warning);">ASSETS ENCRYPTED</div>
-        </div>
-        <div class="panel-content">
-            <div style="background:var(--accent-dim); padding:15px; border:1px solid var(--accent); border-radius:4px; text-align:center; margin-bottom:15px;">
-                <div style="font-size:32px; font-family:var(--font-tech); font-weight:800;">50.00 <span style="font-size:12px;">CR</span></div>
-                <div style="font-size:9px; letter-spacing:2px;">COMPUTE CREDITS</div>
+    <aside id="side-vault" class="sidebar-container">
+        <div class="sidebar-header"><h2>Vault & Workshop</h2></div>
+        <div class="sidebar-content">
+            
+            <div class="module-box" style="border-color:var(--warning);">
+                <span class="module-label" style="color:var(--warning);">Neural Workshop // Crop Tool</span>
+                <input type="file" id="workshopInput" accept="image/*" onchange="initWorkshop(this)">
+                <div id="crop-container">
+                    <img id="crop-preview">
+                </div>
+                <button id="cropBtn" class="btn-action" style="display:none; margin-bottom:5px;" onclick="executeCrop()">Finalize Neural Crop</button>
+                <button id="identBtn" class="btn-action" style="display:none; background:var(--text-dim);" onclick="interrogateWorkshop()">Identify Subject</button>
             </div>
-            <div class="control-group">
-                <span class="group-label">Allocation Matrix</span>
+
+            <div class="module-box">
+                <span class="module-label">Project Ledger</span>
+                <div id="projectList">
+                    <div class="project-item">Initial Nexus Setup...</div>
+                </div>
+            </div>
+
+            <div class="module-box">
+                <span class="module-label">Deposit Matrix</span>
                 <div id="paypal-container-U448X4TUAZ4EL"></div>
             </div>
-            <div class="control-group">
-                <span class="group-label">Asset Registry</span>
-                <ul style="list-style:none; padding:0; font-family:var(--font-tech); font-size:11px; color:var(--text-dim);" id="assetReg">
-                    <li>> SYNC_READY_001.DAT</li>
-                    <li>> NEURAL_CORE_BCK.BIN</li>
-                </ul>
-            </div>
         </div>
-        <div class="console-log" id="vaultLog"></div>
+        <div class="terminal-output" id="vaultLog"></div>
     </aside>
 
-    <aside id="tab-logs" class="sidebar">
-        <div class="panel-header"><div class="panel-title">DIAGNOSTICS</div></div>
-        <div class="panel-content">
-            <div class="control-group">
-                <span class="group-label">Hardware Telemetry</span>
+    <aside id="side-diag" class="sidebar-container">
+        <div class="sidebar-header"><h2>Hardware Telemetry</h2></div>
+        <div class="sidebar-content">
+            <div class="module-box">
+                <span class="module-label">GPU: RTX 3060 Status</span>
                 <div style="font-family:var(--font-tech); font-size:12px; line-height:2;">
-                    GPU: NVIDIA RTX 3060<br>
-                    TEMP: <span id="gpuTemp">62</span>°C<br>
-                    VRAM: <span id="vram">4.2</span>GB / 12GB<br>
-                    LOAD: <span id="load">14</span>%
-                </div>
-            </div>
-            <div class="control-group">
-                <span class="group-label">Protocol Status</span>
-                <div style="font-size:11px; color:var(--success);">
-                    [✓] TLS 1.3 Encryption<br>
-                    [✓] Handshake Verified<br>
-                    [✓] Neural Link Secure
+                    TEMP: <span id="valTemp">64</span>°C | LOAD: <span id="valLoad">12</span>%<br>
+                    VRAM: 4.8GB / 12GB [SECURE]
                 </div>
             </div>
         </div>
     </aside>
 
-    <main class="viewport">
-        <div class="top-bar">
-            <div><i class="fa-solid fa-microchip"></i> ARCHON_CORE</div>
-            <div>PING: <span id="ping">24</span>ms</div>
-            <div style="color:var(--success);"><i class="fa-solid fa-lock"></i> SECURE</div>
-            <div id="clock">00:00:00</div>
-        </div>
-        <div class="content-area" id="gridContainer">
-            <div id="grid" class="grid">
-                <div style="grid-column: 1/-1; text-align:center; margin-top:15vh; opacity:0.3;">
-                    <i class="fa-solid fa-satellite-dish" style="font-size:50px; margin-bottom:20px;"></i><br>
-                    <span style="font-family:var(--font-tech); letter-spacing:3px;">AWAITING NEURAL SEED</span>
-                </div>
-            </div>
+    <main class="main-viewport">
+        <header class="status-bar">
+            <div><i class="fa-solid fa-microchip"></i> ARCHON_v4.2</div>
+            <div>PING: <span id="pingVal">21</span>ms</div>
+            <div id="clockDisplay">00:00:00</div>
+        </header>
+        <div class="content-scroll">
+            <div id="mainGrid" class="art-grid"></div>
         </div>
     </main>
 
     <script>
-        const API = "http://127.0.0.1:7860";
-        let currentImg = "";
-        const audio = new Audio('ambient.wav'); audio.loop = true; audio.volume = 0.2;
+        const API_BASE = "http://127.0.0.1:7860";
+        let cropper;
+        let activeCropData = "";
+        const bgAudio = new Audio('ambient.wav'); bgAudio.loop = true; bgAudio.volume = 0.2;
 
-        const STYLES = {
-            cinematic: ", cinematic lighting, 8k, highly detailed, masterpieces, anamorphic lens flare",
-            anime: ", aesthetic anime style, vibrant colors, makoto shinkai style, high resolution",
-            cyberpunk: ", cyberpunk 2077 style, neon lights, rainy street, futuristic, high contrast",
-            realism: ", photorealistic, raw photo, fujifilm, 8k, highly detailed skin texture, dslr",
-            vaporwave: ", vaporwave aesthetic, 80s retro, synthwave, pink and teal palette, glitch art",
-            dark: ", dark moody atmosphere, noir, shadows, high contrast, gritty, cinematic smoke"
-        };
-
-        function applyStyle(key) {
-            const p = document.getElementById('prompt');
-            // Remove any existing Nexus style strings to avoid stacking the same style
-            Object.values(STYLES).forEach(s => { p.value = p.value.replace(s, ""); });
-            // Append the new style
-            p.value += STYLES[key];
-            logMsg("system", `STYLE INJECTED: ${key.toUpperCase()}`);
-        }
-
-        function unlock() {
-            if(document.getElementById('passKey').value.toUpperCase()==="NEXUS77") {
-                document.getElementById('gatekeeper').style.display='none';
-                audio.play().catch(e=>{});
-                logMsg("system", "INTERFACE INITIALIZED. WELCOME OPERATOR.");
+        function authenticate() {
+            if(document.getElementById('accessCode').value.toUpperCase() === "NEXUS77") {
+                document.getElementById('auth-layer').style.display = 'none';
+                bgAudio.play().catch(e => {});
+                writeLog("sysLog", "LINK ESTABLISHED.");
             }
         }
 
-        function switchTab(t) {
-            document.querySelectorAll('.sidebar').forEach(s=>s.classList.remove('active'));
-            document.querySelectorAll('.tab-icon').forEach(i=>i.classList.remove('active'));
-            document.getElementById('tab-'+t).classList.add('active');
-            document.getElementById('nav-'+t).classList.add('active');
-            if(t==='vault') logMsg("vault", "HANDSHAKE VERIFIED. ACCESSING VAULT.");
+        function navTo(p, el) {
+            document.querySelectorAll('.sidebar-container').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('side-' + p).classList.add('active');
+            el.classList.add('active');
         }
 
-        function togglePlay() {
-            const i = document.getElementById('musicIcon');
-            if(audio.paused) { audio.play(); i.className="fa-solid fa-music"; }
-            else { audio.pause(); i.className="fa-solid fa-volume-xmark"; }
-        }
-
-        async function generate() {
-            const p = document.getElementById('prompt').value; if(!p) return;
-            logMsg("system", "STARTING RENDER CYCLE...");
-            const grid = document.getElementById('grid');
-            if(grid.innerText.includes("AWAITING")) grid.innerHTML = "";
-
-            try {
-                const res = await fetch(`${API}/sdapi/v1/txt2img`, {
-                    method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({
-                        prompt: p, negative_prompt: document.getElementById('neg_prompt').value,
-                        steps: parseInt(document.getElementById('steps').value),
-                        cfg_scale: parseInt(document.getElementById('cfg').value)
-                    })
-                });
-                const data = await res.json();
-                const b64 = "data:image/png;base64," + data.images[0];
-                addArt(b64, p);
-                logMsg("system", "RENDER COMPLETE.");
-            } catch(e) { logMsg("system", "ERROR: UPLINK LOST."); }
-        }
-
-        async function identify() {
-            if(!currentImg) return alert("Upload source vision first.");
-            logMsg("system", "INTERROGATING VISION CLIP...");
-            try {
-                const res = await fetch(`${API}/sdapi/v1/interrogate`, {
-                    method:'POST', headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify({image: currentImg.split(',')[1], model: "clip"})
-                });
-                const data = await res.json();
-                document.getElementById('prompt').value = data.caption || data.prompt;
-                logMsg("system", "VISION SYNCHRONIZED.");
-            } catch(e) { logMsg("system", "CLIP INTERROGATE FAILED."); }
-        }
-
-        function previewVision(input) {
-            const r = new FileReader();
-            r.onload = e => { 
-                currentImg = e.target.result; 
-                logMsg("system", "VISION SOURCE LOADED.");
+        // WORKSHOP LOGIC
+        function initWorkshop(input) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.getElementById('crop-preview');
+                img.src = e.target.result;
+                document.getElementById('crop-container').style.display = 'block';
+                document.getElementById('cropBtn').style.display = 'block';
+                document.getElementById('identBtn').style.display = 'block';
+                
+                if(cropper) cropper.destroy();
+                cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1 });
+                writeLog("vaultLog", "WORKSHOP IMAGE LOADED. BUFFER READY.");
             };
-            r.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        function executeCrop() {
+            const canvas = cropper.getCroppedCanvas({ width: 512, height: 512 });
+            activeCropData = canvas.toDataURL('image/png');
+            writeLog("vaultLog", "NEURAL CROP FINALIZED. SENT TO BUFFER.");
+            alert("Image Cropped & Ready for Identification!");
+        }
+
+        async function interrogateWorkshop() {
+            const dataToUse = activeCropData || document.getElementById('crop-preview').src;
+            writeLog("vaultLog", "INTERROGATING SUBJECT...");
+            try {
+                const res = await fetch(`${API_BASE}/sdapi/v1/interrogate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ image: dataToUse.split(',')[1], model: 'clip' })
+                });
+                const data = await res.json();
+                document.getElementById('promptField').value = data.caption;
+                writeLog("sysLog", "WORKSHOP DATA SYNCED TO STUDIO.");
+            } catch(e) { writeLog("vaultLog", "IDENT ERROR: FORGE OFFLINE."); }
+        }
+
+        // PROJECT LOGIC
+        function saveProject() {
+            const p = document.getElementById('promptField').value;
+            if(!p) return;
+            const list = document.getElementById('projectList');
+            const item = document.createElement('div');
+            item.className = 'project-item';
+            item.innerText = p.substring(0, 40) + "...";
+            item.onclick = () => { document.getElementById('promptField').value = p; };
+            list.prepend(item);
+            writeLog("vaultLog", "PROJECT SECURED IN LEDGER.");
+        }
+
+        async function runRender() {
+            const prompt = document.getElementById('promptField').value;
+            writeLog("sysLog", "SYNTHESIS INITIALIZED...");
+            try {
+                const res = await fetch(`${API_BASE}/sdapi/v1/txt2img`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ prompt: prompt, steps: 25, cfg_scale: 7 })
+                });
+                const data = await res.json();
+                addArt("data:image/png;base64," + data.images[0], prompt);
+                writeLog("sysLog", "CYCLE COMPLETE.");
+            } catch(e) { writeLog("sysLog", "UPLINK FAILURE."); }
         }
 
         function addArt(src, p) {
             const card = document.createElement('div');
             card.className = 'art-card';
-            card.innerHTML = `<img src="${src}"><div style="padding:10px; font-family:var(--font-tech); font-size:9px;">
-                ID: ARCHON-${Math.floor(Math.random()*999)}<br><br>${p.substring(0,30)}...
-                <a href="${src}" download="archon.png" class="btn-main" style="display:block; text-align:center; margin-top:10px; font-size:9px; padding:5px;">DOWNLOAD</a>
-            </div>`;
-            document.getElementById('grid').prepend(card);
+            card.innerHTML = `<img src="${src}"><div style="padding:10px; font-size:9px;">ID: ${Math.floor(Math.random()*999)}<br>${p.substring(0,25)}...</div>`;
+            document.getElementById('mainGrid').prepend(card);
         }
 
-        function logMsg(type, msg) {
-            const l = document.getElementById(type === 'system' ? 'sysLog' : 'vaultLog');
-            l.innerHTML += `<div class="log-entry">${msg}</div>`;
+        function writeLog(t, m) {
+            const l = document.getElementById(t);
+            l.innerHTML += `<div>> ${m}</div>`;
             l.scrollTop = l.scrollHeight;
         }
 
         setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-            document.getElementById('gpuTemp').innerText = Math.floor(Math.random()*10 + 60);
-            document.getElementById('load').innerText = Math.floor(Math.random()*20 + 10);
-            document.getElementById('ping').innerText = Math.floor(Math.random()*15 + 20);
+            document.getElementById('clockDisplay').innerText = new Date().toLocaleTimeString();
+            document.getElementById('valTemp').innerText = Math.floor(Math.random()*5 + 60);
         }, 1000);
 
         try { paypal.HostedButtons({ hostedButtonId: "U448X4TUAZ4EL" }).render("#paypal-container-U448X4TUAZ4EL"); } catch(e) {}
