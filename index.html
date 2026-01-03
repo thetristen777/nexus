@@ -1,259 +1,400 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>NEXUS ARCHON</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS ARCHON | Neural Workshop</title>
+    
+    <script src="https://www.paypal.com/sdk/js?client-id=BAAmHnd5CiEDa90TY6DIL5eA9Xp5A8uUMNaYK4_uw3AwsFuLkJzoBNoeaTCsPWDZ2yn0u1or0aXuq64C6g&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-<style>
-:root{
-  --bg:#0b0d10;
-  --panel:#131722;
-  --accent:#00ffe1;
-  --text:#e6e6e6;
-  --text-dim:#8b8f9a;
-  --border:#1f2433;
-}
+    <style>
+        /* --- CORE ARCHITECTURE --- */
+        :root {
+            --bg: #030304; 
+            --panel: rgba(18, 18, 22, 0.95); 
+            --nav-bg: #050507;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4); 
+            --accent-dim: rgba(99, 102, 241, 0.1);
+            --success: #10b981; 
+            --warning: #f59e0b; 
+            --text-main: #f1f5f9;
+            --text-dim: #64748b; 
+            --border-color: rgba(255, 255, 255, 0.08);
+            --scanline-opacity: 0.4;
+            --vignette-opacity: 0.8;
+            
+            --font-tech: 'Share Tech Mono', monospace; 
+            --font-display: 'Rajdhani', sans-serif;
+            --font-main: 'Inter', sans-serif;
+            --sidebar-width: 420px; 
+            --nav-width: 70px;
+        }
 
-*{box-sizing:border-box;font-family:Inter,system-ui,monospace}
-body{
-  margin:0;
-  background:radial-gradient(circle at top,#121722,#07090d);
-  color:var(--text);
-  overflow:hidden;
-}
-header{
-  height:60px;
-  display:flex;
-  align-items:center;
-  padding:0 20px;
-  border-bottom:1px solid var(--border);
-  background:#0d1018;
-}
-header h1{
-  font-size:14px;
-  letter-spacing:3px;
-  color:var(--accent);
-}
-main{
-  display:grid;
-  grid-template-columns:300px 1fr;
-  height:calc(100vh - 60px);
-}
-aside{
-  background:var(--panel);
-  border-right:1px solid var(--border);
-  padding:15px;
-  overflow:auto;
-}
-section{
-  padding:15px;
-  overflow:auto;
-}
-.module-box{
-  border:1px solid var(--border);
-  padding:12px;
-  margin-bottom:14px;
-}
-.module-label{
-  font-size:10px;
-  letter-spacing:2px;
-  color:var(--accent);
-  display:block;
-  margin-bottom:8px;
-}
-label{
-  font-size:11px;
-  color:var(--text-dim);
-}
-input,select,textarea,button{
-  width:100%;
-  margin:6px 0 10px;
-  background:#0e1220;
-  color:var(--text);
-  border:1px solid var(--border);
-  padding:6px;
-}
-button{
-  cursor:pointer;
-  background:linear-gradient(145deg,#00ffe1,#00c9b7);
-  color:#00110e;
-  font-weight:600;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:12px;
-}
-.art-card{
-  border:1px solid var(--border);
-  background:#0d1018;
-}
-.art-card img{
-  width:100%;
-  display:block;
-}
-</style>
+        body.light-mode {
+            --bg: #e2e5e9;
+            --panel: rgba(255, 255, 255, 0.95);
+            --nav-bg: #f8fafc;
+            --accent: #4f46e5;
+            --accent-glow: rgba(79, 70, 229, 0.2);
+            --accent-dim: rgba(79, 70, 229, 0.05);
+            --text-main: #1e293b;
+            --text-dim: #64748b;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --scanline-opacity: 0.05;
+            --vignette-opacity: 0.1;
+        }
+
+        * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg); }
+        body { background-color: var(--bg); color: var(--text-main); font-family: var(--font-main); margin: 0; display: flex; height: 100vh; overflow: hidden; transition: background 0.3s, color 0.3s; }
+
+        .grid-overlay { position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.1; pointer-events: none; }
+        .vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(circle, transparent 50%, rgba(0,0,0, var(--vignette-opacity)) 100%); z-index: 1001; transition: 0.3s; }
+        .crt-scanline { position: fixed; inset: 0; z-index: 999; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%); background-size: 100% 4px; pointer-events: none; opacity: var(--scanline-opacity); transition: 0.3s;}
+
+        .primary-nav { width: var(--nav-width); background: var(--nav-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 20px; z-index: 100; transition: background 0.3s; }
+        .nav-item { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dim); transition: 0.3s; border: 1px solid transparent; position: relative; }
+        .nav-item:hover { color: var(--accent); background: var(--accent-dim); transform: scale(1.05); }
+        .nav-item.active { background: var(--accent); color: #fff; box-shadow: 0 0 25px var(--accent-glow); border-color: rgba(255,255,255,0.2); }
+        
+        .sidebar-container { width: var(--sidebar-width); background: var(--panel); backdrop-filter: blur(20px); border-right: 1px solid var(--border-color); display: none; flex-direction: column; z-index: 90; box-shadow: 10px 0 40px rgba(0,0,0,0.1); transition: background 0.3s; }
+        .sidebar-container.active { display: flex; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+
+        .sidebar-header { padding: 25px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-header h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 22px; color: var(--text-main); letter-spacing: 2px; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+        .sidebar-header h2 i { color: var(--accent); font-size: 16px; }
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 25px; }
+
+        .module-box { background: rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 24px; position: relative; transition: border 0.3s; }
+        body.light-mode .module-box { background: rgba(255, 255, 255, 0.5); }
+        .module-box:hover { border-color: var(--accent); }
+        .module-label { display: block; font-family: var(--font-tech); font-size: 11px; color: var(--text-dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; }
+        
+        textarea, input, select { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px; font-family: var(--font-tech); font-size: 13px; border-radius: 6px; outline: none; margin-bottom: 12px; transition: 0.2s; }
+        body.light-mode textarea, body.light-mode input, body.light-mode select { background: #fff; }
+        
+        .btn-action { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: 1px; cursor: pointer; border-radius: 6px; transition: 0.3s; text-transform: uppercase; position: relative; overflow: hidden; }
+        .btn-action:hover { filter: brightness(1.2); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4); }
+        .btn-action.secondary { background: transparent; border: 1px solid var(--border-color); color: var(--text-dim); }
+        
+        /* SLIDERS CUSTOM */
+        input[type="range"] { height: 4px; background: var(--border-color); appearance: none; border-radius: 2px; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 15px; height: 15px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+
+        #crop-container { width: 100%; height: 280px; background: #050505; margin-bottom: 15px; overflow: hidden; display: none; border: 1px solid var(--accent); border-radius: 6px; }
+        #crop-preview { max-width: 100%; }
+
+        .main-viewport { flex: 1; display: flex; flex-direction: column; background: radial-gradient(circle at 50% 50%, var(--bg) 0%, #000 120%); transition: background 0.3s; }
+        .status-bar { height: 50px; background: var(--panel); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; font-family: var(--font-tech); font-size: 11px; color: var(--text-dim); letter-spacing: 1px; backdrop-filter: blur(5px); }
+        .content-scroll { flex: 1; overflow-y: auto; padding: 40px; }
+        .art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        
+        .art-card { background: var(--panel); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; animation: fadeIn 0.5s ease; transition: 0.3s; position: relative; }
+        .art-card img { width: 100%; height: auto; display: block; }
+
+        .terminal-output { height: 120px; background: #020202; border-top: 1px solid var(--border-color); padding: 15px; font-family: var(--font-tech); font-size: 11px; color: var(--success); overflow-y: auto; line-height: 1.6; }
+        
+        #auth-layer { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; background-image: radial-gradient(circle at center, #111 0%, #000 100%); transition: 0.5s; }
+        .auth-box { width: 400px; padding: 40px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 20px; text-align: center; backdrop-filter: blur(10px); }
+    </style>
 </head>
-
 <body>
-<header>
-  <h1>NEXUS ARCHON</h1>
-</header>
 
-<main>
-<aside>
+    <div id="auth-layer">
+        <div class="auth-box">
+            <div style="font-family: 'Rajdhani'; color: #fff; font-size: 32px; letter-spacing: 4px; margin-bottom: 5px; text-transform: uppercase; font-weight: 700;">Nexus Archon</div>
+            <div style="font-family: 'Share Tech Mono'; color: var(--accent); font-size: 12px; letter-spacing: 2px; margin-bottom: 30px;">AI WORKSHOP ENVIRONMENT</div>
+            <input type="password" id="accessCode" placeholder="ENTER ACCESS KEY" style="text-align:center; font-size:16px; letter-spacing:3px;">
+            <button class="btn-action" onclick="authenticate()">Initialize Link</button>
+        </div>
+    </div>
 
-<div class="module-box">
-  <span class="module-label">Prompt</span>
-  <textarea id="prompt" rows="4" placeholder="Describe the image..."></textarea>
-  <textarea id="negative" rows="2" placeholder="Negative prompt"></textarea>
-</div>
+    <div class="grid-overlay"></div>
+    <div class="vignette"></div>
+    <div class="crt-scanline"></div>
 
-<div class="module-box">
-  <span class="module-label">Generation Dynamics</span>
+    <nav class="primary-nav">
+        <div class="nav-item active" onclick="navTo('create', this)" title="Generation Studio"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="nav-item" onclick="navTo('vault', this)" title="Workshop & Tools"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div class="nav-item" onclick="navTo('diag', this)" title="System Telemetry"><i class="fa-solid fa-chart-line"></i></div>
+        <div style="flex:1;"></div>
+        <div class="nav-item" onclick="toggleFullscreen()"><i class="fa-solid fa-expand"></i></div>
+        <div class="nav-item" onclick="toggleTheme()"><i class="fa-solid fa-sun" id="themeIcon"></i></div>
+        <div class="nav-item" onclick="navTo('settings', this)"><i class="fa-solid fa-gear"></i></div>
+        <div class="nav-item" onclick="toggleAudio()"><i class="fa-solid fa-play" id="audioIcon"></i></div>
+    </nav>
 
-  <label>Steps: <span id="stepsVal">25</span></label>
-  <input type="range" min="5" max="60" value="25" id="steps">
+    <aside id="side-create" class="sidebar-container active">
+        <div class="sidebar-header"><h2><i class="fa-solid fa-wand-magic-sparkles"></i> Neural Studio</h2></div>
+        <div class="sidebar-content">
+            <div class="module-box">
+                <span class="module-label"><span>Aesthetic Matrix</span></span>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+                    <button class="btn-action secondary" style="font-size:10px; padding:8px;" onclick="applyPreset('cinematic')">CINEMA</button>
+                    <button class="btn-action secondary" style="font-size:10px; padding:8px;" onclick="applyPreset('cyberpunk')">CYBER</button>
+                    <button class="btn-action secondary" style="font-size:10px; padding:8px;" onclick="applyPreset('anime')">ANIME</button>
+                </div>
+            </div>
+            
+            <div class="module-box">
+                <span class="module-label">Prompt <i class="fa-solid fa-dice" onclick="randomizePrompt()" style="cursor:pointer; color:var(--accent);"></i></span>
+                <textarea id="promptField" rows="3" placeholder="Describe your vision..."></textarea>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:10px;">
+                    <div>
+                        <span class="module-label">Steps: <span id="stepVal">25</span></span>
+                        <input type="range" id="stepSlider" min="1" max="100" value="25" oninput="document.getElementById('stepVal').innerText=this.value">
+                    </div>
+                    <div>
+                        <span class="module-label">Guidance (CFG): <span id="cfgVal">7</span></span>
+                        <input type="range" id="cfgSlider" min="1" max="20" value="7" step="0.5" oninput="document.getElementById('cfgVal').innerText=this.value">
+                    </div>
+                </div>
 
-  <label>CFG Scale: <span id="cfgVal">7</span></label>
-  <input type="range" min="1" max="15" step="0.5" value="7" id="cfg">
+                <span class="module-label" style="margin-top:15px;">Output Resolution</span>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px;">
+                    <button class="btn-action secondary res-btn" style="font-size:9px; padding:5px;" onclick="setRes(512, 512, this)">1:1</button>
+                    <button class="btn-action secondary res-btn" style="font-size:9px; padding:5px;" onclick="setRes(512, 768, this)">2:3</button>
+                    <button class="btn-action secondary res-btn" style="font-size:9px; padding:5px;" onclick="setRes(768, 512, this)">3:2</button>
+                </div>
+                <input type="hidden" id="genWidth" value="512">
+                <input type="hidden" id="genHeight" value="512">
 
-  <label>Denoise (img2img): <span id="denoiseVal">0.55</span></label>
-  <input type="range" min="0.1" max="0.9" step="0.05" value="0.55" id="denoise">
+                <span class="module-label" style="margin-top:15px;">Negative Constraints</span>
+                <textarea id="negPromptField" rows="2" style="color:var(--text-dim);">blur, lowres, text, watermark, bad anatomy</textarea>
+                
+                <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                    <button class="btn-action secondary" style="width:48%;" onclick="saveProject()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                    <button class="btn-action secondary" style="width:48%;" onclick="clearFields()"><i class="fa-solid fa-trash"></i> Clear</button>
+                </div>
+            </div>
 
-  <label>Seed</label>
-  <input type="number" id="seed" placeholder="-1 = random">
+            <button class="btn-action" style="background: linear-gradient(90deg, var(--accent), #4f46e5);" onclick="runRender()">
+                <i class="fa-solid fa-bolt"></i> Execute Render
+            </button>
+        </div>
+        <div class="terminal-output" id="sysLog"><div>> SYSTEM READY.</div></div>
+    </aside>
 
-  <label>Sampler</label>
-  <select id="sampler">
-    <option>Euler a</option>
-    <option>DPM++ 2M Karras</option>
-    <option>DPM++ SDE</option>
-    <option>DDIM</option>
-  </select>
+    <aside id="side-vault" class="sidebar-container">
+        <div class="sidebar-header"><h2><i class="fa-solid fa-microchip"></i> Workshop</h2></div>
+        <div class="sidebar-content">
+            <div class="module-box" style="border-color:var(--accent);">
+                <span class="module-label" style="color:var(--accent);">Neural Manipulation</span>
+                <input type="file" id="workshopInput" accept="image/*" onchange="initWorkshop(this)" style="display:none;">
+                <button class="btn-action secondary" onclick="document.getElementById('workshopInput').click()">Load Source Image</button>
+                <div id="crop-container"><img id="crop-preview"></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                    <button id="cropBtn" class="btn-action" style="display:none; font-size:10px;" onclick="executeCrop()">Finalize Crop</button>
+                    <button id="identBtn" class="btn-action secondary" style="display:none; font-size:10px;" onclick="interrogateWorkshop()">Identify (CLIP)</button>
+                    <button id="upscaleBtn" class="btn-action" style="display:none; grid-column: span 2; background:var(--success);" onclick="runUpscale()">
+                        <i class="fa-solid fa-arrow-up-right-dots"></i> Run Neural Upscale (4x)
+                    </button>
+                </div>
+            </div>
+            <div class="module-box">
+                <span class="module-label">Project Ledger</span>
+                <div id="projectList"></div>
+            </div>
+        </div>
+        <div class="terminal-output" id="vaultLog"></div>
+    </aside>
 
-  <label style="display:flex;gap:6px;align-items:center;">
-    <input type="checkbox" id="useWorkshopImage">
-    Use Workshop Image (img2img)
-  </label>
+    <aside id="side-diag" class="sidebar-container">
+        <div class="sidebar-header"><h2><i class="fa-solid fa-server"></i> Telemetry</h2></div>
+        <div class="sidebar-content">
+            <div class="module-box">
+                <span class="module-label">GPU: RTX 3060 Status</span>
+                <div style="font-family:var(--font-tech); font-size:12px; line-height:2; color:var(--success);">
+                    CORE TEMP: <span id="valTemp">64</span>°C<br>
+                    CORE LOAD: <span id="valLoad">12</span>%<br>
+                    VRAM ALLOC: 4.8GB / 12GB<br>
+                </div>
+            </div>
+        </div>
+    </aside>
 
-  <button onclick="runRender()">EXECUTE RENDER</button>
-</div>
+    <aside id="side-settings" class="sidebar-container">
+        <div class="sidebar-header"><h2><i class="fa-solid fa-sliders"></i> Configuration</h2></div>
+        <div class="sidebar-content">
+            <div class="module-box">
+                <span class="module-label">External API Uplink</span>
+                <input type="text" id="apiUrlInput" placeholder="http://127.0.0.1:7860" oninput="saveApiUrl()">
+                <div style="font-size:9px; color:var(--success); text-align:right;" id="apiStatus">USING LOCAL LOOP</div>
+            </div>
+            <div id="paypal-container-U448X4TUAZ4EL"></div>
+        </div>
+    </aside>
 
-</aside>
+    <main class="main-viewport">
+        <div class="content-scroll"><div id="mainGrid" class="art-grid"></div></div>
+        <header class="status-bar">
+            <div class="tk-branding">Powered by <span>GEMINI</span> & <span>T.K. INDUSTRIES</span></div>
+            <div style="display:flex; gap:20px;">
+                <div>PING: <span id="pingVal">21</span>ms</div>
+                <div id="clockDisplay">00:00:00</div>
+            </div>
+        </header>
+    </main>
 
-<section>
-  <div class="grid" id="mainGrid"></div>
-</section>
-</main>
+    <script>
+        let API_BASE = localStorage.getItem("nexus_api_url") || "http://127.0.0.1:7860";
+        let cropper;
+        const bgAudio = new Audio('ambient.wav'); 
+        bgAudio.loop = true; 
 
-<script>
-// ================= IMAGE VAULT (IndexedDB) =================
-let vaultDB;
-const VAULT_DB="nexus_image_vault";
-const VAULT_STORE="images";
+        function toggleAudio() {
+            const btn = document.getElementById('audioIcon');
+            if(bgAudio.paused) {
+                bgAudio.play().catch(e => console.log("Audio requires interaction"));
+                btn.className = "fa-solid fa-pause"; btn.style.color = "var(--success)";
+            } else {
+                bgAudio.pause(); btn.className = "fa-solid fa-play"; btn.style.color = "";
+            }
+        }
 
-function initVault(){
-  const req=indexedDB.open(VAULT_DB,1);
-  req.onupgradeneeded=e=>{
-    e.target.result.createObjectStore(VAULT_STORE,{keyPath:"id"});
-  };
-  req.onsuccess=e=>{
-    vaultDB=e.target.result;
-    restoreVault();
-  };
-}
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('themeIcon');
+            icon.className = document.body.classList.contains('light-mode') ? "fa-solid fa-moon" : "fa-solid fa-sun";
+        }
 
-function saveToVault(record){
-  if(!vaultDB)return;
-  const tx=vaultDB.transaction(VAULT_STORE,"readwrite");
-  tx.objectStore(VAULT_STORE).put(record);
-}
+        function setRes(w, h, btn) {
+            document.getElementById('genWidth').value = w;
+            document.getElementById('genHeight').value = h;
+            document.querySelectorAll('.res-btn').forEach(b => b.style.borderColor = "");
+            btn.style.borderColor = "var(--accent)";
+        }
 
-function restoreVault(){
-  const tx=vaultDB.transaction(VAULT_STORE,"readonly");
-  tx.objectStore(VAULT_STORE).getAll().onsuccess=e=>{
-    e.target.result.forEach(r=>addArt(r.src,r.prompt,true,r.id));
-  };
-}
+        function authenticate() {
+            if(document.getElementById('accessCode').value.toUpperCase() === "NEXUS77") {
+                document.getElementById('auth-layer').style.opacity = '0';
+                setTimeout(() => document.getElementById('auth-layer').style.display = 'none', 500);
+                writeLog("sysLog", "USER AUTHENTICATED. SESSION STARTED.");
+            }
+        }
 
-// ================= ART GRID =================
-function addArt(src,p,restoring=false,id=null){
-  const uid=id||crypto.randomUUID();
+        function navTo(p, el) {
+            document.querySelectorAll('.sidebar-container').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('side-' + p).classList.add('active');
+            el.classList.add('active');
+        }
 
-  if(!restoring){
-    saveToVault({
-      id:uid,
-      src,
-      prompt:p,
-      time:Date.now(),
-      parent:null
-    });
-  }
+        function writeLog(t, m) {
+            const l = document.getElementById(t);
+            const time = new Date().toLocaleTimeString();
+            l.innerHTML += `<div><span style="opacity:0.5">[${time}]</span> ${m}</div>`;
+            l.scrollTop = l.scrollHeight;
+        }
 
-  const card=document.createElement("div");
-  card.className="art-card";
-  card.innerHTML=`
-    <img src="${src}">
-    <div style="padding:10px">
-      <div style="font-size:10px;color:var(--accent)">ID ${uid.slice(0,8)}</div>
-      <div style="font-size:11px;color:var(--text-dim)">${p.slice(0,60)}</div>
-    </div>`;
-  document.getElementById("mainGrid").prepend(card);
-}
+        // --- FIXED WORKSHOP LOGIC ---
+        function initWorkshop(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.getElementById('crop-preview');
+                    img.src = e.target.result;
+                    document.getElementById('crop-container').style.display = 'block';
+                    document.getElementById('cropBtn').style.display = 'block';
+                    document.getElementById('identBtn').style.display = 'block';
+                    document.getElementById('upscaleBtn').style.display = 'grid';
+                    if(cropper) cropper.destroy();
+                    cropper = new Cropper(img, { aspectRatio: NaN, viewMode: 1 });
+                    writeLog("vaultLog", "IMAGE LOADED.");
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
 
-// ================= GENERATION =================
-async function runRender(){
-  const prompt=document.getElementById("prompt").value;
-  const neg=document.getElementById("negative").value;
+        async function interrogateWorkshop() {
+            if(!cropper) return;
+            writeLog("vaultLog", "INITIALIZING CLIP...");
+            const b64 = cropper.getCroppedCanvas().toDataURL('image/png').split(',')[1];
+            try {
+                const res = await fetch(`${API_BASE}/sdapi/v1/interrogate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ image: b64, model: 'clip' })
+                });
+                const data = await res.json();
+                document.getElementById('promptField').value = data.caption;
+                writeLog("sysLog", "SUBJECT IDENTIFIED.");
+            } catch(e) { writeLog("vaultLog", "API ERROR."); }
+        }
 
-  const steps=+stepsEl.value;
-  const cfg_scale=+cfgEl.value;
-  const denoise=+denoiseEl.value;
-  const sampler_name=samplerEl.value;
-  const seedVal=seedEl.value;
+        async function runUpscale() {
+            if(!cropper) return;
+            writeLog("vaultLog", "STARTING 4X UPSCALE...");
+            const b64 = cropper.getCroppedCanvas().toDataURL('image/png').split(',')[1];
+            try {
+                const res = await fetch(`${API_BASE}/sdapi/v1/extra-single-image`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ image: b64, upscaling_resize: 4, upscaler_1: "R-ESRGAN 4x+" })
+                });
+                const data = await res.json();
+                addArt("data:image/png;base64," + data.image, "Upscale");
+                writeLog("vaultLog", "UPSCALE COMPLETE.");
+            } catch(e) { writeLog("vaultLog", "UPSCALE FAILED."); }
+        }
 
-  let payload={
-    prompt,
-    negative_prompt:neg,
-    steps,
-    cfg_scale,
-    sampler_name,
-    subseed_strength:0.15
-  };
+        async function runRender() {
+            const prompt = document.getElementById('promptField').value;
+            if(!prompt) return;
+            writeLog("sysLog", "RENDERING...");
+            try {
+                const res = await fetch(`${API_BASE}/sdapi/v1/txt2img`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        prompt: prompt, 
+                        negative_prompt: document.getElementById('negPromptField').value,
+                        steps: parseInt(document.getElementById('stepSlider').value),
+                        cfg_scale: parseFloat(document.getElementById('cfgSlider').value),
+                        width: parseInt(document.getElementById('genWidth').value),
+                        height: parseInt(document.getElementById('genHeight').value),
+                        sampler_name: "Euler a"
+                    })
+                });
+                const data = await res.json();
+                addArt("data:image/png;base64," + data.images[0], prompt);
+                writeLog("sysLog", "SUCCESS.");
+            } catch(e) { writeLog("sysLog", "CONNECTION ERROR."); }
+        }
 
-  if(seedVal) payload.seed=+seedVal;
+        function addArt(src, p) {
+            const card = document.createElement('div');
+            card.className = 'art-card';
+            card.innerHTML = `
+                <img src="${src}">
+                <div style="padding:15px;">
+                    <div style="font-size:11px; color:var(--text-dim);">${p.substring(0,40)}...</div>
+                    <a href="${src}" download="nexus.png" class="btn-action secondary" style="display:block; text-align:center; margin-top:10px; padding:8px; font-size:10px; text-decoration:none;">SAVE</a>
+                </div>`;
+            document.getElementById('mainGrid').prepend(card);
+        }
 
-  // 🔴 MOCK GENERATION (replace with real API)
-  const canvas=document.createElement("canvas");
-  canvas.width=512; canvas.height=512;
-  const ctx=canvas.getContext("2d");
-  ctx.fillStyle="#111";
-  ctx.fillRect(0,0,512,512);
-  ctx.fillStyle="#00ffe1";
-  ctx.font="16px monospace";
-  ctx.fillText("NEXUS RENDER",20,40);
-  ctx.fillText(prompt.slice(0,40),20,80);
+        setInterval(() => {
+            document.getElementById('clockDisplay').innerText = new Date().toLocaleTimeString();
+            document.getElementById('valTemp').innerText = Math.floor(60 + Math.random()*5);
+        }, 1000);
 
-  addArt(canvas.toDataURL(),prompt);
-}
+        function saveApiUrl() {
+            API_BASE = document.getElementById('apiUrlInput').value;
+            localStorage.setItem("nexus_api_url", API_BASE);
+        }
 
-// ================= UI POLISH =================
-const stepsEl=steps;
-const cfgEl=cfg;
-const denoiseEl=denoise;
-
-[stepsEl,cfgEl,denoiseEl].forEach(el=>{
-  el.oninput=()=>{
-    document.getElementById(el.id+"Val").innerText=el.value;
-  };
-});
-
-// ================= INIT =================
-window.onload=()=>{
-  initVault();
-};
-</script>
+        function randomizePrompt() {
+            const concepts = ["neon samurai", "cyberpunk forest", "space explorer", "mechanical owl"];
+            document.getElementById('promptField').value = concepts[Math.floor(Math.random()*concepts.length)];
+        }
+    </script>
 </body>
 </html>
