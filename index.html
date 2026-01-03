@@ -3,240 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS ARCHON | Neural Video Studio</title>
+    <title>NEXUS ARCHON | Secure Neural Interface</title>
     <script src="https://www.paypal.com/sdk/js?client-id=BAAmHnd5CiEDa90TY6DIL5eA9Xp5A8uUMNaYK4_uw3AwsFuLkJzoBNoeaTCsPWDZ2yn0u1or0aXuq64C6g&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg: #030305;
-            --glass: rgba(18, 18, 26, 0.7);
+            --bg: #020203;
+            --panel: rgba(13, 13, 16, 0.85);
             --accent: #6366f1;
-            --accent-glow: rgba(99, 102, 241, 0.4);
-            --pink: #ec4899;
-            --text: #ffffff;
-            --text-dim: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1);
+            --accent-dim: rgba(99, 102, 241, 0.15);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text: #e2e8f0;
+            --text-dim: #64748b;
+            --border: rgba(255, 255, 255, 0.08);
+            --font-main: 'Inter', sans-serif;
+            --font-tech: 'Share Tech Mono', monospace;
         }
 
-        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-
+        * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--accent) var(--bg); }
+        
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-main);
             margin: 0;
             display: flex;
             height: 100vh;
             overflow: hidden;
+            font-size: 14px;
         }
 
-        /* LIVING BACKGROUND */
-        .mesh-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(at 0% 0%, #1e1b4b 0px, transparent 50%),
-                        radial-gradient(at 100% 100%, #312e81 0px, transparent 50%),
-                        radial-gradient(at 50% 50%, #020617 0px, transparent 100%);
-            animation: meshMove 20s infinite alternate;
+        /* --- BACKGROUND FX --- */
+        .grid-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.2;
         }
-        @keyframes meshMove { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+        
+        .scanline {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            opacity: 0.6;
+        }
 
-        /* TACTILE TAB BAR */
+        /* --- LAYOUT COMPONENTS --- */
         .tab-bar {
-            width: 80px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(20px);
+            width: 70px;
+            background: #050507;
             border-right: 1px solid var(--border);
             display: flex; flex-direction: column; align-items: center;
-            padding: 30px 0; gap: 25px;
+            padding: 20px 0; gap: 15px;
+            z-index: 10;
         }
 
         .tab-icon {
-            width: 48px; height: 48px; border-radius: 14px;
+            width: 44px; height: 44px; border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 20px;
-            background: transparent; color: var(--text-dim);
+            cursor: pointer; font-size: 18px;
+            color: var(--text-dim);
+            transition: all 0.2s;
             border: 1px solid transparent;
         }
+        .tab-icon:hover { color: var(--text); background: var(--accent-dim); border-color: var(--border); }
+        .tab-icon.active { background: var(--accent); color: white; box-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
 
-        .tab-icon:hover { 
-            background: var(--glass); color: var(--text); 
-            transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        .tab-icon.active {
-            background: var(--accent); color: white;
-            box-shadow: 0 0 20px var(--accent-glow);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        /* FROSTED SIDEBARS */
+        /* --- SIDEBAR PANEL --- */
         .sidebar {
-            width: 360px;
-            background: var(--glass);
-            backdrop-filter: blur(30px) saturate(150%);
+            width: 400px;
+            background: var(--panel);
+            backdrop-filter: blur(10px);
             border-right: 1px solid var(--border);
-            padding: 30px;
-            overflow-y: auto;
             display: none;
-            animation: slideRight 0.4s ease-out;
+            flex-direction: column;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
-        .sidebar.active { display: flex; flex-direction: column; }
-        @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .sidebar.active { display: flex; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-        .brand { font-size: 1.1rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 40px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
-
-        /* INPUT STYLING */
-        label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-top: 20px; display: block; letter-spacing: 1px; }
-        textarea, select, input {
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-            border-radius: 12px; color: white; padding: 14px; margin-top: 8px;
-            font-size: 13px; outline: none;
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.2);
         }
-        textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+        .panel-title { font-family: var(--font-tech); font-size: 18px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
+        .panel-subtitle { font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; margin-top: 5px; }
+        
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        /* PSYCHOLOGICAL BUTTONS */
-        .btn-gen {
-            background: linear-gradient(135deg, var(--accent), #4f46e5);
-            border: none; padding: 18px; border-radius: 15px;
-            color: white; font-weight: 800; cursor: pointer; margin-top: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            position: relative; overflow: hidden;
+        .panel-content { flex: 1; overflow-y: auto; padding: 20px; }
+
+        /* --- DENSE UI ELEMENTS --- */
+        .control-group { margin-bottom: 20px; border: 1px solid var(--border); padding: 12px; border-radius: 6px; background: rgba(0,0,0,0.2); }
+        .control-group-title { font-family: var(--font-tech); font-size: 11px; color: var(--text-dim); margin-bottom: 10px; display: block; border-bottom: 1px solid var(--border); padding-bottom: 4px; text-transform: uppercase; }
+
+        label { font-size: 11px; color: var(--text-dim); display: block; margin-bottom: 6px; font-weight: 600; }
+        
+        input, select, textarea {
+            width: 100%; background: #0a0a0c; border: 1px solid var(--border);
+            color: var(--text); padding: 10px; font-family: var(--font-tech); font-size: 12px;
+            border-radius: 4px; outline: none; transition: border 0.2s;
         }
-        .btn-gen:hover { transform: scale(1.02); box-shadow: 0 8px 25px var(--accent-glow); }
-        .btn-gen:active { transform: scale(0.98); }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 
-        /* MAIN VIEWPORT */
-        .main { flex: 1; padding: 40px; overflow-y: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 30px; }
+        .dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .tri-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 
-        .art-card {
-            background: var(--glass); border: 1px solid var(--border);
-            border-radius: 24px; overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        /* --- SECURITY THEATER --- */
+        .security-badge {
+            background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 10px; border-radius: 4px; margin-top: 10px;
+            display: flex; align-items: center; gap: 10px;
         }
-        .art-card:hover { transform: translateY(-10px) scale(1.01); border-color: var(--accent); }
-        .art-card img { width: 100%; border-bottom: 1px solid var(--border); }
+        .lock-icon { font-size: 18px; color: var(--success); }
+        .security-text div:first-child { font-family: var(--font-tech); color: var(--success); font-size: 12px; letter-spacing: 1px; }
+        .security-text div:last-child { font-size: 9px; color: var(--text-dim); }
 
-        .about-card {
-            padding: 30px; background: rgba(255,255,255,0.03);
-            border-radius: 20px; border: 1px solid var(--border); line-height: 1.6;
+        .protocol-list { list-style: none; padding: 0; margin: 0; font-family: var(--font-tech); font-size: 10px; color: var(--text-dim); }
+        .protocol-list li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .protocol-list span { color: var(--accent); }
+
+        /* --- CONSOLE LOG --- */
+        .console-log {
+            height: 120px; background: #000; border-top: 1px solid var(--border);
+            font-family: var(--font-tech); font-size: 10px; padding: 10px;
+            color: var(--success); overflow: hidden; opacity: 0.8;
+            display: flex; flex-direction: column; justify-content: flex-end;
         }
-        
-        #creditDisplay { font-size: 32px; font-weight: 900; background: linear-gradient(to right, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    </style>
-</head>
-<body>
+        .log-entry { margin-bottom: 2px; }
+        .log-entry::before { content: "> "; color: var(--text-dim); }
 
-    <div class="mesh-bg"></div>
-
-    <nav class="tab-bar">
-        <div class="tab-icon active" onclick="switchTab('create')" title="Neural Studio">🎨</div>
-        <div class="tab-icon" onclick="switchTab('vault')" title="Payment Vault">💎</div>
-        <div class="tab-icon" onclick="switchTab('about')" title="The Protocol">🧬</div>
-    </nav>
-
-    <aside id="tab-create" class="sidebar active">
-        <div class="brand">NEXUS ARCHON</div>
-        
-        <label>Neural Vision Prompt</label>
-        <textarea id="prompt" rows="5" placeholder="Imagine something impossible..."></textarea>
-        
-        <label>Configuration</label>
-        <select id="size">
-            <option value="512x512">1:1 Square</option>
-            <option value="512x768">2:3 Vertical</option>
-            <option value="768x512">3:2 Cinematic</option>
-        </select>
-
-        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 18px; margin-top:25px; border: 1px solid var(--border);">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size: 14px; font-weight: 700;">Animation Sync</span>
-                <input type="checkbox" id="videoMode" style="width:24px; height:24px; accent-color: var(--pink);">
-            </div>
-            <p style="font-size: 10px; color: var(--text-dim); margin-top:10px;">Requires 20 Neural Credits per sequence.</p>
-        </div>
-
-        <button class="btn-gen" onclick="generate()">INITIATE SYNTHESIS</button>
-    </aside>
-
-    <aside id="tab-vault" class="sidebar">
-        <div class="brand">THE VAULT</div>
-        <div id="creditDisplay">50 CR</div>
-        <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 30px;">Powering the 3060 Neural Core</p>
-        
-        <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 20px; border: 1px solid var(--border);">
-            <div id="paypal-container-U448X4TUAZ4EL"></div>
-        </div>
-    </aside>
-
-    <aside id="tab-about" class="sidebar">
-        <div class="brand">THE PROTOCOL</div>
-        <div class="about-card">
-            <h3 style="margin-top:0;">Indie Neural Research</h3>
-            <p style="font-size: 13px; color: var(--text-dim);">Nexus Archon is a localized AI experiment. By utilizing an optimized RTX 3060 pipeline, we provide high-fidelity video synthesis without the corporate overhead.</p>
-            <p style="font-size: 13px; color: var(--text-dim);">Built with <strong>Stable Diffusion Forge</strong> and <strong>AnimateDiff</strong>, this studio represents the future of decentralized creativity.</p>
-        </div>
-    </aside>
-
-    <main class="main">
-        <div id="grid" class="grid">
-            <div class="about-card" style="grid-column: 1/-1; text-align: center; border: 1px dashed var(--accent);">
-                <h2 style="letter-spacing: 2px;">WAITING FOR INPUT</h2>
-                <p style="color: var(--text-dim);">Select a tab to begin your neural journey.</p>
-            </div>
-        </div>
-    </main>
-
-<script>
-    const API_URL = "http://127.0.0.1:7860";
-    
-    function switchTab(tabName) {
-        document.querySelectorAll('.sidebar').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-icon').forEach(i => i.classList.remove('active'));
-        document.getElementById('tab-' + tabName).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
-    paypal.HostedButtons({ hostedButtonId: "U448X4TUAZ4EL" }).render("#paypal-container-U448X4TUAZ4EL");
-
-    async function generate() {
-        const isVid = document.getElementById('videoMode').checked;
-        const [w, h] = document.getElementById('size').value.split('x');
-        const grid = document.getElementById('grid');
-        
-        // Remove placeholder on first gen
-        if(grid.innerText.includes("WAITING")) grid.innerHTML = "";
-
-        const payload = {
-            prompt: document.getElementById('prompt').value,
-            steps: 20,
-            width: parseInt(w), height: parseInt(h),
-            alwayson_scripts: isVid ? { "AnimateDiff": { args: [{ model: "mm_sd_v15_v2.ckpt", enable: true, video_length: 16, fps: 8, format: ["GIF"] }] } } : {}
-        };
-
-        try {
-            const res = await fetch(`${API_URL}/sdapi/v1/txt2img`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            addCard(data.images[0], isVid);
-        } catch (e) { alert("Forge Connection Error. Please verify the API is active."); }
-    }
-
-    function addCard(img, isVid) {
-        const type = isVid ? 'data:image/gif;base64,' : 'data:image/png;base64,';
-        const card = document.createElement('div');
-        card.className = 'art-card';
-        card.innerHTML = `
-            <img src="${type}${img}">
-            <div style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:10px; font-weight:bold; color:var(--accent);">${isVid ? 'ANIMATION' : 'STILL'}</span>
-                <a href="${type}${img}" download="nexus.png" style="text-decoration:none; color:white; font-size:11px; background:rgba(255,255,255,0.1); padding:8px 15px; border-radius:10px;">DOWNLOAD</a>
-            </div>
-        `;
-        document.getElementById('grid').prepend(card);
-    }
-</script>
-</body>
-</html>
+        /* --- BUTTONS --- */
+        .btn-main {
+            width: 100%; background: var(--accent); color: white;
+            border: none; padding: 12px; font-family: var(--font-tech);
+            font-size: 14px; letter-spacing: 2px; cursor: pointer;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: all
