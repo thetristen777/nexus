@@ -77,7 +77,7 @@
         .module-label { display: block; font-family: var(--font-tech); font-size: 11px; color: var(--text-dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; }
         
         textarea, input, select { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px; font-family: var(--font-tech); font-size: 13px; border-radius: 6px; outline: none; margin-bottom: 12px; transition: 0.2s; }
-        body.light-mode textarea, body.light-mode input, body.light-mode select { background: #fff; }
+        body.light-mode textarea, body.light-mode input, body.light-mode select { background: #fff; color: #000; }
         
         .btn-action { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: 1px; cursor: pointer; border-radius: 6px; transition: 0.3s; text-transform: uppercase; position: relative; overflow: hidden; }
         .btn-action:hover { filter: brightness(1.2); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4); }
@@ -102,6 +102,9 @@
         
         #auth-layer { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; background-image: radial-gradient(circle at center, #111 0%, #000 100%); transition: 0.5s; }
         .auth-box { width: 400px; padding: 40px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 20px; text-align: center; backdrop-filter: blur(10px); }
+
+        .switch-container { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; }
+        .switch-container input { width: auto; margin: 0; }
     </style>
 </head>
 <body>
@@ -133,6 +136,14 @@
     <aside id="side-create" class="sidebar-container active">
         <div class="sidebar-header"><h2><i class="fa-solid fa-wand-magic-sparkles"></i> Neural Studio</h2></div>
         <div class="sidebar-content">
+            
+            <div class="module-box">
+                <span class="module-label"><span>Active Checkpoint</span> <i class="fa-solid fa-rotate" onclick="fetchModels()" style="cursor:pointer;"></i></span>
+                <select id="modelSelect" onchange="switchModel(this.value)">
+                    <option>Loading Models...</option>
+                </select>
+            </div>
+
             <div class="module-box">
                 <span class="module-label"><span>Aesthetic Matrix</span></span>
                 <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
@@ -198,6 +209,22 @@
                     </button>
                 </div>
             </div>
+
+            <div class="module-box">
+                <span class="module-label">ControlNet Integration</span>
+                <label class="switch-container">
+                    <input type="checkbox" id="cnEnable"> Enable ControlNet
+                </label>
+                <select id="cnModel">
+                    <option value="control_v11p_sd15_canny">Canny Edge</option>
+                    <option value="control_v11f1p_sd15_depth">Depth Map</option>
+                    <option value="control_v11p_sd15_openpose">OpenPose</option>
+                    <option value="control_v11p_sd15_softedge">Soft Edge</option>
+                </select>
+                <span class="module-label">Control Weight: <span id="cnWeightVal">1.0</span></span>
+                <input type="range" id="cnWeight" min="0" max="2" step="0.1" value="1.0" oninput="document.getElementById('cnWeightVal').innerText=this.value">
+            </div>
+
             <div class="module-box">
                 <span class="module-label">Project Ledger</span>
                 <div id="projectList"></div>
@@ -249,6 +276,41 @@
         const bgAudio = new Audio('ambient.wav'); 
         bgAudio.loop = true; 
 
+        window.onload = () => {
+            fetchModels();
+            if(localStorage.getItem("nexus_api_url")) {
+                document.getElementById('apiUrlInput').value = API_BASE;
+            }
+        };
+
+        async function fetchModels() {
+            try {
+                const res = await fetch(`${API_BASE}/sdapi/v1/sd-models`);
+                const models = await res.json();
+                const select = document.getElementById('modelSelect');
+                select.innerHTML = '';
+                models.forEach(m => {
+                    let opt = document.createElement('option');
+                    opt.value = m.title;
+                    opt.innerText = m.model_name;
+                    select.appendChild(opt);
+                });
+                writeLog("sysLog", "MODELS SYNCHRONIZED.");
+            } catch(e) { writeLog("sysLog", "MODEL FETCH FAILED."); }
+        }
+
+        async function switchModel(title) {
+            writeLog("sysLog", "SWITCHING NEURAL CORE...");
+            try {
+                await fetch(`${API_BASE}/sdapi/v1/options`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ sd_model_checkpoint: title })
+                });
+                writeLog("sysLog", "CORE SWAP COMPLETE.");
+            } catch(e) { writeLog("sysLog", "CORE SWAP FAILED."); }
+        }
+
         function toggleAudio() {
             const btn = document.getElementById('audioIcon');
             if(bgAudio.paused) {
@@ -289,12 +351,12 @@
 
         function writeLog(t, m) {
             const l = document.getElementById(t);
+            if(!l) return;
             const time = new Date().toLocaleTimeString();
             l.innerHTML += `<div><span style="opacity:0.5">[${time}]</span> ${m}</div>`;
             l.scrollTop = l.scrollHeight;
         }
 
-        // --- FIXED WORKSHOP LOGIC ---
         function initWorkshop(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -313,20 +375,59 @@
             }
         }
 
-        async function interrogateWorkshop() {
-            if(!cropper) return;
-            writeLog("vaultLog", "INITIALIZING CLIP...");
-            const b64 = cropper.getCroppedCanvas().toDataURL('image/png').split(',')[1];
+        async function runRender() {
+            const prompt = document.getElementById('promptField').value;
+            if(!prompt) return;
+            writeLog("sysLog", "RENDERING...");
+
+            let payload = {
+                prompt: prompt,
+                negative_prompt: document.getElementById('negPromptField').value,
+                steps: parseInt(document.getElementById('stepSlider').value),
+                cfg_scale: parseFloat(document.getElementById('cfgSlider').value),
+                width: parseInt(document.getElementById('genWidth').value),
+                height: parseInt(document.getElementById('genHeight').value),
+                sampler_name: "Euler a"
+            };
+
+            // Inject ControlNet if enabled
+            if(document.getElementById('cnEnable').checked && cropper) {
+                const b64 = cropper.getCroppedCanvas().toDataURL('image/png').split(',')[1];
+                payload.alwayson_scripts = {
+                    "ControlNet": {
+                        "args": [{
+                            "input_image": b64,
+                            "model": document.getElementById('cnModel').value,
+                            "weight": parseFloat(document.getElementById('cnWeight').value)
+                        }]
+                    }
+                };
+                writeLog("sysLog", "CONTROLNET ACTIVE.");
+            }
+
             try {
-                const res = await fetch(`${API_BASE}/sdapi/v1/interrogate`, {
+                const res = await fetch(`${API_BASE}/sdapi/v1/txt2img`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ image: b64, model: 'clip' })
+                    body: JSON.stringify(payload)
                 });
                 const data = await res.json();
-                document.getElementById('promptField').value = data.caption;
-                writeLog("sysLog", "SUBJECT IDENTIFIED.");
-            } catch(e) { writeLog("vaultLog", "API ERROR."); }
+                addArt("data:image/png;base64," + data.images[0], prompt);
+                writeLog("sysLog", "SUCCESS.");
+            } catch(e) { writeLog("sysLog", "CONNECTION ERROR."); }
+        }
+
+        // Keep all other existing functions (addArt, saveApiUrl, etc.)
+        function addArt(src, p) {
+            const card = document.createElement('div');
+            card.className = 'art-card';
+            card.innerHTML = `
+                <img src="${src}">
+                <div style="padding:15px;">
+                    <div style="font-size:11px; color:var(--text-dim);">${p.substring(0,40)}...</div>
+                    <a href="${src}" download="nexus.png" class="btn-action secondary" style="display:block; text-align:center; margin-top:10px; padding:8px; font-size:10px; text-decoration:none;">SAVE</a>
+                </div>`;
+            document.getElementById('mainGrid').prepend(card);
         }
 
         async function runUpscale() {
@@ -343,42 +444,6 @@
                 addArt("data:image/png;base64," + data.image, "Upscale");
                 writeLog("vaultLog", "UPSCALE COMPLETE.");
             } catch(e) { writeLog("vaultLog", "UPSCALE FAILED."); }
-        }
-
-        async function runRender() {
-            const prompt = document.getElementById('promptField').value;
-            if(!prompt) return;
-            writeLog("sysLog", "RENDERING...");
-            try {
-                const res = await fetch(`${API_BASE}/sdapi/v1/txt2img`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        prompt: prompt, 
-                        negative_prompt: document.getElementById('negPromptField').value,
-                        steps: parseInt(document.getElementById('stepSlider').value),
-                        cfg_scale: parseFloat(document.getElementById('cfgSlider').value),
-                        width: parseInt(document.getElementById('genWidth').value),
-                        height: parseInt(document.getElementById('genHeight').value),
-                        sampler_name: "Euler a"
-                    })
-                });
-                const data = await res.json();
-                addArt("data:image/png;base64," + data.images[0], prompt);
-                writeLog("sysLog", "SUCCESS.");
-            } catch(e) { writeLog("sysLog", "CONNECTION ERROR."); }
-        }
-
-        function addArt(src, p) {
-            const card = document.createElement('div');
-            card.className = 'art-card';
-            card.innerHTML = `
-                <img src="${src}">
-                <div style="padding:15px;">
-                    <div style="font-size:11px; color:var(--text-dim);">${p.substring(0,40)}...</div>
-                    <a href="${src}" download="nexus.png" class="btn-action secondary" style="display:block; text-align:center; margin-top:10px; padding:8px; font-size:10px; text-decoration:none;">SAVE</a>
-                </div>`;
-            document.getElementById('mainGrid').prepend(card);
         }
 
         setInterval(() => {
